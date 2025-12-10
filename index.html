@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUTOMATRIX - Device Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="images/rutomatrix.ico">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .dashboard-container {
+            display: flex;
+            position: relative;
+            flex-direction: column;
+            background: linear-gradient(135deg, #1a1a1a, #2c2c2c);
+            min-height: 100vh;
+        }
+        
+        /* Header with logo */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: rgba(30, 30, 30, 0.95);
+            border-bottom: 1px solid #333;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+        
+        .logo-text span {
+            color: #ff6a00;
+        }
+        
+        /* Dashboard header with menu */
+        .dashboard-header {
+            position: absolute;
+            top: 65px;
+            right: 30px;
+            z-index: 100;
+        }
+        
+        .menu-toggle-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #ff6a00;
+            font-size: 1.5rem;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+        
+        .menu-toggle-btn:hover {
+            background-color: rgba(255, 106, 0, 0.1);
+        }
+        
+        /* Menu dropdown */
+        .menu-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            width: 280px;
+            z-index: 101;
+            display: none;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+        
+        .menu-dropdown.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .menu-header {
+            padding: 15px;
+            background-color: #252525;
+            border-bottom: 1px solid #333;
+        }
+        
+        .menu-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ff6a00;
+            margin-bottom: 3px;
+        }
+        
+        .menu-subtitle {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+        
+        .device-details {
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .device-info-item {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .device-info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .info-label {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 3px;
+            display: block;
+        }
+        
+        .info-value {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        .ip-address {
+            font-family: monospace;
+            font-size: 0.9rem;
+            background-color: #252525;
+            padding: 6px 10px;
+            border-radius: 5px;
+            border-left: 2px solid #ff6a00;
+        }
+        
+        /* Dashboard content */
+        .dashboard-center-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 15px;
+        }
+        
+        .dashboard-content-wrapper {
+            background-color: #151618;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            margin: 20px auto;
+            max-width: 1200px;
+            width: 95%;
+            position: relative;
+            z-index: 1;
+            border: 1px solid #333;
+        }
+        
+        .dashboard-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ff6a00;
+            margin: 0 0 8px 0;
+            text-align: left;
+        }
+        
+        .dashboard-para {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #ccc;
+            margin: 0 0 30px 0;
+            text-align: left;
+        }
+        
+        /* Devices grid */
+        .devices-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            justify-items: center;
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 10px 0;
+        }
+        
+        /* Device card styling - SMALLER */
+        .device-card {
+            width: 200px;
+            height: 200px;
+            padding: 20px;
+            font-size: 14px;
+            background: #1e1e1e;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            border: 2px solid #ff6a00;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .device-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 106, 0, 0.2);
+            border-color: #ff6a00;
+        }
+        
+        .device-card:hover .device-icon {
+            transform: scale(1.05);
+        }
+        
+        .device-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #ff6a00;
+            transition: all 0.3s ease;
+        }
+        
+        .device-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            text-align: center;
+            color: #f5f5f5;
+            line-height: 1.3;
+        }
+        
+        .device-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #00cc66;
+            box-shadow: 0 0 8px rgba(0, 204, 102, 0.5);
+        }
+        
+        .status-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #00cc66;
+        }
+        
+        /* Modal window for feature pages */
+        .feature-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .feature-modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            width: 800px;
+            height: 600px;
+            background-color: #1e1e1e;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid #ff6a00;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            background-color: #252525;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ff6a00;
+        }
+        
+        .modal-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .modal-btn {
+            background: transparent;
+            border: none;
+            color: #aaa;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-btn:hover {
+            background-color: rgba(255, 106, 0, 0.1);
+            color: #ff6a00;
+        }
+        
+        .modal-body {
+            flex: 1;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .modal-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #888;
+            font-size: 0.8rem;
+            border-top: 1px solid #333;
+            background-color: #1a1a1a;
+            margin-top: 20px;
+        }
+        
+        .logo-image {
+            height: 30px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* Animation for status indicator */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        
+        .status-indicator {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .devices-grid {
+                grid-template-columns: repeat(3, 1fr);
+                max-width: 800px;
+            }
+            
+            .device-card {
+                width: 190px;
+                height: 190px;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .devices-grid {
+                grid-template-columns: repeat(2, 1fr);
+                max-width: 500px;
+            }
+            
+            .device-card {
+                width: 200px;
+                height: 200px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .devices-grid {
+                grid-template-columns: repeat(2, 1fr);
+                max-width: 450px;
+            }
+            
+            .device-card {
+                width: 180px;
+                height: 180px;
+                padding: 15px;
+            }
+            
+            .dashboard-title {
+                font-size: 1.5rem;
+            }
+            
+            .dashboard-para {
+                font-size: 0.9rem;
+            }
+            
+            .header {
+                padding: 12px 20px;
+            }
+            
+            .logo-text {
+                font-size: 1.5rem;
+            }
+            
+            .modal-content {
+                width: 95%;
+                height: 500px;
+            }
+
+            .logo-image {
+                height: 27px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .devices-grid {
+                grid-template-columns: 1fr;
+                max-width: 300px;
+            }
+            
+            .device-card {
+                width: 220px;
+                height: 220px;
+            }
+            
+            .logo-image {
+                height: 23px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .device-card {
+                width: 100%;
+                max-width: 250px;
+                height: 200px;
+                padding: 15px;
+            }
+            
+            .dashboard-content-wrapper {
+                padding: 20px 15px;
+            }
+            
+            .menu-dropdown {
+                width: 250px;
+                right: -15px;
+            }
+            
+            .modal-content {
+                height: 450px;
+            }
+            
+            .logo-image {
+                height: 20px;
+            }
+        }
+        
+        /* Custom scrollbar */
+        .device-details::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .device-details::-webkit-scrollbar-track {
+            background: #252525;
+            border-radius: 3px;
+        }
+        
+        .device-details::-webkit-scrollbar-thumb {
+            background: #ff6a00;
+            border-radius: 3px;
+        }
+        
+        .device-details::-webkit-scrollbar-thumb:hover {
+            background: #e85a00;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header with logo -->
+        <div class="header">
+            <div class="logo-left">
+                <!-- RUTOMATRIX Logo -->
+                <img src="images/RutoMatrix.png" alt="RUTOMATRIX Logo" class="logo-image logo-image-left">
+            </div>
+
+            <div class="logo-right">
+                <!-- RUTOMATRIX Logo -->
+                <img src="images/tessolve.png" alt="Tessolve Logo" class="logo-image logo-image-right">
+            </div>
+            
+            <div class="dashboard-header">
+                <button class="menu-toggle-btn" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <!-- Menu dropdown for device details -->
+                <div class="menu-dropdown" id="menuDropdown">
+                    <div class="menu-header">
+                        <div class="menu-title">Device Details</div>
+                        <div class="menu-subtitle">IP Information & Device Specifications</div>
+                    </div>
+                    
+                    <div class="device-details" id="deviceDetails">
+                        <!-- Device details will be populated here when a device is clicked -->
+                        <div class="no-selection" style="text-align: center; padding: 30px 15px; color: #888;">
+                            <i class="fas fa-mouse-pointer" style="font-size: 2rem; color: #555; margin-bottom: 10px;"></i>
+                            <p style="font-size: 0.9rem;">Click on a device card to view its details here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Content -->
+        <div class="dashboard-center-wrapper">
+            <div class="dashboard-content-wrapper">
+                <h1 class="dashboard-title">Device Dashboard</h1>
+                <h2 class="dashboard-para">Control and monitor your selected devices</h2>
+                
+                <div class="devices-grid">
+                    <!-- Device 001 - Virtual Desk -->
+                    <div class="device-card" data-device-id="001" data-feature="virtual-desk">
+                        <div class="device-icon">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <div class="device-name">Device 001 - Virtual Desk</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Device 001 - OS Flashing -->
+                    <div class="device-card" data-device-id="001" data-feature="os-flashing">
+                        <div class="device-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="device-name">Device 001 - OS Flashing</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Device 001 - USB File Sharing -->
+                    <div class="device-card" data-device-id="001" data-feature="usb-file-sharing">
+                        <div class="device-icon">
+                            <i class="fas fa-usb"></i>
+                        </div>
+                        <div class="device-name">Device 001 - USB File Sharing</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Device 001 - Post Code Reading -->
+                    <div class="device-card" data-device-id="001" data-feature="post-code-reading">
+                        <div class="device-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="device-name">Device 001 - Post Code Reading</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Device 001 - System State Control & ATX -->
+                    <div class="device-card" data-device-id="001" data-feature="system-state-control">
+                        <div class="device-icon">
+                            <i class="fas fa-power-off"></i>
+                        </div>
+                        <div class="device-name">Device 001 - System State Control & ATX</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Device 001 - BIOS Log Monitor -->
+                    <div class="device-card" data-device-id="001" data-feature="bios-log-monitor">
+                        <div class="device-icon">
+                            <i class="fas fa-microchip"></i>
+                        </div>
+                        <div class="device-name">Device 001 - BIOS Log Monitor</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Device 001 - Firmware Flashing -->
+                    <div class="device-card" data-device-id="001" data-feature="firmware-flashing">
+                        <div class="device-icon">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <div class="device-name">Device 001 - Firmware Flashing</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Device 001 - PDU -->
+                    <div class="device-card" data-device-id="001" data-feature="pdu">
+                        <div class="device-icon">
+                            <i class="fas fa-plug"></i>
+                        </div>
+                        <div class="device-name">Device 001 - PDU</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Feature Modal Window -->
+        <div class="feature-modal" id="featureModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title" id="modalTitle">Feature Window</div>
+                    <div class="modal-controls">
+                        <button class="modal-btn" id="minimizeBtn">
+                            <i class="fas fa-window-minimize"></i>
+                        </button>
+                        <button class="modal-btn" id="closeBtn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <iframe class="modal-iframe" id="featureIframe"></iframe>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            RUTOMATRIX Device Management System | All devices operational
+        </div>
+    </div>
+
+    <script>
+        // Device data for each device type
+        const deviceData = {
+            "virtual-desk": {
+                name: "Virtual Desk",
+                ip: "192.168.1.101",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:5E",
+                status: "Ready",
+                lastActive: "2025-11-28 15:42:00",
+                specs: "Dual Monitor Support, Remote Access, Virtualization Enabled",
+                htmlFile: "virtual_os.html"
+            },
+            "os-flashing": {
+                name: "OS Flashing",
+                ip: "192.168.1.102",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:5F",
+                status: "Ready",
+                lastActive: "2025-11-28 14:30:00",
+                specs: "Multiple OS Support, Fast Flash Technology, Error Recovery",
+                htmlFile: "virtual_os.html"
+            },
+            "usb-file-sharing": {
+                name: "USB File Sharing",
+                ip: "192.168.1.103",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:60",
+                status: "Ready",
+                lastActive: "2025-11-28 15:15:00",
+                specs: "USB 3.2 Gen 2, Multiple Port Support, Secure Transfer",
+                htmlFile: "usb.html"
+            },
+            "post-code-reading": {
+                name: "Post Code Reading",
+                ip: "192.168.1.104",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:61",
+                status: "Ready",
+                lastActive: "2025-11-28 13:45:00",
+                specs: "Real-time POST Monitoring, Error Code Database, Log Export",
+                htmlFile: "psb.html"
+            },
+            "system-state-control": {
+                name: "System State Control & ATX",
+                ip: "192.168.1.105",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:62",
+                status: "Ready",
+                lastActive: "2025-11-28 15:40:00",
+                specs: "ATX Power Control, System State Monitoring, Remote Reboot",
+                htmlFile: "psb.html"
+            },
+            "bios-log-monitor": {
+                name: "BIOS Log Monitor",
+                ip: "192.168.1.106",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:63",
+                status: "Ready",
+                lastActive: "2025-11-28 12:20:00",
+                specs: "BIOS Event Logging, Real-time Monitoring, Alert System",
+                htmlFile: "psb.html"
+            },
+            "firmware-flashing": {
+                name: "Firmware Flashing",
+                ip: "192.168.1.107",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:64",
+                status: "Ready",
+                lastActive: "2025-11-28 11:10:00",
+                specs: "Firmware Update Tools, Rollback Support, Validation Checks",
+                htmlFile: "firmware.html"
+            },
+            "pdu": {
+                name: "PDU",
+                ip: "192.168.1.108",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:65",
+                status: "Ready",
+                lastActive: "2025-11-28 15:35:00",
+                specs: "Power Distribution Control, Remote Outlet Management, Power Monitoring",
+                htmlFile: "pdu.html"
+            }
+        };
+        
+        // DOM elements
+        const menuToggle = document.getElementById('menuToggle');
+        const menuDropdown = document.getElementById('menuDropdown');
+        const deviceDetails = document.getElementById('deviceDetails');
+        const deviceCards = document.querySelectorAll('.device-card');
+        const featureModal = document.getElementById('featureModal');
+        const featureIframe = document.getElementById('featureIframe');
+        const modalTitle = document.getElementById('modalTitle');
+        const minimizeBtn = document.getElementById('minimizeBtn');
+        const closeBtn = document.getElementById('closeBtn');
+        
+        // Toggle menu visibility
+        menuToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            menuDropdown.classList.toggle('active');
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!menuDropdown.contains(e.target) && !menuToggle.contains(e.target)) {
+                menuDropdown.classList.remove('active');
+            }
+        });
+        
+        // Add click event to each device card
+        deviceCards.forEach(card => {
+            card.addEventListener('click', function() {
+                const feature = this.getAttribute('data-feature');
+                const deviceInfo = deviceData[feature];
+                
+                if (deviceInfo) {
+                    // Update menu dropdown with device details
+                    deviceDetails.innerHTML = `
+                        <div class="device-info-item">
+                            <span class="info-label">Device Name</span>
+                            <span class="info-value">${this.querySelector('.device-name').textContent}</span>
+                        </div>
+                        
+                        <div class="device-info-item">
+                            <span class="info-label">IP Address</span>
+                            <div class="info-value ip-address">${deviceInfo.ip}</div>
+                        </div>
+                        
+                        <div class="device-info-item">
+                            <span class="info-label">Subnet Mask</span>
+                            <div class="info-value ip-address">${deviceInfo.subnet}</div>
+                        </div>
+                        
+                        <div class="device-info-item">
+                            <span class="info-label">Gateway</span>
+                            <div class="info-value ip-address">${deviceInfo.gateway}</div>
+                        </div>
+                        
+                        <div class="device-info-item">
+                            <span class="info-label">MAC Address</span>
+                            <div class="info-value ip-address">${deviceInfo.mac}</div>
+                        </div>
+                        
+                        <div class="device-info-item">
+                            <span class="info-label">Status</span>
+                            <span class="info-value" style="color: #00cc66;">${deviceInfo.status}</span>
+                        </div>
+                        
+                        <div class="device-info-item">
+                            <span class="info-label">Last Active</span>
+                            <span class="info-value">${deviceInfo.lastActive}</span>
+                        </div>
+                        
+                        <div class="device-info-item">
+                            <span class="info-label">Specifications</span>
+                            <span class="info-value">${deviceInfo.specs}</span>
+                        </div>
+                    `;
+                    
+                    // Open the menu if it's closed
+                    if (!menuDropdown.classList.contains('active')) {
+                        menuDropdown.classList.add('active');
+                    }
+                    
+                    // Open the feature HTML file in modal window
+                    setTimeout(() => {
+                        const width = 800;
+                        const height = 600;
+
+                        const left = (screen.width - width) / 2;
+                        const top = (screen.height - height) / 2;
+
+                        window.open(
+                            deviceInfo.htmlFile,
+                            'intelMiniWindow',
+                            `width=${width},height=${height},left=${left},top=${top},resizable=yes`
+                        );
+                    }, 300);
+                    
+                    // Highlight the selected card
+                    deviceCards.forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    // Add selected style
+                    this.style.boxShadow = '0 0 20px rgba(255, 106, 0, 0.4)';
+                    this.style.transform = 'translateY(-5px)';
+                    
+                    // Remove highlight from other cards
+                    deviceCards.forEach(c => {
+                        if (c !== this) {
+                            c.style.boxShadow = '';
+                            c.style.transform = '';
+                        }
+                    });
+                }
+            });
+            
+            // Add hover effect
+            card.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('selected')) {
+                    this.style.transform = 'translateY(-5px)';
+                }
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('selected')) {
+                    this.style.transform = 'translateY(0)';
+                }
+            });
+        });
+        
+        // Function to open feature in modal window
+        function openFeatureModal(feature, deviceInfo) {
+            // Set modal title
+            modalTitle.textContent = `${deviceInfo.name} - Device 001`;
+            
+            // Load the HTML file in iframe
+            const htmlFile = deviceInfo.htmlFile;
+            featureIframe.src = htmlFile;
+            
+            // Show the modal
+            featureModal.classList.add('active');
+        }
+        
+        // Close modal window
+        closeBtn.addEventListener('click', function() {
+            featureModal.classList.remove('active');
+            featureIframe.src = '';
+        });
+        
+        // Minimize modal window (simulate minimize - just hide it)
+        minimizeBtn.addEventListener('click', function() {
+            featureModal.classList.remove('active');
+        });
+        
+        // Close modal when clicking outside
+        featureModal.addEventListener('click', function(e) {
+            if (e.target === featureModal) {
+                featureModal.classList.remove('active');
+                featureIframe.src = '';
+            }
+        });
+        
+        // Close dropdown when pressing Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                menuDropdown.classList.remove('active');
+                featureModal.classList.remove('active');
+                featureIframe.src = '';
+            }
+        });
+        
+        // Create placeholder HTML files for features if they don't exist
+        // This is just a helper function - in production, you would have actual HTML files
+        function createPlaceholderFeatureFile(featureName) {
+            return `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>${featureName}</title>
+                    <style>
+                        body {
+                            font-family: 'Poppins', sans-serif;
+                            background-color: #1a1a1a;
+                            color: #f5f5f5;
+                            margin: 0;
+                            padding: 20px;
+                            height: 100vh;
+                            overflow: auto;
+                        }
+                        .feature-content {
+                            max-width: 800px;
+                            margin: 0 auto;
+                            padding: 30px;
+                            background-color: #252525;
+                            border-radius: 10px;
+                            border-left: 4px solid #ff6a00;
+                        }
+                        h1 {
+                            color: #ff6a00;
+                            margin-bottom: 20px;
+                        }
+                        .status {
+                            display: inline-block;
+                            padding: 5px 15px;
+                            background-color: #00cc66;
+                            color: white;
+                            border-radius: 20px;
+                            font-weight: bold;
+                            margin-bottom: 20px;
+                        }
+                        .info-grid {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 15px;
+                            margin-top: 20px;
+                        }
+                        .info-item {
+                            padding: 10px;
+                            background-color: #1e1e1e;
+                            border-radius: 5px;
+                        }
+                        .label {
+                            color: #aaa;
+                            font-size: 0.9rem;
+                            margin-bottom: 5px;
+                        }
+                        .value {
+                            font-weight: bold;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="feature-content">
+                        <h1>${featureName} - Device 001</h1>
+                        <div class="status">Active & Running</div>
+                        <p>This is the ${featureName} interface for Device 001. All controls and monitoring functions are available here.</p>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="label">Device Status</div>
+                                <div class="value">Operational</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">IP Address</div>
+                                <div class="value">192.168.1.101</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Last Updated</div>
+                                <div class="value">${new Date().toLocaleString()}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Connection</div>
+                                <div class="value">Secure (SSL)</div>
+                            </div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
+        }
+    </script>
+</body>
+</html>

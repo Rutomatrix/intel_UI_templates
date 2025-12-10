@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDU Controller</title>
+    <link rel="icon" type="image/x-icon" href="images/rutomatrix.ico">
+    <style>
+        :root {
+            --primary: #ff6a00; /* Orange */
+            --primary-dark: #e55d00; /* Darker orange */
+            --secondary-dark: #0f70b8; /* Darker blue */
+            --muted: #6b7280;
+            --background: #1b1a23;
+            --card-bg: #25232e;
+            --text: #ffffff;
+            --success: #10b981; /* Green for ON state */
+            --danger: #ef4444; /* Red for OFF state */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            color: var(--text);
+            font-family: "Poppins", sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+            background: var(--background);
+        }
+
+        .main {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #2196f39c;
+            background: linear-gradient(145deg, #25232e, #2a2835);
+            position: relative;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 22px;
+            z-index: -1;
+            opacity: 0.3;
+            filter: blur(10px);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            color: var(--text);
+        }
+
+        .card-sub {
+            color: var(--muted);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        /* Power Switch Animation */
+        .power-switch {
+            --color-invert: var(--primary);
+            --width: 150px;
+            --height: 150px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: var(--width);
+            height: var(--height);
+            z-index: 10;
+            margin: 0 auto;
+        }
+
+        .power-switch .button {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            pointer-events: auto;
+        }
+
+        .power-switch .button:after {
+            content: "";
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background: radial-gradient(
+                circle closest-side,
+                var(--color-invert),
+                transparent
+            );
+            filter: blur(20px);
+            opacity: 0;
+            transition: opacity 1s ease, transform 1s ease;
+            transform: perspective(1px) translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        .power-switch .power-on,
+        .power-switch .power-off {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            z-index: 1;
+            fill: none;
+            stroke: var(--color-invert);
+            stroke-width: 8px;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.5s ease;
+            pointer-events: none;
+        }
+
+        .power-switch .line {
+            opacity: 0.2;
+        }
+
+        .power-switch .circle {
+            opacity: 0.2;
+            transform: rotate(-58deg);
+            transform-origin: center 80px;
+            stroke-dasharray: 220;
+            stroke-dashoffset: 40;
+        }
+
+        .power-switch .power-on {
+            filter: drop-shadow(0px 0px 6px rgba(255, 106, 0, 0.8));
+        }
+
+        .power-switch .power-on .line {
+            opacity: 0;
+            transition: opacity 0.3s ease 1s;
+        }
+
+        .power-switch .power-on .circle {
+            opacity: 1;
+            stroke-dashoffset: 220;
+            transition: transform 0s ease, stroke-dashoffset 1s ease 0s;
+        }
+
+        .power-switch input {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            z-index: 2;
+            cursor: pointer;
+            opacity: 0;
+        }
+
+        .power-switch input:checked + .button:after {
+            opacity: 0.15;
+            transform: scale(2) perspective(1px) translateZ(0);
+            backface-visibility: hidden;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .power-switch input:checked + .button .power-on,
+        .power-switch input:checked + .button .power-off {
+            animation: click-animation 0.3s ease forwards;
+            transform: scale(1);
+        }
+
+        .power-switch input:checked + .button .power-on .line,
+        .power-switch input:checked + .button .power-off .line {
+            animation: line-animation 0.8s ease-in forwards;
+        }
+
+        .power-switch input:checked + .button .power-on .circle,
+        .power-switch input:checked + .button .power-off .circle {
+            transform: rotate(302deg);
+        }
+
+        .power-switch input:checked + .button .power-on .line {
+            opacity: 1;
+            transition: opacity 0.05s ease-in 0.55s;
+        }
+
+        .power-switch input:checked + .button .power-on .circle {
+            transform: rotate(302deg);
+            stroke-dashoffset: 40;
+            transition: transform 0.4s ease 0.2s, stroke-dashoffset 0.4s ease 0.2s;
+        }
+
+        /* Color States */
+        .power-switch:not(.power-on) .power-off {
+            stroke: var(--muted);
+        }
+
+        .power-switch.power-on .power-off,
+        .power-switch.power-on .power-on {
+            stroke: var(--primary);
+        }
+
+        .power-switch.power-on .button:after {
+            background: radial-gradient(circle closest-side, var(--primary), transparent);
+        }
+
+        .power-switch.power-on .power-on {
+            filter: drop-shadow(0px 0px 8px rgba(255, 106, 0, 0.6));
+        }
+
+        /* Hover Effects */
+        .power-switch .button {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+            border-radius: 50%;
+        }
+
+        .power-switch:hover .button {
+            transform: scale(1.05);
+        }
+
+        .power-switch:hover .power-off,
+        .power-switch:hover .power-on {
+            filter: drop-shadow(0px 0px 10px rgba(255, 106, 0, 0.4));
+        }
+
+        .power-switch.power-on:hover .power-on {
+            filter: drop-shadow(0px 0px 15px rgba(255, 106, 0, 0.8));
+        }
+
+        .power-switch:hover .button:after {
+            opacity: 0.1;
+            transform: scale(1.5) perspective(1px) translateZ(0);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .power-switch:not(.power-on):hover .power-off {
+            stroke: #9ca3af;
+            filter: drop-shadow(0px 0px 8px rgba(156, 163, 175, 0.3));
+        }
+
+        .power-switch .button:active {
+            transform: scale(0.95);
+            transition: transform 0.1s ease;
+        }
+
+        /* Controls - Single Button */
+        .controls {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            max-width: 300px;
+            position: relative;
+            z-index: 20;
+            margin-top: 1rem;
+        }
+
+        .power-btn {
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 200px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ON State Styling */
+        .power-btn.on-state {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        .power-btn.on-state:hover {
+            background: linear-gradient(135deg, #059669, var(--success));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .power-btn.on-state:active {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        /* OFF State Styling */
+        .power-btn.off-state {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+
+        .power-btn.off-state:hover {
+            background: linear-gradient(135deg, #dc2626, var(--danger));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+
+        .power-btn.off-state:active {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Disabled state */
+        .power-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Status Indicator */
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-top: 1rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .status-dot.online {
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        .status-dot.offline {
+            background: var(--danger);
+            box-shadow: 0 0 10px var(--danger);
+        }
+
+        /* Connection Status */
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .connection-status.online {
+            color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .connection-status.offline {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Animations */
+        @keyframes line-animation {
+            0% {
+                transform: translateY(0);
+            }
+            10% {
+                transform: translateY(10px);
+            }
+            40% {
+                transform: translateY(-25px);
+            }
+            60% {
+                transform: translateY(-25px);
+            }
+            85% {
+                transform: translateY(10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        @keyframes click-animation {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .card {
+                padding: 1.5rem;
+            }
+
+            .power-switch {
+                --width: 120px;
+                --height: 120px;
+            }
+
+            .power-btn {
+                padding: 0.875rem 2rem;
+                font-size: 1rem;
+                min-width: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="main">
+        <section class="card">
+            <h1 class="card-title">Power Outlet Control</h1>
+            <p class="card-sub">GPIO 21 (Active Low Relay)</p>
+
+            <div class="card-body">
+                <!-- Power Switch Animation -->
+                <div class="power-switch">
+                    <input type="checkbox" id="power-toggle" />
+                    <div class="button">
+                        <svg class="power-off">
+                            <use xlink:href="#line" class="line" />
+                            <use xlink:href="#circle" class="circle" />
+                        </svg>
+                        <svg class="power-on">
+                            <use xlink:href="#line" class="line" />
+                            <use xlink:href="#circle" class="circle" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Single Button for Power Control -->
+                <div class="controls">
+                    <button id="power-btn" class="power-btn off-state" onclick="togglePower()">
+                        TURN ON
+                    </button>
+                </div>
+
+                <!-- Status Indicator -->
+                <div class="status-indicator">
+                    <div class="status-dot" id="status-dot"></div>
+                    <span id="status-text">Checking status...</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- SVG Symbols -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+        <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150" id="line">
+            <line x1="75" y1="34" x2="75" y2="58" />
+        </symbol>
+        <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150" id="circle">
+            <circle cx="75" cy="80" r="35" />
+        </symbol>
+    </svg>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const powerBtn = document.getElementById("power-btn");
+            const powerToggle = document.getElementById("power-toggle");
+            const powerSwitch = document.querySelector(".power-switch");
+            const statusDot = document.getElementById("status-dot");
+            const statusText = document.getElementById("status-text");
+            let isProcessing = false;
+            let currentState = false;
+
+            // Fetch current status from server
+            async function fetchStatus() {
+                try {
+                    const res = await fetch("/api/status");
+                    if (!res.ok) throw new Error("Status fetch failed");
+                    const data = await res.json();
+                    updateUI(data.relay_on, false);
+                    updateStatus(true);
+                } catch (err) {
+                    console.error("Status fetch error:", err);
+                    updateStatus(false);
+                }
+            }
+
+            // Update the UI based on power state
+            function updateUI(isOn, fromUserAction = true) {
+                currentState = isOn;
+                powerToggle.checked = isOn;
+
+                if (isOn) {
+                    // ON State
+                    powerSwitch.classList.add("power-on");
+                    powerSwitch.classList.remove("power-off", "offline");
+                    powerBtn.textContent = "TURN OFF";
+                    powerBtn.classList.remove("off-state");
+                    powerBtn.classList.add("on-state");
+                    statusText.textContent = "Outlet is ON";
+                    statusDot.className = "status-dot online";
+                } else {
+                    // OFF State
+                    powerSwitch.classList.add("power-off");
+                    powerSwitch.classList.remove("power-on", "offline");
+                    powerBtn.textContent = "TURN ON";
+                    powerBtn.classList.remove("on-state");
+                    powerBtn.classList.add("off-state");
+                    statusText.textContent = "Outlet is OFF";
+                    statusDot.className = "status-dot offline";
+                }
+            }
+
+            // Update connection status
+            function updateStatus(isOnline) {
+                if (isOnline) {
+                    statusDot.title = "Connected to server";
+                } else {
+                    statusDot.title = "Connection lost";
+                    powerSwitch.classList.add("offline");
+                }
+            }
+
+            // Toggle power state
+            async function togglePower() {
+                if (isProcessing) {
+                    console.log("Request already in progress, skipping...");
+                    return;
+                }
+
+                try {
+                    isProcessing = true;
+                    const newState = !currentState;
+                    const action = newState ? "on" : "off";
+
+                    // Immediate UI feedback
+                    updateUI(newState, true);
+
+                    // Button click animation
+                    powerBtn.classList.add("clicking");
+                    setTimeout(() => powerBtn.classList.remove("clicking"), 300);
+
+                    // Send action to server
+                    const res = await fetch("/api/toggle", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action }),
+                    });
+
+                    if (!res.ok) {
+                        throw new Error("Server response not OK");
+                    }
+
+                    const data = await res.json();
+                    
+                    // Update UI with server response to ensure sync
+                    updateUI(data.relay_on, true);
+                    updateStatus(true);
+                    
+                } catch (error) {
+                    console.error("Error toggling power:", error);
+                    // Revert UI on error by fetching current status
+                    await fetchStatus();
+                } finally {
+                    isProcessing = false;
+                }
+            }
+
+            // Power switch toggle event
+            powerToggle.addEventListener("change", function () {
+                const action = this.checked ? "on" : "off";
+                togglePower(action);
+            });
+
+            // Initial load
+            fetchStatus();
+
+            // Polling every 2 seconds
+            setInterval(fetchStatus, 2000);
+
+            // Make togglePower available globally for onclick
+            window.togglePower = togglePower;
+        });
+    </script>
+</body>
+</html>
