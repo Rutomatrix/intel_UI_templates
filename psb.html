@@ -25,6 +25,206 @@
       margin: 0 auto;
     }
 
+    /* Power Control Header - UPDATED */
+    .power-control-header {
+      background: #1E1E1E;
+      border-radius: 8px;
+      padding: 16px 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #333;
+    }
+
+    .device-info {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .device-name-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .device-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #FF6A00;
+    }
+
+    #device-timer {
+      font-size: 14px;
+      color: #BBBBBB;
+      background: #252525;
+      padding: 4px 12px;
+      border-radius: 4px;
+    }
+
+    /* UPDATED: Power controls now in single line */
+    .power-controls-container {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .power-status-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-label {
+      font-size: 14px;
+      color: #BBBBBB;
+    }
+
+    .power-status {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 140px;
+    }
+
+    .status-active {
+      background: rgba(39, 174, 96, 0.15);
+      color: #2ecc71;
+      border: 1px solid rgba(39, 174, 96, 0.3);
+    }
+
+    .status-off {
+      background: rgba(231, 76, 60, 0.15);
+      color: #e74c3c;
+      border: 1px solid rgba(231, 76, 60, 0.3);
+    }
+
+    .status-unknown {
+      background: rgba(243, 156, 18, 0.15);
+      color: #f39c12;
+      border: 1px solid rgba(243, 156, 18, 0.3);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .status-active .status-dot {
+      background: #2ecc71;
+      box-shadow: 0 0 8px #2ecc71;
+    }
+
+    .status-off .status-dot {
+      background: #e74c3c;
+      box-shadow: 0 0 8px #e74c3c;
+    }
+
+    .status-unknown .status-dot {
+      background: #f39c12;
+      box-shadow: 0 0 8px #f39c12;
+    }
+
+    /* UPDATED: Power buttons - icon only */
+    .power-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .power-btn {
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+    }
+
+    .power-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .power-btn:active {
+      transform: translateY(0);
+    }
+
+    .power-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    .btn-on {
+      background: linear-gradient(135deg, #ff6a00, #ff8533);
+      box-shadow: 0 4px 14px rgba(255, 106, 0, 0.35);
+    }
+
+    .btn-off {
+      background: linear-gradient(135deg, #e74c3c, #ff6b6b);
+      box-shadow: 0 4px 14px rgba(231, 76, 60, 0.35);
+    }
+
+    .btn-reset {
+      background: linear-gradient(135deg, #0971b3, #3498db);
+      box-shadow: 0 4px 14px rgba(9, 113, 179, 0.35);
+    }
+
+    /* BIOS CONTROL BUTTONS - FIXED: Separate from power-btn */
+    .bios-control-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 100px;
+    }
+
+    .bios-control-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .bios-control-btn:active {
+      transform: translateY(0);
+    }
+
+    .bios-control-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    .last-updated {
+      font-size: 12px;
+      color: #888;
+      text-align: right;
+      margin-top: 4px;
+    }
+
     /* Tabs Styling */
     .tabs-container {
       display: flex;
@@ -95,35 +295,6 @@
       background: #1E1E1E;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-
-    .device-info {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .device-name-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .device-name {
-      font-size: 18px;
-      font-weight: 600;
-      color: #FF6A00;
-      white-space: normal;
-      overflow: visible;
-      text-overflow: unset;
-      word-break: break-word;
-      line-height: 1.2;
-      text-align: center;
-    }
-
-    #device-timer {
-      margin-left: 10px;
-      font-size: 14px;
-      color: #BBBBBB;
     }
 
     .controls {
@@ -488,121 +659,6 @@
       margin: 40px auto;
     }
 
-    /* POWER CONTROL STYLES */
-    .power-control-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .power-panel {
-      background: #1E1E1E;
-      border: 2px solid #0971b3;
-      border-radius: 12px;
-      padding: 30px;
-      width: 100%;
-      max-width: 500px;
-      text-align: center;
-    }
-
-    .power-status {
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 8px;
-      text-align: center;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      background-color: #222222;
-      border-left: 5px solid #333333;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .status-active {
-      background: rgba(39, 174, 96, 0.1);
-      border-left: 5px solid #27ae60;
-      color: #aaffaa;
-    }
-
-    .status-off {
-      background: rgba(231, 76, 60, 0.1);
-      border-left: 5px solid #e74c3c;
-      color: #ffaaaa;
-    }
-
-    .status-unknown {
-      background: rgba(243, 156, 18, 0.1);
-      border-left: 5px solid #f39c12;
-      color: #ffffaa;
-    }
-
-    .btn {
-      padding: 12px 24px;
-      margin: 8px;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
-      font-size: 14px;
-      min-width: 100px;
-      transition: all 0.3s ease;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-
-    .btn:active {
-      transform: translateY(0);
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none !important;
-    }
-
-    .btn-on {
-      background: #ff6a00;
-      box-shadow: 0 4px 14px rgba(255, 106, 0, 0.35);
-    }
-
-    .btn-off {
-      background: #e74c3c;
-      box-shadow: 0 4px 14px rgba(231, 76, 60, 0.35);
-    }
-
-    .btn-reset {
-      background: #0971b3;
-      box-shadow: 0 4px 14px rgba(9, 113, 179, 0.35);
-    }
-
-    .btn-container {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 25px;
-    }
-
-    .last-updated {
-      margin-top: 15px;
-      font-size: 12px;
-      color: #BBBBBB;
-      text-align: center;
-    }
-
     /* BIOS LOG MONITOR STYLES */
     .bios-content {
       flex: 1;
@@ -647,21 +703,6 @@
       align-items: center;
     }
 
-    .btn-connect {
-      background: #0971b3;
-      color: white;
-    }
-
-    .btn-disconnect {
-      background: #e74c3c;
-      color: white;
-    }
-
-    .btn-clear {
-      background: #555;
-      color: white;
-    }
-
     .log-status {
       display: inline-flex;
       align-items: center;
@@ -679,13 +720,6 @@
     .log-status.disconnected {
       background: #555;
       color: white;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      margin-right: 6px;
     }
 
     .log-container {
@@ -740,11 +774,21 @@
     }
 
     @media (max-width: 768px) {
-      .tabs-container {
+      .power-control-header {
         flex-direction: column;
+        gap: 16px;
       }
-
-      .btn-container {
+      
+      .power-controls-container {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .power-buttons {
+        justify-content: flex-end;
+      }
+      
+      .tabs-container {
         flex-direction: column;
       }
 
@@ -755,19 +799,57 @@
       .modal-actions {
         flex-direction: column;
       }
+      
+      .log-controls {
+        flex-wrap: wrap;
+      }
     }
   </style>
 </head>
 <body>
   <div class="main-container">
-    <!-- Main Tabs Navigation -->
+    <!-- Power Control Header - UPDATED -->
+    <div class="power-control-header">
+      <div class="device-info">
+        <div class="device-name-row">
+          <div class="device-name">${device.name}</div>
+          <div id="device-timer">--:--:--</div>
+        </div>
+      </div>
+      
+      <!-- UPDATED: Status and buttons in single line -->
+      <div class="power-controls-container">
+        <div class="power-status-container">
+          <span class="status-label">System Status:</span>
+          <div id="power-status" class="power-status status-unknown">
+            <span class="status-dot"></span>
+            <span id="status-text">Checking...</span>
+          </div>
+        </div>
+        
+        <!-- UPDATED: Icon-only buttons -->
+        <div class="power-buttons">
+          <button id="btn-on" class="power-btn btn-on" title="Power ON">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>
+            </svg>
+          </button>
+          <button id="btn-off" class="power-btn btn-off" title="Power OFF">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z"/>
+            </svg>
+          </button>
+          <button id="btn-reset" class="power-btn btn-reset" title="Reset">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Tabs Navigation (Only 2 tabs now) -->
     <div class="tabs-container">
-      <button class="tab-btn" id="power-tab" onclick="switchMainTab('power')">
-        <svg class="tab-icon" viewBox="0 0 24 24">
-          <path fill="currentColor" d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>
-        </svg>
-        Power Control
-      </button>
       <button class="tab-btn active" id="postcode-tab" onclick="switchMainTab('postcode')">
         <svg class="tab-icon" viewBox="0 0 24 24">
           <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
@@ -785,14 +867,8 @@
     <!-- Postcode Scanner Content -->
     <div class="tab-content active" id="postcode-content">
       <div class="header">
-        <div class="device-info">
-          <div class="device-name-row">
-            <div class="device-name">${device.name}</div>
-            <div id="device-timer"></div>
-          </div>
-        </div>
         <div class="controls">
-          <button class="refresh-btn" id="refresh-btn">Reset</button>
+          <button class="refresh-btn" id="refresh-btn">Reset Device</button>
           <button class="launch-btn" id="launch-btn">Start Reading</button>
         </div>
       </div>
@@ -829,49 +905,8 @@
       </div>
     </div>
 
-    <!-- Power Control Content -->
-    <div class="tab-content" id="power-content">
-      <div class="header">
-        <div class="device-info">
-          <div class="device-name-row">
-            <div class="device-name">${device.name}</div>
-            <div id="power-device-timer"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="power-control-content">
-        <div class="power-panel">
-          <h2 style="color: white; margin-bottom: 25px; text-align: center;">System Power Control</h2>
-          
-          <div id="power-status" class="power-status status-unknown">
-            System status will appear here
-          </div>
-          
-          <div id="power-last-updated" class="last-updated">
-            Last updated: --
-          </div>
-          
-          <div class="btn-container">
-            <button id="btn-on" class="btn btn-on">Power ON</button>
-            <button id="btn-off" class="btn btn-off">Power OFF</button>
-            <button id="btn-reset" class="btn btn-reset">Reset</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- BIOS Log Monitor Content -->
     <div class="tab-content" id="bios-content">
-      <div class="header">
-        <div class="device-info">
-          <div class="device-name-row">
-            <div class="device-name">${device.name}</div>
-            <div id="bios-device-timer"></div>
-          </div>
-        </div>
-      </div>
-
       <!-- BIOS Tabs (Live Logs & Files) -->
       <div class="bios-tabs">
         <button class="bios-tab-btn active" onclick="switchBiosTab('logs')">Live Logs</button>
@@ -882,9 +917,9 @@
         <!-- Live Logs Tab -->
         <div id="bios-logs" style="display: flex; flex-direction: column; gap: 16px;">
           <div class="log-controls">
-            <button id="bios-connect-btn" class="btn btn-connect">Connect</button>
-            <button id="bios-disconnect-btn" class="btn btn-disconnect" style="display:none;">Disconnect</button>
-            <button id="bios-clear-btn" class="btn btn-clear">Clear Logs</button>
+            <button id="bios-connect-btn" class="bios-control-btn btn-on">Connect</button>
+            <button id="bios-disconnect-btn" class="bios-control-btn btn-off" style="display:none;">Disconnect</button>
+            <button id="bios-clear-btn" class="bios-control-btn btn-reset">Clear Logs</button>
             <span id="bios-status" class="log-status disconnected">
               <span class="status-dot"></span>
               Disconnected
@@ -939,22 +974,11 @@
     function switchMainTab(tabName) {
       // Update main tabs
       document.getElementById('postcode-tab').classList.toggle('active', tabName === 'postcode');
-      document.getElementById('power-tab').classList.toggle('active', tabName === 'power');
       document.getElementById('bios-tab').classList.toggle('active', tabName === 'bios');
       
       // Update main content
       document.getElementById('postcode-content').classList.toggle('active', tabName === 'postcode');
-      document.getElementById('power-content').classList.toggle('active', tabName === 'power');
       document.getElementById('bios-content').classList.toggle('active', tabName === 'bios');
-      
-      // Update timers
-      const mainTimer = document.getElementById('device-timer');
-      if (mainTimer) {
-        const powerTimer = document.getElementById('power-device-timer');
-        const biosTimer = document.getElementById('bios-device-timer');
-        if (powerTimer) powerTimer.innerHTML = mainTimer.innerHTML;
-        if (biosTimer) biosTimer.innerHTML = mainTimer.innerHTML;
-      }
     }
 
     // Postcode Tab Switching
@@ -982,6 +1006,134 @@
         loadBiosFiles();
       }
     }
+
+    // ==================== POWER CONTROL ====================
+    document.addEventListener('DOMContentLoaded', () => {
+      const powerStatus = document.getElementById('power-status');
+      const statusText = document.getElementById('status-text');
+      const lastUpdated = document.getElementById('power-last-updated');
+      const btnOn = document.getElementById('btn-on');
+      const btnOff = document.getElementById('btn-off');
+      const btnReset = document.getElementById('btn-reset');
+
+      let powerCooldown = false;
+
+      async function powerOn() { 
+        await sendPowerCommand('on'); 
+        startPowerCooldown();
+      }
+      async function powerOff() { 
+        await sendPowerCommand('off'); 
+        startPowerCooldown();
+      }
+      async function powerReset() { 
+        await sendPowerCommand('reset'); 
+        startPowerCooldown();
+      }
+
+      function startPowerCooldown() {
+        if (powerCooldown) return;
+        powerCooldown = true;
+        
+        [btnOn, btnOff, btnReset].forEach(btn => btn.disabled = true);
+        
+        setTimeout(() => {
+          [btnOn, btnOff, btnReset].forEach(btn => btn.disabled = false);
+          powerCooldown = false;
+        }, 10000); // 10 second cooldown
+      }
+
+      function updateLastUpdatedTime() {
+        const now = new Date();
+        if (lastUpdated) {
+          lastUpdated.textContent = 'Last updated: ' + now.toLocaleTimeString();
+        }
+      }
+
+      async function sendPowerCommand(action) {
+        const btn = document.getElementById(`btn-${action}`);
+        const originalHTML = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<span class="loading"></span>`;
+
+        try {
+          const response = await fetch(`http://${ip_add}:8001/power/${action}`, {
+            method: 'POST'
+          });
+          
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          const data = await response.json();
+          if (data.status !== 'success') throw new Error(data.message);
+
+          statusText.textContent = `${action.toUpperCase()} command sent`;
+          powerStatus.className = 'power-status status-active';
+          
+          updateLastUpdatedTime();
+          setTimeout(checkPowerStatus, 2000);
+          showAlert(`Power ${action} command sent successfully!`, 'success');
+
+        } catch (error) {
+          statusText.textContent = `Failed: ${error.message}`;
+          powerStatus.className = 'power-status status-unknown';
+          showAlert(`Failed to send power ${action} command`, 'error');
+        } finally {
+          btn.innerHTML = originalHTML;
+          setTimeout(() => {
+            btn.disabled = false;
+          }, 2000);
+        }
+      }
+
+      async function checkPowerStatus() {
+        try {
+          const response = await fetch(`http://${ip_add}:8001/power/state`);
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+          const data = await response.json();
+          const currentStatus = data.status || 'unknown';
+          const stateText = data.state || currentStatus;
+          
+          statusText.textContent = stateText;
+          
+          powerStatus.className = 'power-status';
+          if (currentStatus === 'active') {
+            powerStatus.classList.add('status-active');
+          } else if (currentStatus === 'off') {
+            powerStatus.classList.add('status-off');
+          } else {
+            powerStatus.classList.add('status-unknown');
+          }
+
+          updateLastUpdatedTime();
+
+        } catch (error) {
+          statusText.textContent = 'Error checking status';
+          powerStatus.className = 'power-status status-unknown';
+        }
+      }
+
+      // Update device timer
+      function updateDeviceTimer() {
+        const timerElement = document.getElementById('device-timer');
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        timerElement.textContent = timeString;
+      }
+
+      btnOn.addEventListener('click', powerOn);
+      btnOff.addEventListener('click', powerOff);
+      btnReset.addEventListener('click', powerReset);
+
+      // Initial status check
+      checkPowerStatus();
+      
+      // Update timer every second
+      updateDeviceTimer();
+      setInterval(updateDeviceTimer, 1000);
+      
+      // Check status every 30 seconds
+      setInterval(checkPowerStatus, 30000);
+    });
 
     // ==================== POSTCODE SCANNER ====================
     let isPolling = false;
@@ -1021,6 +1173,7 @@
             launchBtn.disabled = false;
             launchBtn.textContent = 'Start Reading';
             cursor.style.display = 'none';
+            showAlert('Failed to start reading process', 'error');
           });
       }
 
@@ -1089,6 +1242,7 @@
         
         refreshBtn.disabled = true;
         refreshBtn.classList.add('loading');
+        refreshBtn.innerHTML = '<span class="loading"></span>Resetting...';
 
         try {
           const response = await fetch('http://${ip_add}:8001/power/reset', {
@@ -1108,6 +1262,7 @@
         } finally {
           refreshBtn.disabled = false;
           refreshBtn.classList.remove('loading');
+          refreshBtn.textContent = 'Reset Device';
         }
       });
 
@@ -1152,114 +1307,6 @@
       }
     }
 
-    // ==================== POWER CONTROL ====================
-    document.addEventListener('DOMContentLoaded', () => {
-      const powerStatus = document.getElementById('power-status');
-      const lastUpdated = document.getElementById('power-last-updated');
-      const btnOn = document.getElementById('btn-on');
-      const btnOff = document.getElementById('btn-off');
-      const btnReset = document.getElementById('btn-reset');
-
-      let powerCooldown = false;
-
-      const statusIcons = {
-        active: '✓',
-        off: '⏻',
-        shutdown: '🔌',
-        'server off': '🖥️',
-        hybernate: '🌙',
-        unknown: '❓',
-        error: '⚠️'
-      };
-
-      async function powerOn() { 
-        await sendPowerCommand('on'); 
-        startPowerCooldown();
-      }
-      async function powerOff() { 
-        await sendPowerCommand('off'); 
-        startPowerCooldown();
-      }
-      async function powerReset() { 
-        await sendPowerCommand('reset'); 
-        startPowerCooldown();
-      }
-
-      function startPowerCooldown() {
-        if (powerCooldown) return;
-        powerCooldown = true;
-        
-        [btnOn, btnOff, btnReset].forEach(btn => btn.disabled = true);
-        
-        setTimeout(() => {
-          [btnOn, btnOff, btnReset].forEach(btn => btn.disabled = false);
-          powerCooldown = false;
-        }, 10000); // 10 second cooldown
-      }
-
-      function updateLastUpdatedTime() {
-        const now = new Date();
-        lastUpdated.textContent = 'Last updated: ' + now.toLocaleTimeString();
-      }
-
-      async function sendPowerCommand(action) {
-        const btn = document.getElementById(`btn-${action}`);
-        btn.disabled = true;
-
-        try {
-          const response = await fetch(`http://${ip_add}:8001/power/${action}`, {
-            method: 'POST'
-          });
-          
-          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-          const data = await response.json();
-          if (data.status !== 'success') throw new Error(data.message);
-
-          powerStatus.textContent = `Power ${action} command sent successfully`;
-          powerStatus.className = 'power-status status-active';
-          
-          updateLastUpdatedTime();
-          setTimeout(checkPowerStatus, 2000);
-
-        } catch (error) {
-          powerStatus.textContent = `Failed: ${error.message}`;
-          powerStatus.className = 'power-status status-unknown';
-          btn.disabled = false;
-        }
-      }
-
-      async function checkPowerStatus() {
-        try {
-          const response = await fetch(`http://${ip_add}:8001/power/state`);
-          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-          const data = await response.json();
-          const currentStatus = data.status || 'unknown';
-          
-          const statusIcon = statusIcons[currentStatus] || statusIcons['unknown'];
-          powerStatus.innerHTML = `${statusIcon} ${data.state || currentStatus}`;
-
-          powerStatus.className = 'power-status';
-          if (currentStatus === 'active') powerStatus.classList.add('status-active');
-          else if (currentStatus === 'off') powerStatus.classList.add('status-off');
-          else powerStatus.classList.add('status-unknown');
-
-          updateLastUpdatedTime();
-
-        } catch (error) {
-          powerStatus.textContent = 'Error checking status';
-          powerStatus.className = 'power-status status-unknown';
-        }
-      }
-
-      btnOn.addEventListener('click', powerOn);
-      btnOff.addEventListener('click', powerOff);
-      btnReset.addEventListener('click', powerReset);
-
-      // Initial status check
-      checkPowerStatus();
-    });
-
     // ==================== BIOS LOG MONITOR ====================
     let isBiosConnected = false;
     let biosLogInterval = null;
@@ -1273,6 +1320,9 @@
 
       async function connectBios() {
         if (isBiosConnected) return;
+        
+        connectBtn.disabled = true;
+        connectBtn.innerHTML = '<span class="loading"></span>Connecting...';
         
         try {
           const response = await fetch('http://${ip_add}:5020/start-logging', { method: 'POST' });
@@ -1292,16 +1342,25 @@
             
             logContainer.innerHTML = '';
             biosLogInterval = setInterval(fetchBiosLogs, 1000);
+            showAlert('BIOS logging started successfully', 'success');
           } else {
             alert('Failed to start logging: ' + data.message);
+            showAlert('Failed to start BIOS logging', 'error');
           }
         } catch (error) {
           alert('Error connecting: ' + error.message);
+          showAlert('Error connecting to BIOS log', 'error');
+        } finally {
+          connectBtn.disabled = false;
+          connectBtn.textContent = 'Connect';
         }
       }
 
       async function disconnectBios() {
         if (!isBiosConnected) return;
+        
+        disconnectBtn.disabled = true;
+        disconnectBtn.innerHTML = '<span class="loading"></span>Disconnecting...';
         
         try {
           const response = await fetch('http://${ip_add}:5020/stop-logging', { method: 'POST' });
@@ -1318,8 +1377,13 @@
           disconnectBtn.style.display = 'none';
           biosStatus.className = 'log-status disconnected';
           biosStatus.innerHTML = '<span class="status-dot"></span>Disconnected';
+          showAlert('BIOS logging stopped', 'info');
         } catch (error) {
           alert('Error disconnecting: ' + error.message);
+          showAlert('Error disconnecting from BIOS log', 'error');
+        } finally {
+          disconnectBtn.disabled = false;
+          disconnectBtn.textContent = 'Disconnect';
         }
       }
 
@@ -1345,6 +1409,7 @@
 
       function clearBiosLogs() {
         logContainer.innerHTML = '';
+        showAlert('BIOS logs cleared', 'info');
       }
 
       connectBtn.addEventListener('click', connectBios);
@@ -1465,7 +1530,7 @@
         right: 20px;
         padding: 12px 16px;
         border-radius: 6px;
-        background: \${type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : type === 'warning' ? '#f39c12' : '#3498db'};
+        background: ${type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : type === 'warning' ? '#f39c12' : '#3498db'};
         color: white;
         z-index: 1000;
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
