@@ -1,0 +1,14 @@
+[Unit]
+Description=Flask Index Route Service
+After=network.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/rpi/intel_UI_templates
+ExecStart=/usr/bin/python3 /home/rpi/intel_UI_templates/app.py
+Restart=always
+Environment="FLASK_ENV=production"
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy=multi-user.target
