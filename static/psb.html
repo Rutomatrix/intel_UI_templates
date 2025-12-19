@@ -970,6 +970,7 @@
   </div>
 
   <script>
+    let HOST_NAME = window.location.hostname
     // Main Tab Switching
     function switchMainTab(tabName) {
       // Update main tabs
@@ -1058,7 +1059,7 @@
         btn.innerHTML = `<span class="loading"></span>`;
 
         try {
-          const response = await fetch(`http://${window.location.hostname}:8001/power/${action}`, {
+          const response = await fetch(`http://${HOST_NAME}:8001/power/${action}`, {
             method: 'POST'
           });
           
@@ -1087,7 +1088,7 @@
 
       async function checkPowerStatus() {
         try {
-          const response = await fetch(`http://${window.location.hostname}:8001/power/state`);
+          const response = await fetch(`http://${HOST_NAME}:8001/power/state`);
           if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
           const data = await response.json();
@@ -1161,7 +1162,7 @@
         postcodeList.innerHTML = '';
         cursor.style.display = 'block';
         
-        fetch(`http://${window.location.hostname}:5010/get_data`)
+        fetch(`http://${HOST_NAME}:5010/get_data`)
           .then(response => response.json())
           .then(data => {
             statusMessage.textContent = 'Started reading...';
@@ -1181,7 +1182,7 @@
       function pollForUpdates() {
         if (!isPolling) return;
         
-        fetch(`http://${window.location.hostname}:5010/poll_data`)
+        fetch(`http://${HOST_NAME}:5010/poll_data`)
           .then(response => response.json())
           .then(data => {
             postcodeList.innerHTML = '';
@@ -1246,7 +1247,7 @@
         refreshBtn.innerHTML = '<span class="loading"></span>Resetting...';
 
         try {
-          const response = await fetch(`http://${window.location.hostname}:8001/power/reset`, {
+          const response = await fetch(`http://${HOST_NAME}:8001/power/reset`, {
             method: 'GET',
           });
 
@@ -1280,7 +1281,7 @@
       
       try {
         // This endpoint needs to be implemented on your server
-        const response = await fetch(`http://${window.location.hostname}:5010/list-files`);
+        const response = await fetch(`http://${HOST_NAME}:5010/list-files`);
         const data = await response.json();
         
         if (data.files && data.files.length > 0) {
@@ -1326,7 +1327,7 @@
         connectBtn.innerHTML = '<span class="loading"></span>Connecting...';
         
         try {
-          const response = await fetch(`http://${window.location.hostname}:5020/start-logging`, { method: 'POST' });
+          const response = await fetch(`http://${HOST_NAME}:5020/start-logging`, { method: 'POST' });
           const data = await response.json();
           
           if (response.status === 409) {
@@ -1364,7 +1365,7 @@
         disconnectBtn.innerHTML = '<span class="loading"></span>Disconnecting...';
         
         try {
-          const response = await fetch(`http://${window.location.hostname}:5020/stop-logging`, { method: 'POST' });
+          const response = await fetch(`http://${HOST_NAME}:5020/stop-logging`, { method: 'POST' });
           const data = await response.json();
           
           if (response.status === 403) {
@@ -1390,7 +1391,7 @@
 
       async function fetchBiosLogs() {
         try {
-          const response = await fetch(`http://${window.location.hostname}:5020/get-logs`);
+          const response = await fetch(`http://${HOST_NAME}:5020/get-logs`);
           const data = await response.json();
           
           if (data.logs && data.logs.length > 0) {
@@ -1425,7 +1426,7 @@
       
       try {
         // This endpoint needs to be implemented on your server
-        const response = await fetch(`http://${window.location.hostname}:5020/list-files`);
+        const response = await fetch(`http://${HOST_NAME}:5020/list-files`);
         const data = await response.json();
         
         if (data.files && data.files.length > 0) {
@@ -1457,7 +1458,7 @@
     let currentFile = null;
     let currentFileType = null;
     const DRIVER_PORT = 5010;
-    const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${DRIVER_PORT}`;
+    const API_BASE_URL = `${window.location.protocol}//${HOST_NAME}:${DRIVER_PORT}`;
 
     async function openFile(file, type) {
       currentFile = file;
@@ -1477,8 +1478,8 @@
       
       try {
         const endpoint = type === 'postcode' ? 
-          `http://${window.location.hostname}:5010/get-file/${encodeURIComponent(file.name)}` :
-          `http://${window.location.hostname}:5020/get-file/${encodeURIComponent(file.name)}`;
+          `http://${HOST_NAME}:5010/get-file/${encodeURIComponent(file.name)}` :
+          `http://${HOST_NAME}:5020/get-file/${encodeURIComponent(file.name)}`;
         
         const response = await fetch(`${API_BASE_URL}${endpoint}`);
         const data = await response.json();
