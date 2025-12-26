@@ -6,7 +6,7 @@
     <title>RUTOMATRIX - Device Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/rutomatrix.ico') }}">
+    <link rel="icon" type="image/x-icon" href="../static/images/rutomatrix.ico">
     <style>
         * {
             margin: 0;
@@ -529,12 +529,12 @@
         <div class="header">
             <div class="logo-left">
                 <!-- RUTOMATRIX Logo -->
-                <img src="{{ url_for('static', filename='images/RutoMatrix.png') }}" alt="RUTOMATRIX Logo" class="logo-image logo-image-left">
+                <img src="../static/images/RutoMatrix.png" alt="RUTOMATRIX Logo" class="logo-image logo-image-left">
             </div>
 
             <div class="logo-right">
                 <!-- RUTOMATRIX Logo -->
-                <img src="{{ url_for('static', filename='images/tessolve.png') }}" alt="Tessolve Logo" class="logo-image logo-image-right">
+                <img src="../static/images/tessolve.png" alt="Tessolve Logo" class="logo-image logo-image-right">
             </div>
             
             <div class="dashboard-header">
@@ -568,23 +568,11 @@
                 
                 <div class="devices-grid">
                     <!-- Device 001 - Virtual Desk -->
-                    <div class="device-card" data-device-id="001" data-feature="virtual-desk">
+                    <div class="device-card" data-device-id="001" data-feature="virtual-os">
                         <div class="device-icon">
                             <i class="fas fa-desktop"></i>
                         </div>
-                        <div class="device-name">Device 001 - Virtual Desk</div>
-                        <div class="device-status">
-                            <div class="status-indicator"></div>
-                            <div class="status-text">Ready</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Device 001 - OS Flashing -->
-                    <div class="device-card" data-device-id="001" data-feature="os-flashing">
-                        <div class="device-icon">
-                            <i class="fas fa-download"></i>
-                        </div>
-                        <div class="device-name">Device 001 - OS Flashing</div>
+                        <div class="device-name">Device 001 - Virtual Desk & OS Flashing</div>
                         <div class="device-status">
                             <div class="status-indicator"></div>
                             <div class="status-text">Ready</div>
@@ -603,36 +591,14 @@
                         </div>
                     </div>
                     
-                    <!-- Device 001 - Post Code Reading -->
-                    <div class="device-card" data-device-id="001" data-feature="post-code-reading">
-                        <div class="device-icon">
-                            <i class="fas fa-code"></i>
-                        </div>
-                        <div class="device-name">Device 001 - Post Code Reading</div>
-                        <div class="device-status">
-                            <div class="status-indicator"></div>
-                            <div class="status-text">Ready</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Device 001 - System State Control & ATX -->
-                    <div class="device-card" data-device-id="001" data-feature="system-state-control">
-                        <div class="device-icon">
-                            <i class="fas fa-power-off"></i>
-                        </div>
-                        <div class="device-name">Device 001 - System State Control & ATX</div>
-                        <div class="device-status">
-                            <div class="status-indicator"></div>
-                            <div class="status-text">Ready</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Device 001 - BIOS Log Monitor -->
-                    <div class="device-card" data-device-id="001" data-feature="bios-log-monitor">
+                    <!-- Device 001 - System Control & Monitoring -->
+                    <div class="device-card" data-device-id="001" data-feature="system-monitoring">
                         <div class="device-icon">
                             <i class="fas fa-microchip"></i>
                         </div>
-                        <div class="device-name">Device 001 - BIOS Log Monitor</div>
+                        <div class="device-name">
+                            Device 001 - Postcode / BIOS Log / System State & ATX
+                        </div>
                         <div class="device-status">
                             <div class="status-indicator"></div>
                             <div class="status-text">Ready</div>
@@ -662,6 +628,31 @@
                             <div class="status-text">Ready</div>
                         </div>
                     </div>
+
+                    <!-- Device 001 - PythonSV -->
+                    <div class="device-card" data-feature="python-service">
+                        <div class="device-icon">
+                            <i class="fas fa-python"></i>
+                        </div>
+                        <div class="device-name">PythonSV</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+
+                    <!-- Device 001 - BMC -->
+                    <div class="device-card" data-feature="bmc-server-info">
+                        <div class="device-icon">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div class="device-name">BMC Server Info</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -694,27 +685,16 @@
     <script>
         // Device data for each device type
         const deviceData = {
-            "virtual-desk": {
-                name: "Virtual Desk",
+            "virtual-os": {
+                name: "Virtual Desk & OS Flashing",
                 ip: "192.168.1.101",
                 subnet: "255.255.255.0",
                 gateway: "192.168.1.1",
                 mac: "00:1A:2B:3C:4D:5E",
                 status: "Ready",
                 lastActive: "2025-11-28 15:42:00",
-                specs: "Dual Monitor Support, Remote Access, Virtualization Enabled",
-                htmlFile: "/static/virtual_os.html"
-            },
-            "os-flashing": {
-                name: "OS Flashing",
-                ip: "192.168.1.102",
-                subnet: "255.255.255.0",
-                gateway: "192.168.1.1",
-                mac: "00:1A:2B:3C:4D:5F",
-                status: "Ready",
-                lastActive: "2025-11-28 14:30:00",
-                specs: "Multiple OS Support, Fast Flash Technology, Error Recovery",
-                htmlFile: "/static/virtual_os.html"
+                specs: "Virtual Desk (Remote Access, Dual Monitor), OS Flashing (Multi-OS, Fast Flash, Recovery)",
+                htmlFile: "../static/virtual_os.html"
             },
             "usb-file-sharing": {
                 name: "USB File Sharing",
@@ -725,40 +705,18 @@
                 status: "Ready",
                 lastActive: "2025-11-28 15:15:00",
                 specs: "USB 3.2 Gen 2, Multiple Port Support, Secure Transfer",
-                htmlFile: "/static/usb.html"
+                htmlFile: "../static/usb.html"
             },
-            "post-code-reading": {
-                name: "Post Code Reading",
+            "system-monitoring": {
+                name: "POST Code / BIOS / System State Control",
                 ip: "192.168.1.104",
                 subnet: "255.255.255.0",
                 gateway: "192.168.1.1",
                 mac: "00:1A:2B:3C:4D:61",
                 status: "Ready",
-                lastActive: "2025-11-28 13:45:00",
-                specs: "Real-time POST Monitoring, Error Code Database, Log Export",
-                htmlFile: "/static/psb.html"
-            },
-            "system-state-control": {
-                name: "System State Control & ATX",
-                ip: "192.168.1.105",
-                subnet: "255.255.255.0",
-                gateway: "192.168.1.1",
-                mac: "00:1A:2B:3C:4D:62",
-                status: "Ready",
                 lastActive: "2025-11-28 15:40:00",
-                specs: "ATX Power Control, System State Monitoring, Remote Reboot",
-                htmlFile: "/static/psb.html"
-            },
-            "bios-log-monitor": {
-                name: "BIOS Log Monitor",
-                ip: "192.168.1.106",
-                subnet: "255.255.255.0",
-                gateway: "192.168.1.1",
-                mac: "00:1A:2B:3C:4D:63",
-                status: "Ready",
-                lastActive: "2025-11-28 12:20:00",
-                specs: "BIOS Event Logging, Real-time Monitoring, Alert System",
-                htmlFile: "/static/psb.html"
+                specs: "POST Code Monitoring, BIOS Log Tracking, ATX Power & System State Control",
+                htmlFile: "../static/psb.html"
             },
             "firmware-flashing": {
                 name: "Firmware Flashing",
@@ -769,7 +727,7 @@
                 status: "Ready",
                 lastActive: "2025-11-28 11:10:00",
                 specs: "Firmware Update Tools, Rollback Support, Validation Checks",
-                htmlFile: "/static/firmware.html"
+                htmlFile: "../static/firmware.html"
             },
             "pdu": {
                 name: "PDU",
@@ -780,7 +738,29 @@
                 status: "Ready",
                 lastActive: "2025-11-28 15:35:00",
                 specs: "Power Distribution Control, Remote Outlet Management, Power Monitoring",
-                htmlFile: "/static/pdu.html"
+                htmlFile: "../static/pdu.html"
+            },
+            "python-service": {
+                name: "PythonSV",
+                ip: "192.168.1.109",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:66",
+                status: "Ready",
+                lastActive: "2025-11-28 16:10:00",
+                specs: "Python Flask Service, REST API, Background Worker",
+                htmlFile: "../static/pythonsv.html"
+            },
+            "bmc-server-info": {
+                name: "BMC Server Info",
+                ip: "192.168.1.110",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:67",
+                status: "Ready",
+                lastActive: "2025-11-28 16:10:00",
+                specs: "Python Flask Service, REST API, Background Worker",
+                htmlFile: "../static/bmc.html"
             }
         };
         

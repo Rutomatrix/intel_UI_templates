@@ -263,7 +263,7 @@
     // ===== Iframe functionality (SV URL loading with timeout) =====
     const iframe     = document.getElementById("content-frame");
     const messageDiv = document.getElementById("message");
-    const url        = "https://10.208.57.80:4200/"; // set your actual URL
+    const url        = `https://${window.location.hostname}:4200/`; // set your actual URL
 
     if (!url) {
       messageDiv.textContent = "Unable to get response from the API";
