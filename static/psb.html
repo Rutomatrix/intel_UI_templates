@@ -225,6 +225,148 @@
       margin-top: 4px;
     }
 
+    /* BIOS LOG MONITOR STYLES - UPDATED */
+.bios-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* This is crucial for proper flexbox scrolling */
+}
+ 
+.bios-tabs {
+  display: flex;
+  background: #1E1E1E;
+  border-radius: 6px;
+  padding: 2px;
+  flex-shrink: 0; /* Prevent tabs from shrinking */
+}
+ 
+.bios-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #BBBBBB;
+  padding: 10px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  text-align: center;
+}
+ 
+.bios-tab-btn:hover {
+  background: rgba(255, 106, 0, 0.1);
+}
+ 
+.bios-tab-btn.active {
+  background: #FF6A00;
+  color: #FFFFFF;
+}
+ 
+.log-controls {
+  margin-bottom: 15px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-shrink: 0; /* Prevent controls from shrinking */
+}
+ 
+.log-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 13px;
+}
+ 
+.log-status.connected {
+  background: #27ae60;
+  color: white;
+}
+ 
+.log-status.disconnected {
+  background: #555;
+  color: white;
+}
+ 
+/* UPDATED: Log container with fixed height and proper scrolling */
+.log-container {
+  flex: 1; /* Take available space */
+  background: #0d0e0f;
+  color: #d4d4d4;
+  padding: 15px;
+  border-radius: 6px;
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  border: 1px solid #333;
+  min-height: 300px; /* Minimum height */
+  max-height: 500px; /* Maximum height */
+  height: 0; /* Important for flexbox scrolling */
+}
+ 
+/* Alternatively, if you want a completely fixed height */
+.log-container.fixed-height {
+  height: 400px; /* Fixed height */
+  flex: none; /* Disable flex growth */
+}
+ 
+.log-entry {
+  margin-bottom: 4px;
+  padding: 4px;
+  white-space: pre-wrap; /* Preserve line breaks */
+  word-break: break-word; /* Break long words */
+}
+ 
+.log-entry:hover {
+  background: #1a1b1c;
+}
+ 
+.log-timestamp {
+  color: #888;
+  margin-right: 8px;
+  white-space: nowrap; /* Keep timestamps on one line */
+}
+ 
+/* For better scrolling performance */
+.log-container {
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #FF6A00 #333; /* Firefox */
+}
+ 
+/* Custom scrollbar for Webkit browsers */
+.log-container::-webkit-scrollbar {
+  width: 8px;
+}
+ 
+.log-container::-webkit-scrollbar-track {
+  background: #1E1E1E;
+  border-radius: 4px;
+}
+ 
+.log-container::-webkit-scrollbar-thumb {
+  background: #FF6A00;
+  border-radius: 4px;
+}
+ 
+.log-container::-webkit-scrollbar-thumb:hover {
+  background: #e55a00;
+}
+ 
+/* Main container adjustments to ensure proper layout */
+#bios-logs {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%; /* Take full height of parent */
+  min-height: 0; /* Crucial for nested flex scrolling */
+}
+
     /* Tabs Styling */
     .tabs-container {
       display: flex;
