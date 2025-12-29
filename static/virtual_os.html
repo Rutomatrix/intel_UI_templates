@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>${title}</title>
+  <title>Virtual desk and OS Flashin</title>
   <link rel="icon" type="image/x-icon" href="/static/images/rutomatrix.ico">
   <style>
     body {
@@ -475,7 +475,7 @@
       <div class="header">
         <div class="device-info">
           <div class="device-name-row">
-            <div class="device-name">${device.name}</div>
+            <div class="device-name">Rutomatrix</div>
             <div id="device-timer"></div>
           </div>
         </div>
@@ -540,7 +540,7 @@
 
       <div class="remote-desktop-wrapper">
         <div class="remote-desktop-header">
-          <span>Remote Desktop - ${ip_add}</span>
+          <span>Remote Desktop</span>
           <div class="connection-status disconnected" id="connection-status">Disconnected</div>
         </div>
         <div class="remote-desktop-content">
@@ -559,7 +559,7 @@
       <div class="header">
         <div class="device-info">
           <div class="device-name-row">
-            <div class="device-name">${device.name}</div>
+            <div class="device-name">Rutomatrix</div>
             <div id="os-device-timer"></div>
           </div>
         </div>
@@ -583,8 +583,6 @@
   </div>
 
   <script>
-
-    let HOST_NAME = window.location.hostname
     // Tab switching functionality
     function switchTab(tabName) {
       // Update tabs
@@ -622,21 +620,21 @@
           // Connect
           remoteDesktopFeed.innerHTML = '<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;">' +
             '<div class="loading-spinner"></div>' +
-            '<p style="color: #FF6A00; font-weight: bold;">Connecting to ${ip_add}...</p>' +
+            '<p style="color: #FF6A00; font-weight: bold;">Connecting to ${window.location.hostname}...</p>' +
             '</div>';
           
           connectionStatus.textContent = 'Connecting...';
           connectionStatus.className = 'connection-status';
 
           try {
-            const data = await testConnection(`http://${HOST_NAME}:8000/start_stream`);
-            const data1 = await testConnection1(`http://${HOST_NAME}:5000/start_stream`);
+            const data = await testConnection(`/start_stream`);
+            const data1 = await testConnection1(`/start_stream`);
             
-            if (data.status === 'already running' || data.status === 'started') {
+            if (data1.status === 'already running' || data1.status === 'started') {
               // Create video element
               videoElement = document.createElement('img');
               videoElement.id = 'remoteDesktopImg';
-              videoElement.src = `http://${HOST_NAME}:9000/stream?advance_headers=1&dual_final_frames=1&t=` + Date.now();
+              videoElement.src = `http://${window.location.hostname}:9000/stream?advance_headers=1&dual_final_frames=1&t=` + Date.now();
               videoElement.style.width = '100%';
               videoElement.style.height = '100%';
               videoElement.style.objectFit = 'contain';
@@ -658,7 +656,7 @@
               // Auto-refresh the stream every 30 seconds
               refreshInterval = setInterval(() => {
                 if (videoElement && isConnected) {
-                  videoElement.src = `http://${HOST_NAME}:9000/stream?advance_headers=1&dual_final_frames=1&t=` + Date.now();
+                  videoElement.src = `http://${window.location.hostname}:9000/stream?advance_headers=1&dual_final_frames=1&t=` + Date.now();
                 }
               }, 30000);
             } else {
@@ -760,7 +758,7 @@
             if (!isModifier) jsCodes.push(e.keyCode);
 
             if (jsCodes.length > 0) {
-              fetch(`http://${HOST_NAME}:5000/keyboard`, {
+              fetch(`http://${window.location.hostname}:5000/keyboard`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ keycodes: jsCodes })
@@ -778,7 +776,7 @@
         document.addEventListener('mousemove', (e) => {
           if (document.pointerLockElement === videoElement) {
             let [dx, dy] = smoothMouseDelta(e.movementX, e.movementY);
-            fetch(`http://${HOST_NAME}:5000/mouse`, {
+            fetch(`http://${window.location.hostname}:5000/mouse`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ x: dx, y: dy, buttons: e.buttons, wheel: 0 })
@@ -788,7 +786,7 @@
 
         document.addEventListener('mousedown', (e) => {
           if (document.pointerLockElement === videoElement) {
-            fetch(`http://${HOST_NAME}:5000/mouse`, {
+            fetch(`http://${window.location.hostname}:5000/mouse`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ x: 0, y: 0, buttons: (1 << e.button), wheel: 0 })
@@ -798,7 +796,7 @@
 
         document.addEventListener('mouseup', (e) => {
           if (document.pointerLockElement === videoElement) {
-            fetch(`http://${HOST_NAME}:5000/mouse`, {
+            fetch(`http://${window.location.hostname}:5000/mouse`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ x: 0, y: 0, buttons: 0, wheel: 0 })
@@ -808,7 +806,7 @@
 
         document.addEventListener('wheel', (e) => {
           if (document.pointerLockElement === videoElement) {
-            fetch(`http://${HOST_NAME}:5000/mouse`, {
+            fetch(`http://${window.location.hostname}:5000/mouse`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ x: 0, y: 0, buttons: 0, wheel: e.deltaY > 0 ? 0xFF : 0x01 })
@@ -821,8 +819,8 @@
 
     async function testConnection(url) {
       // Define the necessary variables (ensure these are available/defined in a higher scope)
-      const DRIVER_PORT = 3334; 
-      const API_BASE_URL = `${window.location.protocol}//${HOST_NAME}:${DRIVER_PORT}`;
+      const DRIVER_PORT = 8000; 
+      const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${DRIVER_PORT}`;
     
       // Construct the absolute URL using the base and the relative path passed to the function
       const absolute_url = `${API_BASE_URL}${url}`;
@@ -844,8 +842,8 @@
 
     async function testConnection1(url) {
       // Define the necessary variables for cross-port communication
-      const DRIVER_PORT = 3334; 
-      const API_BASE_URL = `${window.location.protocol}//${HOST_NAME}:${DRIVER_PORT}`;
+      const DRIVER_PORT = 5000; 
+      const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${DRIVER_PORT}`;
       
       // Construct the absolute URL
       const absolute_url = `${API_BASE_URL}${url}`;
@@ -871,7 +869,7 @@
       // Show popup feedback
       showShortcutPopup(action);
 
-      fetch(`http://${HOST_NAME}:5000/shortcut/` + action, {
+      fetch(`http://${window.location.hostname}:5000/shortcut/` + action, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       })
@@ -933,7 +931,7 @@
 
     function fetchList() {
       document.getElementById('status').textContent = 'Loading ISO files...';
-      fetch(`http://${HOST_NAME}:9001/list`)
+      fetch(`http://${window.location.hostname}:9001/list`)
         .then(res => res.json())
         .then(data => {
           const ul = document.getElementById('isoList');
@@ -975,7 +973,7 @@
 
       document.getElementById('status').textContent = 'Mounting ' + selectedFile + '...';
 
-      fetch(`http://${HOST_NAME}:9001/mount?filename=` + encodeURIComponent(selectedFile), {
+      fetch(`http://${window.location.hostname}:9001/mount?filename=` + encodeURIComponent(selectedFile), {
         method: 'POST'
       })
       .then(res => res.json())
@@ -992,7 +990,7 @@
     function unmount() {
       document.getElementById('status').textContent = 'Unmounting...';
 
-      fetch(`http://${HOST_NAME}:9001/stop`, {
+      fetch(`http://${window.location.hostname}:9001/stop`, {
         method: 'POST'
       })
       .then(res => res.json())

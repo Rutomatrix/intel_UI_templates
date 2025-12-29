@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>${title}</title>
+  <title>Postcode, Bios serial log, System state Reading and ATX</title>
   <link rel="icon" type="image/x-icon" href="/static/images/rutomatrix.ico">
   <style>
     body {
@@ -812,7 +812,7 @@
     <div class="power-control-header">
       <div class="device-info">
         <div class="device-name-row">
-          <div class="device-name">${device.name}</div>
+          <div class="device-name">Rutomatrix</div>
           <div id="device-timer">--:--:--</div>
         </div>
       </div>
@@ -970,7 +970,6 @@
   </div>
 
   <script>
-    let HOST_NAME = window.location.hostname
     // Main Tab Switching
     function switchMainTab(tabName) {
       // Update main tabs
@@ -1059,8 +1058,8 @@
         btn.innerHTML = `<span class="loading"></span>`;
 
         try {
-          const response = await fetch(`http://${HOST_NAME}:8001/power/${action}`, {
-            method: 'POST'
+          const response = await fetch(`http://${window.location.hostname}:3333/power/${action}`, {
+            method: 'GET'
           });
           
           if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -1088,7 +1087,7 @@
 
       async function checkPowerStatus() {
         try {
-          const response = await fetch(`http://${HOST_NAME}:8001/power/state`);
+          const response = await fetch(`http://${window.location.hostname}:3333/state`);
           if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
           const data = await response.json();
@@ -1162,7 +1161,7 @@
         postcodeList.innerHTML = '';
         cursor.style.display = 'block';
         
-        fetch(`http://${HOST_NAME}:5010/get_data`)
+        fetch(`http://${window.location.hostname}:5010/get_data`)
           .then(response => response.json())
           .then(data => {
             statusMessage.textContent = 'Started reading...';
@@ -1182,7 +1181,7 @@
       function pollForUpdates() {
         if (!isPolling) return;
         
-        fetch(`http://${HOST_NAME}:5010/poll_data`)
+        fetch(`http://${window.location.hostname}:5010/poll_data`)
           .then(response => response.json())
           .then(data => {
             postcodeList.innerHTML = '';
@@ -1247,7 +1246,7 @@
         refreshBtn.innerHTML = '<span class="loading"></span>Resetting...';
 
         try {
-          const response = await fetch(`http://${HOST_NAME}:8001/power/reset`, {
+          const response = await fetch(`http://${window.location.hostname}:3333/power/reset`, {
             method: 'GET',
           });
 
@@ -1281,7 +1280,7 @@
       
       try {
         // This endpoint needs to be implemented on your server
-        const response = await fetch(`http://${HOST_NAME}:5010/list-files`);
+        const response = await fetch(`http://${window.location.hostname}:1818/list-files`);
         const data = await response.json();
         
         if (data.files && data.files.length > 0) {
@@ -1327,13 +1326,14 @@
         connectBtn.innerHTML = '<span class="loading"></span>Connecting...';
         
         try {
-          const response = await fetch(`http://${HOST_NAME}:5020/start-logging`, { method: 'POST' });
-          const data = await response.json();
+          const response = await fetch(`http://${window.location.hostname}:1818/start-logging`, { method: 'POST' });
+          
           
           if (response.status === 409) {
             alert('Logging is already active in another tab.');
             return;
           }
+          const data = await response.json();
           
           if (data.status === 'started') {
             isBiosConnected = true;
@@ -1365,7 +1365,7 @@
         disconnectBtn.innerHTML = '<span class="loading"></span>Disconnecting...';
         
         try {
-          const response = await fetch(`http://${HOST_NAME}:5020/stop-logging`, { method: 'POST' });
+          const response = await fetch(`http://${window.location.hostname}:1818/stop-logging`, { method: 'POST' });
           const data = await response.json();
           
           if (response.status === 403) {
@@ -1391,7 +1391,7 @@
 
       async function fetchBiosLogs() {
         try {
-          const response = await fetch(`http://${HOST_NAME}:5020/get-logs`);
+          const response = await fetch(`http://${window.location.hostname}:1818/get-logs`);
           const data = await response.json();
           
           if (data.logs && data.logs.length > 0) {
@@ -1426,7 +1426,7 @@
       
       try {
         // This endpoint needs to be implemented on your server
-        const response = await fetch(`http://${HOST_NAME}:5020/list-files`);
+        const response = await fetch(`http://${window.location.hostname}:1818/list-files`);
         const data = await response.json();
         
         if (data.files && data.files.length > 0) {
@@ -1457,8 +1457,8 @@
     // ==================== FILE VIEWING & DOWNLOAD ====================
     let currentFile = null;
     let currentFileType = null;
-    const DRIVER_PORT = 5010;
-    const API_BASE_URL = `${window.location.protocol}//${HOST_NAME}:${DRIVER_PORT}`;
+    const DRIVER_PORT = 1818;
+    const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${DRIVER_PORT}`;
 
     async function openFile(file, type) {
       currentFile = file;
@@ -1478,8 +1478,8 @@
       
       try {
         const endpoint = type === 'postcode' ? 
-          `http://${HOST_NAME}:5010/get-file/${encodeURIComponent(file.name)}` :
-          `http://${HOST_NAME}:5020/get-file/${encodeURIComponent(file.name)}`;
+          `/get-file/${encodeURIComponent(file.name)}` :
+          `/get-file/${encodeURIComponent(file.name)}`;
         
         const response = await fetch(`${API_BASE_URL}${endpoint}`);
         const data = await response.json();

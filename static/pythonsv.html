@@ -173,8 +173,7 @@
 <body>
   <!-- Header -->
   <div class="header">
-    <div class="device-name">Device Name Here</div>
-    <button class="btn" id="openGuideBtn">User Guide</button>
+    <div class="device-name">Rutomatrix - PythonSV</div>
   </div>
 
   <!-- Page content with iframe -->
@@ -263,7 +262,8 @@
     // ===== Iframe functionality (SV URL loading with timeout) =====
     const iframe     = document.getElementById("content-frame");
     const messageDiv = document.getElementById("message");
-    const url        = `https://${window.location.hostname}:4200/`; // set your actual URL
+    // const url        = `https://${window.location.hostname}:4200/`; // set your actual URL
+    const url        = `http://172.16.38.72:4200/`; // set your actual URL
 
     if (!url) {
       messageDiv.textContent = "Unable to get response from the API";
