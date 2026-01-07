@@ -17,7 +17,7 @@
     .main-container {
       display: flex;
       flex-direction: column;
-      height: 100%;
+      height: 100vh;
       padding: 16px;
       box-sizing: border-box;
       gap: 16px;
@@ -30,12 +30,12 @@
       background: #1E1E1E;
       border-radius: 8px;
       padding: 16px 24px;
-      margin-bottom: 16px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       display: flex;
       justify-content: space-between;
       align-items: center;
       border: 1px solid #333;
+      flex-shrink: 0;
     }
 
     .device-info {
@@ -218,6 +218,54 @@
       box-shadow: none !important;
     }
 
+    /* POSTCODE CONTROL BUTTONS - ADDED */
+    .postcode-control-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 120px;
+    }
+
+    .postcode-control-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .postcode-control-btn:active {
+      transform: translateY(0);
+    }
+
+    .postcode-control-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    .btn-start {
+      background: linear-gradient(135deg, #0971b3, #3498db);
+      box-shadow: 0 4px 14px rgba(9, 113, 179, 0.35);
+    }
+
+    .btn-stop {
+      background: linear-gradient(135deg, #d32f2f, #f44336);
+      box-shadow: 0 4px 14px rgba(211, 47, 47, 0.35);
+    }
+
+    .btn-clear {
+      background: linear-gradient(135deg, #666, #888);
+      box-shadow: 0 4px 14px rgba(102, 102, 102, 0.35);
+    }
+
     .last-updated {
       font-size: 12px;
       color: #888;
@@ -225,156 +273,14 @@
       margin-top: 4px;
     }
 
-    /* BIOS LOG MONITOR STYLES - UPDATED */
-.bios-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0; /* This is crucial for proper flexbox scrolling */
-}
- 
-.bios-tabs {
-  display: flex;
-  background: #1E1E1E;
-  border-radius: 6px;
-  padding: 2px;
-  flex-shrink: 0; /* Prevent tabs from shrinking */
-}
- 
-.bios-tab-btn {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: #BBBBBB;
-  padding: 10px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all 0.2s;
-  text-align: center;
-}
- 
-.bios-tab-btn:hover {
-  background: rgba(255, 106, 0, 0.1);
-}
- 
-.bios-tab-btn.active {
-  background: #FF6A00;
-  color: #FFFFFF;
-}
- 
-.log-controls {
-  margin-bottom: 15px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-shrink: 0; /* Prevent controls from shrinking */
-}
- 
-.log-status {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-weight: 500;
-  font-size: 13px;
-}
- 
-.log-status.connected {
-  background: #27ae60;
-  color: white;
-}
- 
-.log-status.disconnected {
-  background: #555;
-  color: white;
-}
- 
-/* UPDATED: Log container with fixed height and proper scrolling */
-.log-container {
-  flex: 1; /* Take available space */
-  background: #0d0e0f;
-  color: #d4d4d4;
-  padding: 15px;
-  border-radius: 6px;
-  overflow-y: auto; /* Enable vertical scrolling */
-  overflow-x: hidden; /* Prevent horizontal scrolling */
-  font-family: 'Courier New', monospace;
-  font-size: 13px;
-  line-height: 1.5;
-  border: 1px solid #333;
-  min-height: 300px; /* Minimum height */
-  max-height: 500px; /* Maximum height */
-  height: 0; /* Important for flexbox scrolling */
-}
- 
-/* Alternatively, if you want a completely fixed height */
-.log-container.fixed-height {
-  height: 400px; /* Fixed height */
-  flex: none; /* Disable flex growth */
-}
- 
-.log-entry {
-  margin-bottom: 4px;
-  padding: 4px;
-  white-space: pre-wrap; /* Preserve line breaks */
-  word-break: break-word; /* Break long words */
-}
- 
-.log-entry:hover {
-  background: #1a1b1c;
-}
- 
-.log-timestamp {
-  color: #888;
-  margin-right: 8px;
-  white-space: nowrap; /* Keep timestamps on one line */
-}
- 
-/* For better scrolling performance */
-.log-container {
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: #FF6A00 #333; /* Firefox */
-}
- 
-/* Custom scrollbar for Webkit browsers */
-.log-container::-webkit-scrollbar {
-  width: 8px;
-}
- 
-.log-container::-webkit-scrollbar-track {
-  background: #1E1E1E;
-  border-radius: 4px;
-}
- 
-.log-container::-webkit-scrollbar-thumb {
-  background: #FF6A00;
-  border-radius: 4px;
-}
- 
-.log-container::-webkit-scrollbar-thumb:hover {
-  background: #e55a00;
-}
- 
-/* Main container adjustments to ensure proper layout */
-#bios-logs {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  height: 100%; /* Take full height of parent */
-  min-height: 0; /* Crucial for nested flex scrolling */
-}
-
     /* Tabs Styling */
     .tabs-container {
       display: flex;
       background: #1E1E1E;
       border-radius: 8px;
       padding: 4px;
-      margin-bottom: 16px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      flex-shrink: 0;
     }
 
     .tab-btn {
@@ -415,6 +321,8 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
+      min-height: 0;
+      overflow: hidden;
     }
 
     .tab-content {
@@ -422,14 +330,16 @@
       flex: 1;
       flex-direction: column;
       gap: 16px;
+      min-height: 0;
+      overflow: hidden;
     }
 
     .tab-content.active {
       display: flex;
     }
 
-    /* Shared Header */
-    .header {
+    /* POSTCODE SCANNER STYLES - UPDATED */
+    .postcode-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -437,27 +347,52 @@
       background: #1E1E1E;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      flex-shrink: 0;
     }
 
-    .controls {
+    .postcode-controls {
       display: flex;
       gap: 12px;
       align-items: center;
     }
 
-    /* POSTCODE SCANNER STYLES */
-    .postcode-content {
-      flex: 1;
+    .postcode-status-indicator {
       display: flex;
-      flex-direction: column;
-      gap: 16px;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: #2A2A2A;
+      border-radius: 6px;
+      font-size: 14px;
     }
 
+    .postcode-status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #666;
+    }
+
+    .postcode-status-dot.active {
+      background: #4CAF50;
+      animation: pulse 2s infinite;
+    }
+
+    .postcode-status-dot.stopped {
+      background: #F44336;
+    }
+
+    .postcode-status-dot.ready {
+      background: #2196F3;
+    }
+
+    /* POSTCODE TABS STYLING */
     .postcode-tabs {
       display: flex;
       background: #1E1E1E;
       border-radius: 6px;
       padding: 2px;
+      flex-shrink: 0;
     }
 
     .postcode-tab-btn {
@@ -483,47 +418,50 @@
       color: #FFFFFF;
     }
 
-    .launch-btn {
-      background: #ff6a00;
-      border: none;
-      color: #FFFFFF;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      transition: background 0.3s ease;
-    }
-
-    .launch-btn:hover {
-      background: #e55a00;
-    }
-
-    .launch-btn:disabled {
-      background: #666;
-      cursor: not-allowed;
-    }
-
-    .refresh-btn {
+    /* LIVE LOGS TERMINAL STYLING - UPDATED */
+    .postcode-content {
+      flex: 1;
       display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .live-terminal-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      gap: 16px;
+      min-height: 0;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .terminal-header {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .terminal-title {
+      font-size: 18px;
+      color: #BBB;
+    }
+
+    .terminal-info {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .counter {
       background: #2A2A2A;
-      border: none;
-      color: white;
       padding: 8px 16px;
       border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .refresh-btn:hover {
-      background: #FF6A00;
-    }
-
-    .refresh-btn.loading {
-      opacity: 0.7;
-      cursor: not-allowed;
+      font-family: monospace;
+      font-size: 14px;
     }
 
     .postcode-display {
@@ -534,81 +472,367 @@
       flex: 1;
       display: flex;
       flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
     }
 
     .postcode-label {
       font-size: 18px;
       color: #BBBBBB;
       margin-bottom: 15px;
+      flex-shrink: 0;
     }
 
     .postcode-terminal {
       flex: 1;
-      overflow-y: auto;
       background: #000000;
       border: 1px solid #333;
-      border-radius: 6px;
+      border-radius: 8px;
       padding: 15px;
       font-family: 'Courier New', monospace;
-      font-size: 16px;
+      font-size: 14px;
       line-height: 1.4;
+      overflow-y: auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
     }
 
     .postcode-list {
       list-style: none;
       padding: 0;
       margin: 0;
+      flex: 1;
+      min-height: 0;
     }
 
     .postcode-item {
       color: #00ff00;
-      padding: 2px 0;
-      border-left: 3px solid transparent;
+      padding: 6px 0;
       padding-left: 10px;
+      border-left: 3px solid transparent;
+      margin: 2px 0;
       animation: fadeIn 0.3s ease-in;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.3;
     }
 
     .postcode-item.current {
       color: #ff6a00;
       border-left-color: #ff6a00;
       font-weight: bold;
+      background: rgba(255, 106, 0, 0.1);
     }
 
     .postcode-item.final {
       color: #ffffff;
-      background: #ff6a00;
-      padding: 5px 10px;
+      background: linear-gradient(90deg, #ff6a00, #e55a00);
+      padding: 10px;
       border-radius: 4px;
       margin: 5px 0;
+      border-left: none;
       animation: pulse 0.5s ease-in-out;
     }
 
     .status-message {
-      font-size: 16px;
-      color: #BBBBBB;
-      margin-top: 10px;
-      min-height: 20px;
-    }
-
-    .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      border-top-color: #ff6a00;
-      animation: spin 1s ease-in-out infinite;
-      margin-right: 10px;
-    }
-
-    .feed-Placeholder {
-      color: #aaa;
+      padding: 12px;
+      background: #2A2A2A;
+      border-radius: 6px;
       text-align: center;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 15px;
     }
 
     .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 20px;
+      background: #00ff00;
+      vertical-align: middle;
+      margin-left: 2px;
       animation: blink 1s infinite;
+    }
+
+    /* SAVED LOGS STYLING - UPDATED */
+    .logs-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      gap: 16px;
+      min-height: 0;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .logs-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .logs-title {
+      font-size: 18px;
+      color: #BBB;
+    }
+
+    .log-path {
+      color: #666;
+      font-size: 14px;
+      font-family: monospace;
+      background: #2A2A2A;
+      padding: 8px 16px;
+      border-radius: 6px;
+      max-width: 600px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-list-container {
+      flex: 1;
+      background: #1E1E1E;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .file-list-header {
+      padding: 16px;
+      background: #2A2A2A;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .file-list-title {
+      font-size: 16px;
+      color: #BBB;
+    }
+
+    .file-count {
+      background: #0971b3;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
+    .file-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      min-height: 0;
+    }
+
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background: #2A2A2A;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+      flex-shrink: 0;
+    }
+
+    .file-item:hover {
+      background: #3A3A3A;
+      border-color: #0971b3;
+      transform: translateY(-2px);
+    }
+
+    .file-info {
+      flex: 1;
+    }
+
+    .file-name {
+      font-weight: 500;
+      margin-bottom: 6px;
+      word-break: break-all;
+      color: #FFF;
+    }
+
+    .file-details {
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+      color: #BBB;
+    }
+
+    .file-size {
+      font-family: monospace;
+    }
+
+    .file-date {
+      font-style: italic;
+    }
+
+    .file-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .file-action-btn {
+      padding: 8px 16px;
+      background: #3A3A3A;
+      border: none;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s ease;
+    }
+
+    .file-action-btn:hover {
+      background: #4A4A4A;
+    }
+
+    .file-action-btn.download {
+      background: #4CAF50;
+    }
+
+    .file-action-btn.download:hover {
+      background: #45a049;
+    }
+
+    .empty-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      color: #666;
+      font-style: italic;
+      font-size: 16px;
+      text-align: center;
+      height: 100%;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+
+    /* BIOS LOG MONITOR STYLES - UPDATED */
+    .bios-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .bios-tabs {
+      display: flex;
+      background: #1E1E1E;
+      border-radius: 6px;
+      padding: 2px;
+      flex-shrink: 0;
+    }
+
+    .bios-tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #BBBBBB;
+      padding: 10px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .bios-tab-btn:hover {
+      background: rgba(255, 106, 0, 0.1);
+    }
+
+    .bios-tab-btn.active {
+      background: #FF6A00;
+      color: #FFFFFF;
+    }
+
+    .log-controls {
+      margin-bottom: 15px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .log-status {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 13px;
+    }
+
+    .log-status.connected {
+      background: #27ae60;
+      color: white;
+    }
+
+    .log-status.disconnected {
+      background: #555;
+      color: white;
+    }
+
+    .log-container {
+      flex: 1;
+      background: #0d0e0f;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      border: 1px solid #333;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bios-log-content {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    .log-entry {
+      margin-bottom: 4px;
+      padding: 4px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .log-entry:hover {
+      background: #1a1b1c;
+    }
+
+    .log-timestamp {
+      color: #888;
+      margin-right: 8px;
+      white-space: nowrap;
     }
 
     /* FILE VIEWER STYLES (for both Postcode and BIOS) */
@@ -641,35 +865,6 @@
       margin-bottom: 12px;
       color: #ff6a00;
       text-align: center;
-    }
-
-    .file-name {
-      font-weight: 600;
-      font-size: 14px;
-      word-break: break-all;
-      margin-bottom: 8px;
-      color: #fff;
-      text-align: center;
-    }
-
-    .file-meta {
-      font-size: 11px;
-      color: #aaa;
-      text-align: center;
-      line-height: 1.4;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: #666;
-      width: 100%;
-    }
-
-    .empty-state-icon {
-      font-size: 48px;
-      margin-bottom: 15px;
-      opacity: 0.5;
     }
 
     /* MODAL STYLES */
@@ -791,106 +986,6 @@
       overflow-y: auto;
     }
 
-    .spinner {
-      border: 4px solid #333;
-      border-top: 4px solid #ff6a00;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 40px auto;
-    }
-
-    /* BIOS LOG MONITOR STYLES */
-    .bios-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .bios-tabs {
-      display: flex;
-      background: #1E1E1E;
-      border-radius: 6px;
-      padding: 2px;
-    }
-
-    .bios-tab-btn {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: #BBBBBB;
-      padding: 10px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 500;
-      transition: all 0.2s;
-      text-align: center;
-    }
-
-    .bios-tab-btn:hover {
-      background: rgba(255, 106, 0, 0.1);
-    }
-
-    .bios-tab-btn.active {
-      background: #FF6A00;
-      color: #FFFFFF;
-    }
-
-    .log-controls {
-      margin-bottom: 15px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .log-status {
-      display: inline-flex;
-      align-items: center;
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-weight: 500;
-      font-size: 13px;
-    }
-
-    .log-status.connected {
-      background: #27ae60;
-      color: white;
-    }
-
-    .log-status.disconnected {
-      background: #555;
-      color: white;
-    }
-
-    .log-container {
-      flex: 1;
-      background: #0d0e0f;
-      color: #d4d4d4;
-      padding: 15px;
-      border-radius: 6px;
-      overflow-y: auto;
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
-      line-height: 1.5;
-      border: 1px solid #333;
-    }
-
-    .log-entry {
-      margin-bottom: 4px;
-      padding: 4px;
-    }
-
-    .log-entry:hover {
-      background: #1a1b1c;
-    }
-
-    .log-timestamp {
-      color: #888;
-      margin-right: 8px;
-    }
-
     /* Animations */
     @keyframes spin {
       to { transform: rotate(360deg); }
@@ -902,8 +997,8 @@
     }
 
     @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
     }
 
     @keyframes blink {
@@ -911,10 +1006,88 @@
       51%, 100% { opacity: 0; }
     }
 
-    .hidden {
-      display: none;
+    /* Loading Spinner */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
     }
 
+    /* Alert Notifications */
+    .alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 16px 20px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 1000;
+      max-width: 400px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .alert-success {
+      background: #4CAF50;
+      color: white;
+      border-left: 4px solid #2E7D32;
+    }
+
+    .alert-error {
+      background: #F44336;
+      color: white;
+      border-left: 4px solid #C62828;
+    }
+
+    .alert-info {
+      background: #2196F3;
+      color: white;
+      border-left: 4px solid #1565C0;
+    }
+
+    .alert-warning {
+      background: #FF9800;
+      color: white;
+      border-left: 4px solid #EF6C00;
+    }
+
+    .alert-icon {
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #2A2A2A;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #666;
+    }
+
+    /* Responsive Design */
     @media (max-width: 768px) {
       .power-control-header {
         flex-direction: column;
@@ -942,8 +1115,33 @@
         flex-direction: column;
       }
       
-      .log-controls {
+      .log-controls,
+      .postcode-controls {
         flex-wrap: wrap;
+      }
+      
+      .postcode-header,
+      .terminal-header,
+      .logs-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      
+      .log-path {
+        max-width: 100%;
+        font-size: 12px;
+      }
+      
+      .file-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      
+      .file-actions {
+        width: 100%;
+        justify-content: flex-end;
       }
     }
   </style>
@@ -1006,41 +1204,73 @@
       </button>
     </div>
 
-    <!-- Postcode Scanner Content -->
+    <!-- Postcode Scanner Content - UPDATED -->
     <div class="tab-content active" id="postcode-content">
-      <div class="header">
-        <div class="controls">
-          <button class="refresh-btn" id="refresh-btn">Reset Device</button>
-          <button class="launch-btn" id="launch-btn">Start Reading</button>
+      <!-- Postcode Header with Controls - UPDATED -->
+      <div class="postcode-header">
+        <div class="postcode-controls">
+          <div class="postcode-status-indicator">
+            <span class="postcode-status-dot" id="postcode-status-dot"></span>
+            <span id="postcode-status-text">Ready</span>
+          </div>
+          <button class="postcode-control-btn btn-clear" id="postcode-clear-btn">
+            <span class="spinner" style="display: none;" id="postcode-clear-spinner"></span>
+            Clear
+          </button>
+          <button class="postcode-control-btn btn-stop" id="postcode-stop-btn" disabled>
+            <span class="spinner" style="display: none;" id="postcode-stop-spinner"></span>
+            Stop
+          </button>
+          <button class="postcode-control-btn btn-start" id="postcode-start-btn">
+            <span class="spinner" style="display: none;" id="postcode-start-spinner"></span>
+            Start Reading
+          </button>
         </div>
       </div>
 
-      <!-- Postcode Tabs (Scanner & Files) -->
+      <!-- Postcode Tabs (Live Logs & Files) -->
       <div class="postcode-tabs">
-        <button class="postcode-tab-btn active" onclick="switchPostcodeTab('scanner')">Live logs</button>
-        <button class="postcode-tab-btn" onclick="switchPostcodeTab('files')">Log Files</button>
+        <button class="postcode-tab-btn active" onclick="switchPostcodeTab('live-logs')">Live Logs</button>
+        <button class="postcode-tab-btn" onclick="switchPostcodeTab('saved-logs')">Saved Log Files</button>
       </div>
 
       <div class="postcode-content">
-        <!-- Scanner Tab -->
-        <div id="postcode-scanner" class="postcode-display">
-          <div class="postcode-label">Post Code Terminal</div>
-          <div class="postcode-terminal">
-            <ul class="postcode-list" id="postcode-list">
-              <li class="feed-Placeholder">Click "Start Reading" to begin scanning postcodes...</li>
-            </ul>
-            <div class="cursor" id="cursor" style="display: none;">_</div>
+        <!-- Live Logs Tab -->
+        <div id="postcode-live-logs" class="live-terminal-container">
+          <div class="terminal-header">
+            <div class="terminal-title">Live Postcode Terminal</div>
+            <div class="terminal-info">
+              <div class="counter">Postcodes: <span id="postcode-count">0</span></div>
+            </div>
           </div>
-          <div class="status-message" id="status-message">Ready to scan</div>
+
+          <div class="postcode-display">
+            <div class="postcode-label">Post Code Terminal</div>
+            <div class="postcode-terminal">
+              <ul class="postcode-list" id="postcode-list">
+                <li class="empty-state">Click "Start Reading" to begin scanning postcodes...</li>
+              </ul>
+              <span class="cursor" id="cursor" style="display: none;"></span>
+            </div>
+            <div class="status-message" id="postcode-status-message">Ready to scan</div>
+          </div>
         </div>
 
-        <!-- Files Tab -->
-        <div id="postcode-files" class="postcode-display" style="display: none;">
-          <div class="postcode-label">Postcode Log Files</div>
-          <div id="postcode-files-grid" class="files-grid">
-            <div class="empty-state">
-              <div class="empty-state-icon">📁</div>
-              <p>Loading postcode log files...</p>
+        <!-- Saved Logs Tab -->
+        <div id="postcode-saved-logs" class="logs-container" style="display: none;">
+          <div class="logs-header">
+            <div class="logs-title">Saved Log Files</div>
+            <div class="log-path" id="postcode-log-path">/home/rpi/postcode_logs/</div>
+          </div>
+
+          <div class="file-list-container">
+            <div class="file-list-header">
+              <div class="file-list-title">Postcode Log Files</div>
+              <div class="file-count" id="postcode-file-count">0 files</div>
+            </div>
+
+            <div class="file-list" id="postcode-file-list">
+              <div class="empty-state">Loading log files...</div>
             </div>
           </div>
         </div>
@@ -1057,7 +1287,7 @@
 
       <div class="bios-content">
         <!-- Live Logs Tab -->
-        <div id="bios-logs" style="display: flex; flex-direction: column; gap: 16px;">
+        <div id="bios-logs" style="display: flex; flex-direction: column; gap: 16px; height: 100%;">
           <div class="log-controls">
             <button id="bios-connect-btn" class="bios-control-btn btn-on">Connect</button>
             <button id="bios-disconnect-btn" class="bios-control-btn btn-off" style="display:none;">Disconnect</button>
@@ -1069,20 +1299,30 @@
           </div>
           
           <div id="bios-log-container" class="log-container">
-            <div class="empty-state">
-              <div class="empty-state-icon">📄</div>
-              <p>Click "Connect" to start monitoring BIOS logs...</p>
+            <div class="bios-log-content" id="bios-log-content">
+              <div class="empty-state">
+                <div class="empty-state-icon">📄</div>
+                <p>Click "Connect" to start monitoring BIOS logs...</p>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Files Tab -->
-        <div id="bios-files" class="postcode-display" style="display: none;">
-          <div class="postcode-label">BIOS Log Files</div>
-          <div id="bios-files-grid" class="files-grid">
-            <div class="empty-state">
-              <div class="empty-state-icon">📁</div>
-              <p>Loading BIOS log files...</p>
+        <div id="bios-files" class="logs-container" style="display: none;">
+          <div class="logs-header">
+            <div class="logs-title">BIOS Log Files</div>
+            <div class="log-path" id="bios-log-path">/home/rpi/bios_logs/</div>
+          </div>
+
+          <div class="file-list-container">
+            <div class="file-list-header">
+              <div class="file-list-title">BIOS Log Files</div>
+              <div class="file-count" id="bios-file-count">0 files</div>
+            </div>
+
+            <div class="file-list" id="bios-files-list">
+              <div class="empty-state">Loading log files...</div>
             </div>
           </div>
         </div>
@@ -1112,6 +1352,12 @@
   </div>
 
   <script>
+    // Global variables for file management
+    let currentFile = null;
+    let currentFileType = null;
+
+    // ==================== TAB SWITCHING FUNCTIONS ====================
+    
     // Main Tab Switching
     function switchMainTab(tabName) {
       // Update main tabs
@@ -1126,13 +1372,15 @@
     // Postcode Tab Switching
     function switchPostcodeTab(tab) {
       document.querySelectorAll('.postcode-tab-btn').forEach(btn => btn.classList.toggle('active', false));
-      document.querySelectorAll('.postcode-tab-btn')[tab === 'scanner' ? 0 : 1].classList.add('active');
+      document.querySelectorAll('.postcode-tab-btn')[tab === 'live-logs' ? 0 : 1].classList.add('active');
       
-      document.getElementById('postcode-scanner').style.display = tab === 'scanner' ? 'flex' : 'none';
-      document.getElementById('postcode-files').style.display = tab === 'files' ? 'flex' : 'none';
+      document.getElementById('postcode-live-logs').style.display = tab === 'live-logs' ? 'flex' : 'none';
+      document.getElementById('postcode-saved-logs').style.display = tab === 'saved-logs' ? 'flex' : 'none';
       
-      if (tab === 'files') {
-        loadPostcodeFiles();
+      if (tab === 'saved-logs') {
+        if (typeof loadPostcodeFiles === 'function') {
+          loadPostcodeFiles();
+        }
       }
     }
 
@@ -1145,16 +1393,16 @@
       document.getElementById('bios-files').style.display = tab === 'files' ? 'flex' : 'none';
       
       if (tab === 'files') {
-        loadBiosFiles();
+        if (typeof loadBiosFiles === 'function') {
+          loadBiosFiles();
+        }
       }
     }
 
-    
     // ==================== POWER CONTROL ====================
     document.addEventListener('DOMContentLoaded', () => {
       const powerStatus = document.getElementById('power-status');
       const statusText = document.getElementById('status-text');
-      const lastUpdated = document.getElementById('power-last-updated');
       const btnOn = document.getElementById('btn-on');
       const btnOff = document.getElementById('btn-off');
       const btnReset = document.getElementById('btn-reset');
@@ -1186,18 +1434,11 @@
         }, 10000); // 10 second cooldown
       }
 
-      function updateLastUpdatedTime() {
-        const now = new Date();
-        if (lastUpdated) {
-          lastUpdated.textContent = 'Last updated: ' + now.toLocaleTimeString();
-        }
-      }
-
       async function sendPowerCommand(action) {
         const btn = document.getElementById(`btn-${action}`);
         const originalHTML = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = `<span class="loading"></span>`;
+        btn.innerHTML = `<span class="spinner"></span>`;
 
         try {
           const response = await fetch(`http://${window.location.hostname}:3333/power/${action}`, {
@@ -1211,7 +1452,6 @@
           statusText.textContent = `${action.toUpperCase()} command sent`;
           powerStatus.className = 'power-status status-active';
           
-          updateLastUpdatedTime();
           setTimeout(checkPowerStatus, 2000);
           showAlert(`Power ${action} command sent successfully!`, 'success');
 
@@ -1247,8 +1487,6 @@
             powerStatus.classList.add('status-unknown');
           }
 
-          updateLastUpdatedTime();
-
         } catch (error) {
           statusText.textContent = 'Error checking status';
           powerStatus.className = 'power-status status-unknown';
@@ -1278,87 +1516,187 @@
       setInterval(checkPowerStatus, 30000);
     });
 
-    // ==================== POSTCODE SCANNER ====================
-    let isPolling = false;
-    let pollInterval;
-
+    // ==================== POSTCODE SCANNER - FIXED ====================
     document.addEventListener('DOMContentLoaded', () => {
-      const launchBtn = document.getElementById('launch-btn');
-      const refreshBtn = document.getElementById('refresh-btn');
+      // DOM Elements
+      const startBtn = document.getElementById('postcode-start-btn');
+      const stopBtn = document.getElementById('postcode-stop-btn');
+      const clearBtn = document.getElementById('postcode-clear-btn');
       const postcodeList = document.getElementById('postcode-list');
-      const statusMessage = document.getElementById('status-message');
+      const statusMessage = document.getElementById('postcode-status-message');
+      const statusDot = document.getElementById('postcode-status-dot');
+      const statusText = document.getElementById('postcode-status-text');
       const cursor = document.getElementById('cursor');
+      const postcodeCount = document.getElementById('postcode-count');
+      const fileList = document.getElementById('postcode-file-list');
+      const fileCount = document.getElementById('postcode-file-count');
+      const logPath = document.getElementById('postcode-log-path');
 
-      // Launch Button
-      launchBtn.addEventListener('click', async () => {
-        if (isPolling) return;
-        startReading();
-      });
+      // State variables
+      let isPolling = false;
+      let pollInterval;
+      let isReading = false;
+      let logFiles = [];
 
-      function startReading() {
-        launchBtn.disabled = true;
-        launchBtn.innerHTML = '<span class="loading"></span>Starting...';
-        statusMessage.textContent = 'Initializing reading process...';
-        
-        postcodeList.innerHTML = '';
-        cursor.style.display = 'block';
-        
-        fetch(`http://${window.location.hostname}:5010/get_data`)
-          .then(response => response.json())
-          .then(data => {
-            statusMessage.textContent = 'Started reading...';
-            isPolling = true;
-            pollForUpdates();
-          })
-          .catch(error => {
-            console.error('Error starting reading:', error);
-            statusMessage.textContent = 'Failed to start reading process';
-            launchBtn.disabled = false;
-            launchBtn.textContent = 'Start Reading';
-            cursor.style.display = 'none';
-            showAlert('Failed to start reading process', 'error');
-          });
+      // Base URL configuration - fixed to use 5015 port from app.py
+      const POSTCODE_BASE_URL = `http://${window.location.hostname}:5015`;
+
+      // Update status function
+      function updatePostcodeStatus(type, text) {
+        statusDot.className = 'postcode-status-dot';
+        statusDot.classList.add(type);
+        statusText.textContent = text;
       }
 
+      // Start reading button
+      startBtn.addEventListener('click', async () => {
+        if (isReading) return;
+
+        // Update UI
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        document.getElementById('postcode-start-spinner').style.display = 'inline-block';
+        startBtn.innerHTML = '<span class="spinner" id="postcode-start-spinner"></span>Starting...';
+        statusMessage.textContent = 'Starting reading process...';
+        cursor.style.display = 'inline-block';
+        updatePostcodeStatus('active', 'Starting');
+
+        // Clear previous results
+        postcodeList.innerHTML = '<li class="empty-state">Waiting for serial data...</li>';
+
+        try {
+          const response = await fetch(`${POSTCODE_BASE_URL}/start`);
+          const data = await response.json();
+
+          if (data.status === 'started' || data.status === 'success') {
+            statusMessage.textContent = 'Reading serial data...';
+            updatePostcodeStatus('active', 'Reading');
+            isReading = true;
+            isPolling = true;
+            pollForUpdates();
+          } else {
+            throw new Error(data.message || 'Failed to start');
+          }
+        } catch (error) {
+          console.error('Error starting reading:', error);
+          showAlert(`Failed to start: ${error.message}`, 'error');
+          statusMessage.textContent = 'Failed to start reading';
+          resetPostcodeButtons();
+        }
+      });
+
+      // Stop reading button
+      stopBtn.addEventListener('click', async () => {
+        stopBtn.disabled = true;
+        document.getElementById('postcode-stop-spinner').style.display = 'inline-block';
+        stopBtn.innerHTML = '<span class="spinner" id="postcode-stop-spinner"></span>Stopping...';
+
+        try {
+          const response = await fetch(`${POSTCODE_BASE_URL}/stop`);
+          const data = await response.json();
+
+          if (data.status === 'success' || data.status === 'stopped') {
+            statusMessage.textContent = 'Reading stopped';
+            updatePostcodeStatus('stopped', 'Stopped');
+            isReading = false;
+            isPolling = false;
+            clearTimeout(pollInterval);
+            cursor.style.display = 'none';
+            showAlert('Reading stopped successfully', 'success');
+          } else {
+            throw new Error(data.message);
+          }
+        } catch (error) {
+          console.error('Error stopping reading:', error);
+          showAlert(`Failed to stop: ${error.message}`, 'error');
+        } finally {
+          resetPostcodeButtons();
+        }
+      });
+
+      // Clear data button
+      clearBtn.addEventListener('click', async () => {
+        clearBtn.disabled = true;
+        document.getElementById('postcode-clear-spinner').style.display = 'inline-block';
+        clearBtn.innerHTML = '<span class="spinner" id="postcode-clear-spinner"></span>Clearing...';
+
+        try {
+          const response = await fetch(`${POSTCODE_BASE_URL}/clear`);
+          const data = await response.json();
+
+          if (data.status === 'success') {
+            postcodeList.innerHTML = '<li class="empty-state">Click "Start Reading" to begin scanning postcodes...</li>';
+            postcodeCount.textContent = '0';
+            statusMessage.textContent = 'Live data cleared';
+            showAlert('Live data cleared successfully', 'success');
+          }
+        } catch (error) {
+          console.error('Error clearing data:', error);
+          showAlert('Failed to clear data', 'error');
+        } finally {
+          clearBtn.disabled = false;
+          document.getElementById('postcode-clear-spinner').style.display = 'none';
+          clearBtn.innerHTML = 'Clear';
+        }
+      });
+
+      // Poll for live updates
       function pollForUpdates() {
         if (!isPolling) return;
-        
-        fetch(`http://${window.location.hostname}:5010/poll_data`)
+
+        fetch(`${POSTCODE_BASE_URL}/poll`)
           .then(response => response.json())
           .then(data => {
-            postcodeList.innerHTML = '';
-            
+            // Update postcode count
+            const count = data.count || data.postcodes?.length || 0;
+            postcodeCount.textContent = count;
+
+            // Clear and rebuild list if we have data
             if (data.postcodes && data.postcodes.length > 0) {
-              data.postcodes.forEach((code, index) => {
+              postcodeList.innerHTML = '';
+
+              data.postcodes.forEach((item, index) => {
                 const li = document.createElement('li');
                 li.className = 'postcode-item';
-                
-                if (data.status === "success" && index === data.postcodes.length - 1) {
+
+                const isLast = index === data.postcodes.length - 1;
+                const isFinal = data.status === "completed" && isLast;
+
+                if (isFinal) {
                   li.className += ' final';
-                  li.textContent = `${code} (FINAL)`;
-                } else if (index === data.postcodes.length - 1) {
+                  li.textContent = `${item.timestamp || ''} - ${item.code || item} (FINAL)`;
+                } else if (isLast) {
                   li.className += ' current';
-                  li.textContent = `> ${code}`;
+                  li.textContent = `> ${item.timestamp || ''} - ${item.code || item}`;
                 } else {
-                  li.textContent = `  ${code}`;
+                  li.textContent = `  ${item.timestamp || ''} - ${item.code || item}`;
                 }
-                
+
                 postcodeList.appendChild(li);
               });
+
+              // Scroll to bottom
+              const terminal = document.querySelector('.postcode-terminal');
+              terminal.scrollTop = terminal.scrollHeight;
+            } else if (data.status === "running") {
+              // Show waiting message if no data yet
+              if (postcodeList.children.length === 0 ||
+                postcodeList.children[0].className.includes('empty-state')) {
+                postcodeList.innerHTML = '<li class="empty-state">Waiting for serial data...</li>';
+              }
             }
-            
-            const terminal = document.querySelector('.postcode-terminal');
-            if (terminal) terminal.scrollTop = terminal.scrollHeight;
-            
-            if (data.status === "success") {
-              statusMessage.textContent = ' Done! Final postcode received.';
+
+            if (data.status === "completed") {
+              statusMessage.textContent = `Done! ${count} postcodes received.`;
               cursor.style.display = 'none';
+              isReading = false;
               isPolling = false;
-              launchBtn.disabled = false;
-              launchBtn.textContent = 'Start Reading';
+              updatePostcodeStatus('ready', 'Completed');
+              resetPostcodeButtons();
               showAlert('Reading completed successfully!', 'success');
             } else {
-              statusMessage.textContent = `Reading... (${data.postcodes?.length || 0} postcodes found)`;
+              statusMessage.textContent = `Reading... (${count} postcodes)`;
+              // Continue polling
               pollInterval = setTimeout(pollForUpdates, 1000);
             }
           })
@@ -1366,110 +1704,276 @@
             console.error('Error polling data:', error);
             statusMessage.textContent = 'Error occurred during reading';
             cursor.style.display = 'none';
+            isReading = false;
             isPolling = false;
-            launchBtn.disabled = false;
-            launchBtn.textContent = 'Start Reading';
-            showAlert('Error occurred during reading', 'error');
+            updatePostcodeStatus('stopped', 'Error');
+            resetPostcodeButtons();
+            showAlert('Error reading data', 'error');
           });
       }
 
-      // Refresh Button
-      refreshBtn.addEventListener('click', async () => {
-        if (isPolling) {
-          isPolling = false;
-          clearTimeout(pollInterval);
-          launchBtn.disabled = false;
-          launchBtn.textContent = 'Start Reading';
-          cursor.style.display = 'none';
+      // Load postcode files - Defined as global function
+      window.loadPostcodeFiles = async function() {
+        try {
+          const response = await fetch(`${POSTCODE_BASE_URL}/list_logs`);
+          const data = await response.json();
+
+          if (data.status === 'success') {
+            logFiles = data.logs || [];
+            renderFileList();
+            logPath.textContent = data.log_dir || '/home/rpi/postcode_logs/';
+          } else {
+            throw new Error(data.message || 'Invalid response format');
+          }
+        } catch (error) {
+          console.error('Error loading log files:', error);
+          fileList.innerHTML = '<div class="empty-state">Error loading log files</div>';
+          showAlert('Failed to load log files', 'error');
         }
-        
-        refreshBtn.disabled = true;
-        refreshBtn.classList.add('loading');
-        refreshBtn.innerHTML = '<span class="loading"></span>Resetting...';
+      };
+
+      // Render file list
+      function renderFileList() {
+        fileList.innerHTML = '';
+        fileCount.textContent = `${logFiles.length} file${logFiles.length !== 1 ? 's' : ''}`;
+
+        if (logFiles.length === 0) {
+          fileList.innerHTML = '<div class="empty-state">No log files found</div>';
+          return;
+        }
+
+        logFiles.forEach(file => {
+          const fileItem = document.createElement('div');
+          fileItem.className = 'file-item';
+
+          const sizeKB = (file.size / 1024).toFixed(2);
+          const date = new Date(file.modified);
+          const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+          fileItem.innerHTML = `
+            <div class="file-info">
+              <div class="file-name">${file.name}</div>
+              <div class="file-details">
+                <span class="file-size">${sizeKB} KB</span>
+                <span class="file-date">${formattedDate}</span>
+              </div>
+            </div>
+            <div class="file-actions">
+              <button class="file-action-btn" data-action="view" data-filename="${file.name}">View</button>
+              <button class="file-action-btn download" data-action="download" data-filename="${file.name}">Download</button>
+            </div>
+          `;
+
+          fileList.appendChild(fileItem);
+        });
+
+        // Add event listeners to action buttons
+        document.querySelectorAll('.file-action-btn[data-action="view"]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const filename = btn.getAttribute('data-filename');
+            openPostcodeFile(filename);
+          });
+        });
+
+        document.querySelectorAll('.file-action-btn[data-action="download"]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const filename = btn.getAttribute('data-filename');
+            downloadPostcodeFile(filename);
+          });
+        });
+      }
+
+      // Open postcode file
+      async function openPostcodeFile(filename) {
+        currentFile = { name: filename };
+        currentFileType = 'postcode';
+
+        const modal = document.getElementById('file-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalContent = document.getElementById('modal-content');
+        const downloadBtn = document.getElementById('download-btn');
+
+        modalTitle.textContent = filename;
+        modalContent.innerHTML = '<div class="empty-state"><div class="spinner"></div><p>Loading file content...</p></div>';
+        modal.classList.add('active');
+        downloadBtn.style.display = 'flex';
 
         try {
-          const response = await fetch(`http://${window.location.hostname}:3333/power/reset`, {
-            method: 'GET',
-          });
+          const response = await fetch(`${POSTCODE_BASE_URL}/get_log/${encodeURIComponent(filename)}`);
+          const data = await response.json();
 
-          if (!response.ok) {
-            throw new Error("HTTP error! Status: " + response.status);
+          if (data.status === 'success' && data.content) {
+            modalContent.textContent = data.content;
+          } else {
+            modalContent.textContent = 'Error loading file: ' + (data.message || 'Unknown error');
           }
-
-          postcodeList.innerHTML = '<li class="feed-Placeholder">Device reset. Click "Start Reading" to begin scanning...</li>';
-          statusMessage.textContent = 'Device reset successfully';
-          showAlert('Device power reset successfully.', 'success');
         } catch (error) {
-          console.error('Error refreshing device:', error);
-          showAlert('Failed to reset power.', 'error');
-        } finally {
-          refreshBtn.disabled = false;
-          refreshBtn.classList.remove('loading');
-          refreshBtn.textContent = 'Reset Device';
+          modalContent.textContent = 'Error loading file: ' + error.message;
         }
-      });
+      }
 
+      // Download postcode file
+      function downloadPostcodeFile(filename) {
+        window.open(`${POSTCODE_BASE_URL}/get_log/${encodeURIComponent(filename)}?download=true`, '_blank');
+      }
+
+      // Helper functions
+      function resetPostcodeButtons() {
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        document.getElementById('postcode-start-spinner').style.display = 'none';
+        document.getElementById('postcode-stop-spinner').style.display = 'none';
+        startBtn.innerHTML = 'Start Reading';
+        stopBtn.innerHTML = 'Stop';
+      }
+
+      // Initialize
+      updatePostcodeStatus('ready', 'Ready');
+
+      // Clean up on page unload
       window.addEventListener('beforeunload', () => {
         isPolling = false;
+        isReading = false;
         clearTimeout(pollInterval);
       });
     });
 
-    // Load Postcode Files
-    async function loadPostcodeFiles() {
-      const filesGrid = document.getElementById('postcode-files-grid');
-      filesGrid.innerHTML = '<div class="empty-state"><div class="spinner"></div><p>Loading postcode log files...</p></div>';
-      
-      try {
-        // This endpoint needs to be implemented on your server
-        const response = await fetch(`http://${window.location.hostname}:1818/list-files`);
-        const data = await response.json();
-        
-        if (data.files && data.files.length > 0) {
-          filesGrid.innerHTML = '';
-          data.files.forEach(file => {
-            const card = document.createElement('div');
-            card.className = 'file-card';
-            card.onclick = () => openFile(file, 'postcode');
-            card.innerHTML = `
-              <div class="file-icon">📄</div>
-              <div class="file-name">${file.name}</div>
-              <div class="file-meta">
-                Size: ${formatBytes(file.size)}<br>
-                Modified: ${new Date(file.modified * 1000).toLocaleString()}
-              </div>
-            `;
-            filesGrid.appendChild(card);
-          });
-        } else {
-          filesGrid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📁</div><p>No postcode log files found</p></div>';
-        }
-      } catch (error) {
-        console.error('Error loading postcode files:', error);
-        filesGrid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><p>Error loading postcode files</p></div>';
-      }
-    }
-
-    // ==================== BIOS LOG MONITOR ====================
-    let isBiosConnected = false;
-    let biosLogInterval = null;
-
+    // ==================== BIOS LOG MONITOR - FIXED ====================
     document.addEventListener('DOMContentLoaded', () => {
       const connectBtn = document.getElementById('bios-connect-btn');
       const disconnectBtn = document.getElementById('bios-disconnect-btn');
       const clearBtn = document.getElementById('bios-clear-btn');
       const biosStatus = document.getElementById('bios-status');
-      const logContainer = document.getElementById('bios-log-container');
+      const logContainer = document.getElementById('bios-log-content');
+      const biosFilesList = document.getElementById('bios-files-list');
+      const biosFileCount = document.getElementById('bios-file-count');
+      const biosLogPath = document.getElementById('bios-log-path');
+
+      let isBiosConnected = false;
+      let biosLogInterval = null;
+      
+      // BIOS API base URL
+      const BIOS_BASE_URL = `http://${window.location.hostname}:1818`;
+
+      // Define loadBiosFiles function globally
+      window.loadBiosFiles = async function() {
+        biosFilesList.innerHTML = '<div class="empty-state"><div class="spinner"></div><p>Loading BIOS log files...</p></div>';
+        
+        try {
+          const response = await fetch(`${BIOS_BASE_URL}/list-files`);
+          const data = await response.json();
+          
+          if (data.files && Array.isArray(data.files)) {
+            biosFilesList.innerHTML = '';
+            biosFileCount.textContent = `${data.files.length} file${data.files.length !== 1 ? 's' : ''}`;
+            
+            if (data.files.length === 0) {
+              biosFilesList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📁</div><p>No BIOS log files found</p></div>';
+              return;
+            }
+
+            data.files.forEach(file => {
+              const fileItem = document.createElement('div');
+              fileItem.className = 'file-item';
+
+              const sizeKB = (file.size / 1024).toFixed(2);
+              const date = new Date(file.modified);
+              const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+              fileItem.innerHTML = `
+                <div class="file-info">
+                  <div class="file-name">${file.name}</div>
+                  <div class="file-details">
+                    <span class="file-size">${sizeKB} KB</span>
+                    <span class="file-date">${formattedDate}</span>
+                  </div>
+                </div>
+                <div class="file-actions">
+                  <button class="file-action-btn" data-action="view" data-filename="${file.name}">View</button>
+                  <button class="file-action-btn download" data-action="download" data-filename="${file.name}">Download</button>
+                </div>
+              `;
+
+              biosFilesList.appendChild(fileItem);
+            });
+
+            // Add event listeners
+            document.querySelectorAll('#bios-files-list .file-action-btn[data-action="view"]').forEach(btn => {
+              btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const filename = btn.getAttribute('data-filename');
+                openBiosFile(filename);
+              });
+            });
+
+            document.querySelectorAll('#bios-files-list .file-action-btn[data-action="download"]').forEach(btn => {
+              btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const filename = btn.getAttribute('data-filename');
+                downloadBiosFile(filename);
+              });
+            });
+
+          } else {
+            biosFilesList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📁</div><p>No BIOS log files found</p></div>';
+          }
+        } catch (error) {
+          console.error('Error loading BIOS files:', error);
+          biosFilesList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><p>Error loading BIOS files</p></div>';
+        }
+      };
+
+      // Open BIOS file
+      async function openBiosFile(filename) {
+        currentFile = { name: filename };
+        currentFileType = 'bios';
+
+        const modal = document.getElementById('file-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalContent = document.getElementById('modal-content');
+        const downloadBtn = document.getElementById('download-btn');
+
+        modalTitle.textContent = filename;
+        modalContent.innerHTML = '<div class="empty-state"><div class="spinner"></div><p>Loading file content...</p></div>';
+        modal.classList.add('active');
+        downloadBtn.style.display = 'flex';
+
+        try {
+          // Try to use the BIOS server endpoints
+          const response = await fetch(`${BIOS_BASE_URL}/get-file/${encodeURIComponent(filename)}`);
+          const data = await response.json();
+          
+          if (data.content) {
+            modalContent.textContent = data.content;
+          } else if (data.error) {
+            modalContent.textContent = 'Error loading file: ' + data.error;
+          } else {
+            // Fallback to postcode endpoint if BIOS endpoint doesn't work
+            const fallbackResponse = await fetch(`${BIOS_BASE_URL}/get_log/${encodeURIComponent(filename)}`);
+            const fallbackData = await fallbackResponse.json();
+            modalContent.textContent = fallbackData.content || 'No content available for this file.';
+          }
+        } catch (error) {
+          modalContent.textContent = 'Error loading file: ' + error.message;
+        }
+      }
+
+      // Download BIOS file
+      function downloadBiosFile(filename) {
+        // Try BIOS endpoint first, then fallback to postcode endpoint
+        window.open(`${BIOS_BASE_URL}/get-file/${encodeURIComponent(filename)}?download=true`, '_blank');
+      }
 
       async function connectBios() {
         if (isBiosConnected) return;
         
         connectBtn.disabled = true;
-        connectBtn.innerHTML = '<span class="loading"></span>Connecting...';
+        connectBtn.innerHTML = '<span class="spinner"></span>Connecting...';
         
         try {
-          const response = await fetch(`http://${window.location.hostname}:1818/start-logging`, { method: 'POST' });
-          
+          const response = await fetch(`${BIOS_BASE_URL}/start-logging`, { method: 'POST' });
           
           if (response.status === 409) {
             alert('Logging is already active in another tab.');
@@ -1504,10 +2008,10 @@
         if (!isBiosConnected) return;
         
         disconnectBtn.disabled = true;
-        disconnectBtn.innerHTML = '<span class="loading"></span>Disconnecting...';
+        disconnectBtn.innerHTML = '<span class="spinner"></span>Disconnecting...';
         
         try {
-          const response = await fetch(`http://${window.location.hostname}:1818/stop-logging`, { method: 'POST' });
+          const response = await fetch(`${BIOS_BASE_URL}/stop-logging`, { method: 'POST' });
           const data = await response.json();
           
           if (response.status === 403) {
@@ -1533,7 +2037,7 @@
 
       async function fetchBiosLogs() {
         try {
-          const response = await fetch(`http://${window.location.hostname}:1818/get-logs`);
+          const response = await fetch(`${BIOS_BASE_URL}/get-logs`);
           const data = await response.json();
           
           if (data.logs && data.logs.length > 0) {
@@ -1544,7 +2048,10 @@
               entry.innerHTML = `<span class="log-timestamp">[${timestamp}]</span>${escapeHtml(log)}`;
               logContainer.appendChild(entry);
             });
-            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // Scroll to bottom
+            const biosLogContainer = document.getElementById('bios-log-content');
+            biosLogContainer.scrollTop = biosLogContainer.scrollHeight;
           }
         } catch (error) {
           console.error('Error fetching logs:', error);
@@ -1552,7 +2059,7 @@
       }
 
       function clearBiosLogs() {
-        logContainer.innerHTML = '';
+        logContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📄</div><p>Click "Connect" to start monitoring BIOS logs...</p></div>';
         showAlert('BIOS logs cleared', 'info');
       }
 
@@ -1561,83 +2068,8 @@
       clearBtn.addEventListener('click', clearBiosLogs);
     });
 
-    // Load BIOS Files
-    async function loadBiosFiles() {
-      const filesGrid = document.getElementById('bios-files-grid');
-      filesGrid.innerHTML = '<div class="empty-state"><div class="spinner"></div><p>Loading BIOS log files...</p></div>';
-      
-      try {
-        // This endpoint needs to be implemented on your server
-        const response = await fetch(`http://${window.location.hostname}:1818/list-files`);
-        const data = await response.json();
-        
-        if (data.files && data.files.length > 0) {
-          filesGrid.innerHTML = '';
-          data.files.forEach(file => {
-            const card = document.createElement('div');
-            card.className = 'file-card';
-            card.onclick = () => openFile(file, 'bios');
-            card.innerHTML = `
-              <div class="file-icon">📄</div>
-              <div class="file-name">${file.name}</div>
-              <div class="file-meta">
-                Size: ${formatBytes(file.size)}<br>
-                Modified: ${new Date(file.modified * 1000).toLocaleString()}
-              </div>
-            `;
-            filesGrid.appendChild(card);
-          });
-        } else {
-          filesGrid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📁</div><p>No BIOS log files found</p></div>';
-        }
-      } catch (error) {
-        console.error('Error loading BIOS files:', error);
-        filesGrid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><p>Error loading BIOS files</p></div>';
-      }
-    }
-
     // ==================== FILE VIEWING & DOWNLOAD ====================
-    let currentFile = null;
-    let currentFileType = null;
-    const DRIVER_PORT = 1818;
-    const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${DRIVER_PORT}`;
-
-    async function openFile(file, type) {
-      currentFile = file;
-      currentFileType = type;
-      
-      const modal = document.getElementById('file-modal');
-      const modalTitle = document.getElementById('modal-title');
-      const modalContent = document.getElementById('modal-content');
-      const downloadBtn = document.getElementById('download-btn');
-      
-      modalTitle.textContent = file.name;
-      modalContent.innerHTML = '<div class="empty-state"><div class="spinner"></div><p>Loading file content...</p></div>';
-      modal.classList.add('active');
-      
-      // Enable download button
-      downloadBtn.style.display = 'flex';
-      
-      try {
-        const endpoint = type === 'postcode' ? 
-          `/get-file/${encodeURIComponent(file.name)}` :
-          `/get-file/${encodeURIComponent(file.name)}`;
-        
-        const response = await fetch(`${API_BASE_URL}${endpoint}`);
-        const data = await response.json();
-        
-        if (data.content) {
-          modalContent.textContent = data.content;
-        } else if (data.error) {
-          modalContent.textContent = 'Error loading file: ' + data.error;
-        } else {
-          modalContent.textContent = 'No content available for this file.';
-        }
-      } catch (error) {
-        modalContent.textContent = 'Error loading file: ' + error.message;
-      }
-    }
-
+    
     // Download file as .txt
     document.getElementById('download-btn').addEventListener('click', function() {
       if (!currentFile || !currentFileType) return;
@@ -1668,39 +2100,19 @@
     // ==================== COMMON FUNCTIONS ====================
     function showAlert(message, type = 'info') {
       const alertBox = document.createElement('div');
-      alertBox.className = "alert alert-" + type;
-      alertBox.innerHTML = '<span class="alert-icon">!</span>' + message;
-      alertBox.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 12px 16px;
-        border-radius: 6px;
-        background: ${type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : type === 'warning' ? '#f39c12' : '#3498db'};
-        color: white;
-        z-index: 1000;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        min-width: 300px;
-        max-width: 400px;
+      alertBox.className = `alert alert-${type}`;
+      alertBox.innerHTML = `
+        <span class="alert-icon">${type === 'error' ? '✕' : type === 'success' ? '✓' : type === 'warning' ? '⚠' : 'ℹ'}</span>
+        <span>${message}</span>
       `;
 
       document.body.appendChild(alertBox);
 
-      setTimeout(function() {
-        if (alertBox.parentNode) {
-          alertBox.style.opacity = '0';
-          alertBox.style.transition = 'opacity 0.3s';
-          setTimeout(() => {
-            if (alertBox.parentNode) {
-              alertBox.remove();
-            }
-          }, 300);
-        }
-      }, 3000);
+      setTimeout(() => {
+        alertBox.style.opacity = '0';
+        alertBox.style.transform = 'translateX(100%)';
+        setTimeout(() => alertBox.remove(), 300);
+      }, 4000);
     }
 
     function formatBytes(bytes) {
@@ -1730,6 +2142,9 @@
         closeModal();
       }
     });
+
+    // Close modal button
+    document.querySelector('.close-btn').addEventListener('click', closeModal);
   </script>
 </body>
 </html>
