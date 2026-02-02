@@ -1206,74 +1206,13 @@
 
     <!-- Postcode Scanner Content - UPDATED -->
     <div class="tab-content active" id="postcode-content">
-      <!-- Postcode Header with Controls - UPDATED -->
-      <div class="postcode-header">
-        <div class="postcode-controls">
-          <div class="postcode-status-indicator">
-            <span class="postcode-status-dot" id="postcode-status-dot"></span>
-            <span id="postcode-status-text">Ready</span>
-          </div>
-          <button class="postcode-control-btn btn-clear" id="postcode-clear-btn">
-            <span class="spinner" style="display: none;" id="postcode-clear-spinner"></span>
-            Clear
-          </button>
-          <button class="postcode-control-btn btn-stop" id="postcode-stop-btn" disabled>
-            <span class="spinner" style="display: none;" id="postcode-stop-spinner"></span>
-            Stop
-          </button>
-          <button class="postcode-control-btn btn-start" id="postcode-start-btn">
-            <span class="spinner" style="display: none;" id="postcode-start-spinner"></span>
-            Start Reading
-          </button>
-        </div>
-      </div>
-
-      <!-- Postcode Tabs (Live Logs & Files) -->
-      <div class="postcode-tabs">
-        <button class="postcode-tab-btn active" onclick="switchPostcodeTab('live-logs')">Live Logs</button>
-        <button class="postcode-tab-btn" onclick="switchPostcodeTab('saved-logs')">Saved Log Files</button>
-      </div>
-
       <div class="postcode-content">
-        <!-- Live Logs Tab -->
-        <div id="postcode-live-logs" class="live-terminal-container">
-          <div class="terminal-header">
-            <div class="terminal-title">Live Postcode Terminal</div>
-            <div class="terminal-info">
-              <div class="counter">Postcodes: <span id="postcode-count">0</span></div>
-            </div>
-          </div>
-
-          <div class="postcode-display">
-            <div class="postcode-label">Post Code Terminal</div>
-            <div class="postcode-terminal">
-              <ul class="postcode-list" id="postcode-list">
-                <li class="empty-state">Click "Start Reading" to begin scanning postcodes...</li>
-              </ul>
-              <span class="cursor" id="cursor" style="display: none;"></span>
-            </div>
-            <div class="status-message" id="postcode-status-message">Ready to scan</div>
-          </div>
-        </div>
-
-        <!-- Saved Logs Tab -->
-        <div id="postcode-saved-logs" class="logs-container" style="display: none;">
-          <div class="logs-header">
-            <div class="logs-title">Saved Log Files</div>
-            <div class="log-path" id="postcode-log-path">/home/rpi/postcode_logs/</div>
-          </div>
-
-          <div class="file-list-container">
-            <div class="file-list-header">
-              <div class="file-list-title">Postcode Log Files</div>
-              <div class="file-count" id="postcode-file-count">0 files</div>
-            </div>
-
-            <div class="file-list" id="postcode-file-list">
-              <div class="empty-state">Loading log files...</div>
-            </div>
-          </div>
-        </div>
+        <iframe 
+          src=""
+          style="width: 100%; height: 600px; border: none;"
+          title="Postcode Live Scanner"
+          onload="this.src = 'http://' + window.location.hostname + ':5015'">
+        </iframe>
       </div>
     </div>
 
@@ -1441,7 +1380,7 @@
         btn.innerHTML = `<span class="spinner"></span>`;
 
         try {
-          const response = await fetch(`http://${window.location.hostname}:3333/power/${action}`, {
+          const response = await fetch(`http://172.16.38.170:3333/power/${action}`, {
             method: 'GET'
           });
           
@@ -1453,12 +1392,12 @@
           powerStatus.className = 'power-status status-active';
           
           setTimeout(checkPowerStatus, 2000);
-          showAlert(`Power ${action} command sent successfully!`, 'success');
+          // showAlert(`Power ${action} command sent successfully!`, 'success');
 
         } catch (error) {
           statusText.textContent = `Failed: ${error.message}`;
           powerStatus.className = 'power-status status-unknown';
-          showAlert(`Failed to send power ${action} command`, 'error');
+          // showAlert(`Failed to send power ${action} command`, 'error');
         } finally {
           btn.innerHTML = originalHTML;
           setTimeout(() => {
@@ -1469,7 +1408,7 @@
 
       async function checkPowerStatus() {
         try {
-          const response = await fetch(`http://${window.location.hostname}:3333/state`);
+          const response = await fetch(`http://172.16.38.170:3333/state`);
           if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
           const data = await response.json();
@@ -1515,331 +1454,7 @@
       // Check status every 30 seconds
       setInterval(checkPowerStatus, 30000);
     });
-
-    // ==================== POSTCODE SCANNER - FIXED ====================
-    document.addEventListener('DOMContentLoaded', () => {
-      // DOM Elements
-      const startBtn = document.getElementById('postcode-start-btn');
-      const stopBtn = document.getElementById('postcode-stop-btn');
-      const clearBtn = document.getElementById('postcode-clear-btn');
-      const postcodeList = document.getElementById('postcode-list');
-      const statusMessage = document.getElementById('postcode-status-message');
-      const statusDot = document.getElementById('postcode-status-dot');
-      const statusText = document.getElementById('postcode-status-text');
-      const cursor = document.getElementById('cursor');
-      const postcodeCount = document.getElementById('postcode-count');
-      const fileList = document.getElementById('postcode-file-list');
-      const fileCount = document.getElementById('postcode-file-count');
-      const logPath = document.getElementById('postcode-log-path');
-
-      // State variables
-      let isPolling = false;
-      let pollInterval;
-      let isReading = false;
-      let logFiles = [];
-
-      // Base URL configuration - fixed to use 5015 port from app.py
-      const POSTCODE_BASE_URL = `http://${window.location.hostname}:5015`;
-
-      // Update status function
-      function updatePostcodeStatus(type, text) {
-        statusDot.className = 'postcode-status-dot';
-        statusDot.classList.add(type);
-        statusText.textContent = text;
-      }
-
-      // Start reading button
-      startBtn.addEventListener('click', async () => {
-        if (isReading) return;
-
-        // Update UI
-        startBtn.disabled = true;
-        stopBtn.disabled = false;
-        document.getElementById('postcode-start-spinner').style.display = 'inline-block';
-        startBtn.innerHTML = '<span class="spinner" id="postcode-start-spinner"></span>Starting...';
-        statusMessage.textContent = 'Starting reading process...';
-        cursor.style.display = 'inline-block';
-        updatePostcodeStatus('active', 'Starting');
-
-        // Clear previous results
-        postcodeList.innerHTML = '<li class="empty-state">Waiting for serial data...</li>';
-
-        try {
-          const response = await fetch(`${POSTCODE_BASE_URL}/start`);
-          const data = await response.json();
-
-          if (data.status === 'started' || data.status === 'success') {
-            statusMessage.textContent = 'Reading serial data...';
-            updatePostcodeStatus('active', 'Reading');
-            isReading = true;
-            isPolling = true;
-            pollForUpdates();
-          } else {
-            throw new Error(data.message || 'Failed to start');
-          }
-        } catch (error) {
-          console.error('Error starting reading:', error);
-          showAlert(`Failed to start: ${error.message}`, 'error');
-          statusMessage.textContent = 'Failed to start reading';
-          resetPostcodeButtons();
-        }
-      });
-
-      // Stop reading button
-      stopBtn.addEventListener('click', async () => {
-        stopBtn.disabled = true;
-        document.getElementById('postcode-stop-spinner').style.display = 'inline-block';
-        stopBtn.innerHTML = '<span class="spinner" id="postcode-stop-spinner"></span>Stopping...';
-
-        try {
-          const response = await fetch(`${POSTCODE_BASE_URL}/stop`);
-          const data = await response.json();
-
-          if (data.status === 'success' || data.status === 'stopped') {
-            statusMessage.textContent = 'Reading stopped';
-            updatePostcodeStatus('stopped', 'Stopped');
-            isReading = false;
-            isPolling = false;
-            clearTimeout(pollInterval);
-            cursor.style.display = 'none';
-            showAlert('Reading stopped successfully', 'success');
-          } else {
-            throw new Error(data.message);
-          }
-        } catch (error) {
-          console.error('Error stopping reading:', error);
-          showAlert(`Failed to stop: ${error.message}`, 'error');
-        } finally {
-          resetPostcodeButtons();
-        }
-      });
-
-      // Clear data button
-      clearBtn.addEventListener('click', async () => {
-        clearBtn.disabled = true;
-        document.getElementById('postcode-clear-spinner').style.display = 'inline-block';
-        clearBtn.innerHTML = '<span class="spinner" id="postcode-clear-spinner"></span>Clearing...';
-
-        try {
-          const response = await fetch(`${POSTCODE_BASE_URL}/clear`);
-          const data = await response.json();
-
-          if (data.status === 'success') {
-            postcodeList.innerHTML = '<li class="empty-state">Click "Start Reading" to begin scanning postcodes...</li>';
-            postcodeCount.textContent = '0';
-            statusMessage.textContent = 'Live data cleared';
-            showAlert('Live data cleared successfully', 'success');
-          }
-        } catch (error) {
-          console.error('Error clearing data:', error);
-          showAlert('Failed to clear data', 'error');
-        } finally {
-          clearBtn.disabled = false;
-          document.getElementById('postcode-clear-spinner').style.display = 'none';
-          clearBtn.innerHTML = 'Clear';
-        }
-      });
-
-      // Poll for live updates
-      function pollForUpdates() {
-        if (!isPolling) return;
-
-        fetch(`${POSTCODE_BASE_URL}/poll`)
-          .then(response => response.json())
-          .then(data => {
-            // Update postcode count
-            const count = data.count || data.postcodes?.length || 0;
-            postcodeCount.textContent = count;
-
-            // Clear and rebuild list if we have data
-            if (data.postcodes && data.postcodes.length > 0) {
-              postcodeList.innerHTML = '';
-
-              data.postcodes.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.className = 'postcode-item';
-
-                const isLast = index === data.postcodes.length - 1;
-                const isFinal = data.status === "completed" && isLast;
-
-                if (isFinal) {
-                  li.className += ' final';
-                  li.textContent = `${item.timestamp || ''} - ${item.code || item} (FINAL)`;
-                } else if (isLast) {
-                  li.className += ' current';
-                  li.textContent = `> ${item.timestamp || ''} - ${item.code || item}`;
-                } else {
-                  li.textContent = `  ${item.timestamp || ''} - ${item.code || item}`;
-                }
-
-                postcodeList.appendChild(li);
-              });
-
-              // Scroll to bottom
-              const terminal = document.querySelector('.postcode-terminal');
-              terminal.scrollTop = terminal.scrollHeight;
-            } else if (data.status === "running") {
-              // Show waiting message if no data yet
-              if (postcodeList.children.length === 0 ||
-                postcodeList.children[0].className.includes('empty-state')) {
-                postcodeList.innerHTML = '<li class="empty-state">Waiting for serial data...</li>';
-              }
-            }
-
-            if (data.status === "completed") {
-              statusMessage.textContent = `Done! ${count} postcodes received.`;
-              cursor.style.display = 'none';
-              isReading = false;
-              isPolling = false;
-              updatePostcodeStatus('ready', 'Completed');
-              resetPostcodeButtons();
-              showAlert('Reading completed successfully!', 'success');
-            } else {
-              statusMessage.textContent = `Reading... (${count} postcodes)`;
-              // Continue polling
-              pollInterval = setTimeout(pollForUpdates, 1000);
-            }
-          })
-          .catch(error => {
-            console.error('Error polling data:', error);
-            statusMessage.textContent = 'Error occurred during reading';
-            cursor.style.display = 'none';
-            isReading = false;
-            isPolling = false;
-            updatePostcodeStatus('stopped', 'Error');
-            resetPostcodeButtons();
-            showAlert('Error reading data', 'error');
-          });
-      }
-
-      // Load postcode files - Defined as global function
-      window.loadPostcodeFiles = async function() {
-        try {
-          const response = await fetch(`${POSTCODE_BASE_URL}/list_logs`);
-          const data = await response.json();
-
-          if (data.status === 'success') {
-            logFiles = data.logs || [];
-            renderFileList();
-            logPath.textContent = data.log_dir || '/home/rpi/postcode_logs/';
-          } else {
-            throw new Error(data.message || 'Invalid response format');
-          }
-        } catch (error) {
-          console.error('Error loading log files:', error);
-          fileList.innerHTML = '<div class="empty-state">Error loading log files</div>';
-          showAlert('Failed to load log files', 'error');
-        }
-      };
-
-      // Render file list
-      function renderFileList() {
-        fileList.innerHTML = '';
-        fileCount.textContent = `${logFiles.length} file${logFiles.length !== 1 ? 's' : ''}`;
-
-        if (logFiles.length === 0) {
-          fileList.innerHTML = '<div class="empty-state">No log files found</div>';
-          return;
-        }
-
-        logFiles.forEach(file => {
-          const fileItem = document.createElement('div');
-          fileItem.className = 'file-item';
-
-          const sizeKB = (file.size / 1024).toFixed(2);
-          const date = new Date(file.modified);
-          const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-          fileItem.innerHTML = `
-            <div class="file-info">
-              <div class="file-name">${file.name}</div>
-              <div class="file-details">
-                <span class="file-size">${sizeKB} KB</span>
-                <span class="file-date">${formattedDate}</span>
-              </div>
-            </div>
-            <div class="file-actions">
-              <button class="file-action-btn" data-action="view" data-filename="${file.name}">View</button>
-              <button class="file-action-btn download" data-action="download" data-filename="${file.name}">Download</button>
-            </div>
-          `;
-
-          fileList.appendChild(fileItem);
-        });
-
-        // Add event listeners to action buttons
-        document.querySelectorAll('.file-action-btn[data-action="view"]').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const filename = btn.getAttribute('data-filename');
-            openPostcodeFile(filename);
-          });
-        });
-
-        document.querySelectorAll('.file-action-btn[data-action="download"]').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const filename = btn.getAttribute('data-filename');
-            downloadPostcodeFile(filename);
-          });
-        });
-      }
-
-      // Open postcode file
-      async function openPostcodeFile(filename) {
-        currentFile = { name: filename };
-        currentFileType = 'postcode';
-
-        const modal = document.getElementById('file-modal');
-        const modalTitle = document.getElementById('modal-title');
-        const modalContent = document.getElementById('modal-content');
-        const downloadBtn = document.getElementById('download-btn');
-
-        modalTitle.textContent = filename;
-        modalContent.innerHTML = '<div class="empty-state"><div class="spinner"></div><p>Loading file content...</p></div>';
-        modal.classList.add('active');
-        downloadBtn.style.display = 'flex';
-
-        try {
-          const response = await fetch(`${POSTCODE_BASE_URL}/get_log/${encodeURIComponent(filename)}`);
-          const data = await response.json();
-
-          if (data.status === 'success' && data.content) {
-            modalContent.textContent = data.content;
-          } else {
-            modalContent.textContent = 'Error loading file: ' + (data.message || 'Unknown error');
-          }
-        } catch (error) {
-          modalContent.textContent = 'Error loading file: ' + error.message;
-        }
-      }
-
-      // Download postcode file
-      function downloadPostcodeFile(filename) {
-        window.open(`${POSTCODE_BASE_URL}/get_log/${encodeURIComponent(filename)}?download=true`, '_blank');
-      }
-
-      // Helper functions
-      function resetPostcodeButtons() {
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-        document.getElementById('postcode-start-spinner').style.display = 'none';
-        document.getElementById('postcode-stop-spinner').style.display = 'none';
-        startBtn.innerHTML = 'Start Reading';
-        stopBtn.innerHTML = 'Stop';
-      }
-
-      // Initialize
-      updatePostcodeStatus('ready', 'Ready');
-
-      // Clean up on page unload
-      window.addEventListener('beforeunload', () => {
-        isPolling = false;
-        isReading = false;
-        clearTimeout(pollInterval);
-      });
-    });
-
+    
     // ==================== BIOS LOG MONITOR - FIXED ====================
     document.addEventListener('DOMContentLoaded', () => {
       const connectBtn = document.getElementById('bios-connect-btn');
@@ -1990,14 +1605,14 @@
             
             logContainer.innerHTML = '';
             biosLogInterval = setInterval(fetchBiosLogs, 1000);
-            showAlert('BIOS logging started successfully', 'success');
+            //showAlert('BIOS logging started successfully', 'success');
           } else {
             alert('Failed to start logging: ' + data.message);
-            showAlert('Failed to start BIOS logging', 'error');
+            //showAlert('Failed to start BIOS logging', 'error');
           }
         } catch (error) {
           alert('Error connecting: ' + error.message);
-          showAlert('Error connecting to BIOS log', 'error');
+          //showAlert('Error connecting to BIOS log', 'error');
         } finally {
           connectBtn.disabled = false;
           connectBtn.textContent = 'Connect';
@@ -2025,10 +1640,10 @@
           disconnectBtn.style.display = 'none';
           biosStatus.className = 'log-status disconnected';
           biosStatus.innerHTML = '<span class="status-dot"></span>Disconnected';
-          showAlert('BIOS logging stopped', 'info');
+          //showAlert('BIOS logging stopped', 'info');
         } catch (error) {
           alert('Error disconnecting: ' + error.message);
-          showAlert('Error disconnecting from BIOS log', 'error');
+          //showAlert('Error disconnecting from BIOS log', 'error');
         } finally {
           disconnectBtn.disabled = false;
           disconnectBtn.textContent = 'Disconnect';
@@ -2060,7 +1675,7 @@
 
       function clearBiosLogs() {
         logContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📄</div><p>Click "Connect" to start monitoring BIOS logs...</p></div>';
-        showAlert('BIOS logs cleared', 'info');
+        //showAlert('BIOS logs cleared', 'info');
       }
 
       connectBtn.addEventListener('click', connectBios);
@@ -2088,7 +1703,7 @@
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      showAlert(`File "${filename}" downloaded successfully!`, 'success');
+      //showAlert(`File "${filename}" downloaded successfully!`, 'success');
     });
 
     function closeModal() {

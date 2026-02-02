@@ -256,6 +256,76 @@
       cursor: pointer;
     }
 
+    /* Fullscreen Button */
+    .fullscreen-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(30, 30, 30, 0.85);
+      border: 1px solid #404040;
+      color: #FFFFFF;
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: all 0.2s;
+      backdrop-filter: blur(4px);
+    }
+
+    .fullscreen-btn:hover {
+      background: rgba(255, 106, 0, 0.85);
+      border-color: #FF6A00;
+      transform: scale(1.05);
+    }
+
+    .fullscreen-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Fullscreen mode styles */
+    body.fullscreen-mode {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    body.fullscreen-mode .main-container {
+      max-width: 100%;
+      padding: 0;
+    }
+
+    body.fullscreen-mode .remote-desktop-wrapper {
+      border-radius: 0;
+      border: none;
+      height: 100vh;
+    }
+
+    body.fullscreen-mode .remote-desktop-header,
+    body.fullscreen-mode .header,
+    body.fullscreen-mode .tabs-container {
+      display: none;
+    }
+
+    body.fullscreen-mode .remote-desktop-content {
+      height: 100vh;
+    }
+
+    body.fullscreen-mode .fullscreen-btn {
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    body.fullscreen-mode .fullscreen-btn:hover {
+      background: rgba(255, 106, 0, 0.9);
+      border-color: #FF6A00;
+    }
+
     /* Shortcut Feedback Popup - appears inside desktop view */
     .shortcut-overlay {
       position: absolute;
@@ -544,6 +614,13 @@
           <div class="connection-status disconnected" id="connection-status">Disconnected</div>
         </div>
         <div class="remote-desktop-content">
+          <!-- Fullscreen Button -->
+          <button class="fullscreen-btn" id="fullscreen-btn" title="Toggle Fullscreen">
+            <svg viewBox="0 0 24 24">
+              <path fill="currentColor" d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z"/>
+            </svg>
+          </button>
+          
           <div class="shortcut-overlay">
             <div class="shortcut-popup" id="shortcut-popup"></div>
           </div>
@@ -603,6 +680,94 @@
       }
     }
 
+    // Fullscreen functionality
+    let isFullscreen = false;
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    
+    function toggleFullscreen() {
+      if (!isFullscreen) {
+        enterFullscreen();
+      } else {
+        exitFullscreen();
+      }
+    }
+    
+    function enterFullscreen() {
+      const elem = document.documentElement;
+      
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.mozRequestFullScreen) { /* Firefox */
+        elem.mozRequestFullScreen();
+      } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) { /* IE/Edge */
+        elem.msRequestFullscreen();
+      }
+      
+      isFullscreen = true;
+      document.body.classList.add('fullscreen-mode');
+      updateFullscreenIcon();
+    }
+    
+    function exitFullscreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) { /* Firefox */
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) { /* Chrome, Safari & Opera */
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) { /* IE/Edge */
+        document.msExitFullscreen();
+      }
+      
+      isFullscreen = false;
+      document.body.classList.remove('fullscreen-mode');
+      updateFullscreenIcon();
+    }
+    
+    function updateFullscreenIcon() {
+      if (!fullscreenBtn) return;
+      
+      if (isFullscreen) {
+        fullscreenBtn.innerHTML = `
+          <svg viewBox="0 0 24 24">
+            <path fill="currentColor" d="M14,14H19V16H16V19H14V14M10,14H5V16H8V19H10V14M10,10H5V8H8V5H10V10M14,10H19V8H16V5H14V10Z"/>
+          </svg>
+        `;
+        fullscreenBtn.title = "Exit Fullscreen";
+      } else {
+        fullscreenBtn.innerHTML = `
+          <svg viewBox="0 0 24 24">
+            <path fill="currentColor" d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z"/>
+          </svg>
+        `;
+        fullscreenBtn.title = "Enter Fullscreen";
+      }
+    }
+    
+    // Listen for fullscreen change events
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    
+    function handleFullscreenChange() {
+      const fullscreenElement = document.fullscreenElement || 
+                               document.webkitFullscreenElement || 
+                               document.mozFullScreenElement || 
+                               document.msFullscreenElement;
+      
+      isFullscreen = !!fullscreenElement;
+      document.body.classList.toggle('fullscreen-mode', isFullscreen);
+      updateFullscreenIcon();
+    }
+    
+    // Initialize fullscreen button
+    if (fullscreenBtn) {
+      fullscreenBtn.addEventListener('click', toggleFullscreen);
+    }
+
     // PC Remote Desktop functionality
     document.addEventListener('DOMContentLoaded', () => {
       const connectBtn = document.getElementById('connect-btn');
@@ -643,6 +808,9 @@
               // Clear placeholder and add video
               remoteDesktopFeed.remove();
               desktopView.appendChild(videoElement);
+              
+              // Show fullscreen button
+              fullscreenBtn.style.display = 'flex';
               
               // Update UI
               connectBtn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Disconnect';
@@ -727,6 +895,9 @@
           videoElement.remove();
           videoElement = null;
         }
+        
+        // Hide fullscreen button
+        fullscreenBtn.style.display = 'none';
         
         // Reset UI
         desktopView.innerHTML = '<div class="desktop-placeholder" id="remote-desktop-feed">Not connected</div>';
