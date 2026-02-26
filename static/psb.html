@@ -1210,10 +1210,9 @@
     <div class="tab-content active" id="postcode-content">
       <div class="postcode-content">
         <iframe 
-          src=""
+          id="postcodeFrame"
           style="width: 100%; height: 600px; border: none;"
-          title="Postcode Live Scanner"
-          onload="this.src = 'http://' + SERVER_CONFIG.ip + ':5012'">
+          title="Postcode Live Scanner">
         </iframe>
       </div>
     </div>
@@ -1296,6 +1295,9 @@
     // Global variables for file management
     let currentFile = null;
     let currentFileType = null;
+
+    // Assign source to postcode
+    document.getElementById("postcodeFrame").src ="http://" + SERVER_CONFIG.ip + ":5012";
 
     // ==================== TAB SWITCHING FUNCTIONS ====================
     
