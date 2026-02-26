@@ -210,6 +210,9 @@
     <div class="status" id="statusMsg"></div>
   </div>
 
+  <!-- Include config.js file -->
+  <script src="config.js"></script>
+  
   <script>
     // ===== Modal toggle logic =====
     const openGuideBtn   = document.getElementById('openGuideBtn');
@@ -263,8 +266,7 @@
     // ===== Iframe functionality (SV URL loading with timeout) =====
     const iframe     = document.getElementById("content-frame");
     const messageDiv = document.getElementById("message");
-    // const url = `https://${window.location.hostname}:4200/`
-    const url = "https://100.109.50.57:4200/"; // set your actual URL
+    const url = `https://${SERVER_CONFIG.ip}:4200/`
 
     if (!url) {
       messageDiv.textContent = "Unable to get response from the API";

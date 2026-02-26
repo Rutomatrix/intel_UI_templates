@@ -332,11 +332,15 @@
     </div>
   </div>
 
+
+  <!-- Include config.js file -->
+  <script src="config.js"></script>
+
   <script>
   let selectedFile = null;
   let progressInterval;
   const DRIVER_PORT = 5003;
-  const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${DRIVER_PORT}`;
+  const API_BASE_URL = `${window.location.protocol}//${SERVER_CONFIG.ip}:${DRIVER_PORT}`;
         
 
   function startProgress() {

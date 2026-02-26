@@ -659,6 +659,9 @@
     </div>
   </div>
 
+  <!-- Include config.js file -->
+  <script src="config.js"></script>
+  
   <script>
     // Tab switching functionality
     function switchTab(tabName) {
@@ -799,7 +802,7 @@
               // Create video element
               videoElement = document.createElement('img');
               videoElement.id = 'remoteDesktopImg';
-              videoElement.src = `http://${window.location.hostname}:9000/stream?advance_headers=1&dual_final_frames=1&t=` + Date.now();
+              videoElement.src = `http://${SERVER_CONFIG.ip}:9000/stream?advance_headers=1&dual_final_frames=1&t=` + Date.now();
               videoElement.style.width = '100%';
               videoElement.style.height = '100%';
               videoElement.style.objectFit = 'contain';
@@ -824,7 +827,7 @@
               // Auto-refresh the stream every 30 seconds
               refreshInterval = setInterval(() => {
                 if (videoElement && isConnected) {
-                  videoElement.src = `http://${window.location.hostname}:9000/stream?advance_headers=1&dual_final_frames=1&t=` + Date.now();
+                  videoElement.src = `http://${SERVER_CONFIG.ip}:9000/stream?advance_headers=1&dual_final_frames=1&t=` + Date.now();
                 }
               }, 30000);
             } else {
@@ -929,7 +932,7 @@
             if (!isModifier) jsCodes.push(e.keyCode);
 
             if (jsCodes.length > 0) {
-              fetch(`http://${window.location.hostname}:5000/keyboard`, {
+              fetch(`http://${SERVER_CONFIG.ip}:5000/keyboard`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ keycodes: jsCodes })
@@ -947,7 +950,7 @@
         document.addEventListener('mousemove', (e) => {
           if (document.pointerLockElement === videoElement) {
             let [dx, dy] = smoothMouseDelta(e.movementX, e.movementY);
-            fetch(`http://${window.location.hostname}:5000/mouse`, {
+            fetch(`http://${SERVER_CONFIG.ip}:5000/mouse`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ x: dx, y: dy, buttons: e.buttons, wheel: 0 })
@@ -957,7 +960,7 @@
 
         document.addEventListener('mousedown', (e) => {
           if (document.pointerLockElement === videoElement) {
-            fetch(`http://${window.location.hostname}:5000/mouse`, {
+            fetch(`http://${SERVER_CONFIG.ip}:5000/mouse`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ x: 0, y: 0, buttons: (1 << e.button), wheel: 0 })
@@ -967,7 +970,7 @@
 
         document.addEventListener('mouseup', (e) => {
           if (document.pointerLockElement === videoElement) {
-            fetch(`http://${window.location.hostname}:5000/mouse`, {
+            fetch(`http://${SERVER_CONFIG.ip}:5000/mouse`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ x: 0, y: 0, buttons: 0, wheel: 0 })
@@ -977,7 +980,7 @@
 
         document.addEventListener('wheel', (e) => {
           if (document.pointerLockElement === videoElement) {
-            fetch(`http://${window.location.hostname}:5000/mouse`, {
+            fetch(`http://${SERVER_CONFIG.ip}:5000/mouse`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ x: 0, y: 0, buttons: 0, wheel: e.deltaY > 0 ? 0xFF : 0x01 })
@@ -991,7 +994,7 @@
     async function testConnection(url) {
       // Define the necessary variables (ensure these are available/defined in a higher scope)
       const DRIVER_PORT = 8000; 
-      const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${DRIVER_PORT}`;
+      const API_BASE_URL = `${window.location.protocol}//${SERVER_CONFIG.ip}:${DRIVER_PORT}`;
     
       // Construct the absolute URL using the base and the relative path passed to the function
       const absolute_url = `${API_BASE_URL}${url}`;
@@ -1014,7 +1017,7 @@
     async function testConnection1(url) {
       // Define the necessary variables for cross-port communication
       const DRIVER_PORT = 5000; 
-      const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${DRIVER_PORT}`;
+      const API_BASE_URL = `${window.location.protocol}//${SERVER_CONFIG.ip}:${DRIVER_PORT}`;
       
       // Construct the absolute URL
       const absolute_url = `${API_BASE_URL}${url}`;
@@ -1040,7 +1043,7 @@
       // Show popup feedback
       showShortcutPopup(action);
 
-      fetch(`http://${window.location.hostname}:5000/shortcut/` + action, {
+      fetch(`http://${SERVER_CONFIG.ip}:5000/shortcut/` + action, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       })
@@ -1102,7 +1105,7 @@
 
     function fetchList() {
       document.getElementById('status').textContent = 'Loading ISO files...';
-      fetch(`http://${window.location.hostname}:9001/list`)
+      fetch(`http://${SERVER_CONFIG.ip}:9001/list`)
         .then(res => res.json())
         .then(data => {
           const ul = document.getElementById('isoList');
@@ -1144,7 +1147,7 @@
 
       document.getElementById('status').textContent = 'Mounting ' + selectedFile + '...';
 
-      fetch(`http://${window.location.hostname}:9001/mount?filename=` + encodeURIComponent(selectedFile), {
+      fetch(`http://${SERVER_CONFIG.ip}:9001/mount?filename=` + encodeURIComponent(selectedFile), {
         method: 'POST'
       })
       .then(res => res.json())
@@ -1161,7 +1164,7 @@
     function unmount() {
       document.getElementById('status').textContent = 'Unmounting...';
 
-      fetch(`http://${window.location.hostname}:9001/stop`, {
+      fetch(`http://${SERVER_CONFIG.ip}:9001/stop`, {
         method: 'POST'
       })
       .then(res => res.json())

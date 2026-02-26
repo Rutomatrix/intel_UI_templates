@@ -3,6 +3,8 @@
 <head>
   <title>Postcode, Bios serial log, System state Reading and ATX</title>
   <link rel="icon" type="image/x-icon" href="/static/images/rutomatrix.ico">
+  <!-- Include config.js file -->
+  <script src="config.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
@@ -1211,7 +1213,7 @@
           src=""
           style="width: 100%; height: 600px; border: none;"
           title="Postcode Live Scanner"
-          onload="this.src = 'http://' + window.location.hostname + ':5015'">
+          onload="this.src = 'http://' + SERVER_CONFIG.ip + ':5012'">
         </iframe>
       </div>
     </div>
@@ -1380,7 +1382,7 @@
         btn.innerHTML = `<span class="spinner"></span>`;
 
         try {
-          const response = await fetch(`http://172.16.38.170:3333/power/${action}`, {
+          const response = await fetch(`http://${SERVER_CONFIG.ip}:3333/power/${action}`, {
             method: 'GET'
           });
           
@@ -1408,7 +1410,7 @@
 
       async function checkPowerStatus() {
         try {
-          const response = await fetch(`http://172.16.38.170:3333/state`);
+          const response = await fetch(`http://${SERVER_CONFIG.ip}:3333/state`);
           if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
           const data = await response.json();
@@ -1470,7 +1472,7 @@
       let biosLogInterval = null;
       
       // BIOS API base URL
-      const BIOS_BASE_URL = `http://${window.location.hostname}:1818`;
+      const BIOS_BASE_URL = `http://${SERVER_CONFIG.ip}:1818`;
 
       // Define loadBiosFiles function globally
       window.loadBiosFiles = async function() {

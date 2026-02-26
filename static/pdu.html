@@ -529,12 +529,15 @@
         </symbol>
     </svg>
 
+    <!-- Include config.js file -->
+    <script src="config.js"></script>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const powerBtn = document.getElementById("power-btn");
             const powerToggle = document.getElementById("power-toggle");
             const DRIVER_PORT = 3334;
-            const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${DRIVER_PORT}`;
+            const API_BASE_URL = `${window.location.protocol}//${SERVER_CONFIG.ip}:${DRIVER_PORT}`;
             const powerSwitch = document.querySelector(".power-switch");
             const statusDot = document.getElementById("status-dot");
             const statusText = document.getElementById("status-text");
