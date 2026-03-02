@@ -174,7 +174,7 @@
   <!-- Header -->
   <div class="header">
     <div class="device-name">Rutomatrix - PythonSV</div>
-    <button class="btn" id="openGuideBtn">User Guide</button>
+    <button class="btn" id="openGuideBtn">Commands</button>
   </div>
 
   <!-- Page content with iframe -->
@@ -189,7 +189,7 @@
   <div class="modal-overlay" id="modalOverlay" aria-hidden="true"></div>
   <div class="modal" id="userGuideModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-header">
-      <div class="modal-title" id="modalTitle">User Guide</div>
+      <div class="modal-title" id="modalTitle">commands</div>
       <button class="close-btn" id="closeGuideBtn">Close</button>
     </div>
 
@@ -266,7 +266,7 @@
     // ===== Iframe functionality (SV URL loading with timeout) =====
     const iframe     = document.getElementById("content-frame");
     const messageDiv = document.getElementById("message");
-    const url = `https://${SERVER_CONFIG.ip}:4200/`
+    const url = `${SERVER_CONFIG.pythonsv_url}`
 
     if (!url) {
       messageDiv.textContent = "Unable to get response from the API";

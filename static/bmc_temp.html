@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BMC server info</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #121212;
+      color: #FFFFFF;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 700px;
+    }
+
+    .card {
+      background: #1E1E1E;
+      border-radius: 12px;
+      border: 1px solid #333;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      padding: 40px;
+      margin-top: 40px;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .card-header h2 {
+      font-size: 28px;
+      background: linear-gradient(135deg, #28abe2 0%, #f68633 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .card-header p {
+      color: #999;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #ccc;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px 16px;
+      background: #0a0a0a;
+      border: 1px solid #444;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      transition: all 0.3s;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #28abe2;
+      box-shadow: 0 0 0 3px rgba(40, 171, 226, 0.1);
+    }
+
+    .form-group input::placeholder {
+      color: #666;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: #28abe2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      background: #2196d4;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(40, 171, 226, 0.3);
+    }
+
+    .btn:disabled {
+      background: #444;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-execute {
+      width: auto;
+      padding: 10px 24px;
+      font-size: 14px;
+    }
+
+    .option-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      margin-bottom: 24px;
+    }
+
+    .option-row .form-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .terminal-section {
+      margin-top: 24px;
+    }
+
+    .terminal-display {
+      background: #000000;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 60px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .terminal-command {
+      color: #28abe2;
+      margin-bottom: 12px;
+      padding: 8px 12px;
+      background: #0a0a0a;
+      border-radius: 4px;
+      border-left: 3px solid #28abe2;
+    }
+
+    .terminal-prompt {
+      color: #28abe2;
+      margin-right: 8px;
+    }
+
+    .terminal-output {
+      color: #00ff00;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      padding: 8px 12px;
+      background: #0a0a0a;
+      border-radius: 4px;
+      margin-top: 8px;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    .terminal-output.error {
+      color: #ff4444;
+      border-left: 3px solid #ff4444;
+    }
+
+    .terminal-output.success {
+      color: #00ff00;
+      border-left: 3px solid #00ff00;
+    }
+
+    .terminal-output.info {
+      color: #f68633;
+      border-left: 3px solid #f68633;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    .alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1000;
+      max-width: 350px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .alert-success {
+      background: #00c853;
+      color: white;
+    }
+
+    .alert-error {
+      background: #d32f2f;
+      color: white;
+    }
+
+    .alert-info {
+      background: #28abe2;
+      color: white;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(400px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0a0a0a;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #28abe2;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #f68633;
+    }
+
+    @media (max-width: 768px) {
+      .card {
+        padding: 30px 20px;
+      }
+
+      .option-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn-execute {
+        width: 100%;
+      }
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: #1e1e1e;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      right: 15px;
+      z-index: 100;
+    }
+    .device-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #ff6a00;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+      <div class="device-name">Rutomatrix - BMC server info</div>
+  </div> 
+
+  <div class="container">
+    <!-- Login Card -->
+    <div class="card" id="login-card">
+      <div class="card-header">
+        <h2>🔐 Authentication</h2>
+        <p>Enter your credentials to connect</p>
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="ip">IP Address</label>
+          <input 
+            type="text" 
+            id="ip" 
+            placeholder="192.168.1.100"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input 
+            type="text" 
+            id="username" 
+            placeholder="Enter username"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            placeholder="Enter password"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn" id="submit-btn">
+          Connect
+        </button>
+      </form>
+    </div>
+
+    <!-- Command Execution Card -->
+    <div class="card hidden" id="command-card">
+      <div class="card-header">
+        <h2>⚡ Command Execution</h2>
+        <p>Select and execute commands</p>
+      </div>
+
+      <div class="option-row">
+        <div class="form-group">
+          <label for="command-select">Select Command</label>
+          <select id="command-select">
+            <option value="">-- Choose a command --</option>
+            <option value="ls -la">List Directory (Detailed)</option>
+            <option value="pwd">Print Working Directory</option>
+            <option value="df -h">Disk Usage</option>
+            <option value="free -h">Memory Usage</option>
+            <option value="uname -a">System Information</option>
+            <option value="ps aux">Running Processes</option>
+            <option value="ifconfig">Network Configuration</option>
+            <option value="date">Current Date & Time</option>
+            <option value="whoami">Current User</option>
+            <option value="python3 --version">Python Version</option>
+          </select>
+        </div>
+        <button class="btn btn-execute" id="execute-btn" disabled>
+          Execute
+        </button>
+      </div>
+
+      <div class="terminal-section" id="terminal-section">
+        <div class="terminal-display" id="terminal-display">
+          <div style="color: #666; text-align: center; padding: 20px;">
+            Select a command to begin
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include config.js file -->
+  <script src="config.js"></script>
+  
+  <script>
+    // Configuration - Update these URLs with your actual backend endpoints
+    const API_CONFIG = {
+      loginUrl: '/api/auth/login',      // Your login endpoint
+      executeUrl: '/api/execute/command' // Your command execution endpoint
+    };
+
+    // DOM Elements
+    const loginCard = document.getElementById('login-card');
+    const commandCard = document.getElementById('command-card');
+    const loginForm = document.getElementById('login-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const commandSelect = document.getElementById('command-select');
+    const executeBtn = document.getElementById('execute-btn');
+    const terminalDisplay = document.getElementById('terminal-display');
+    
+    let authToken = null;
+    let sessionData = null;
+
+    // Handle Login Form Submission
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      loginCard.classList.add('hidden');
+      commandCard.classList.remove('hidden');
+      const ip = document.getElementById('ip').value;
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="loading-spinner"></span> Connecting...';
+      
+    //   try {
+    //     // Send credentials to backend
+    //     const response = await fetch(API_CONFIG.loginUrl, {
+    //       method: 'POST',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify({
+    //         ip: ip,
+    //         username: username,
+    //         password: password
+    //       })
+    //     });
+        
+    //     const data = await response.json();
+        
+    //     if (response.ok && data.success) {
+    //       // Store auth token and session data
+    //       authToken = data.token || null;
+    //       sessionData = data.session || null;
+          
+    //       // Show success message
+    //       showAlert('Connection established successfully!', 'success');
+          
+    //       // Switch to command card
+    //       setTimeout(() => {
+    //         loginCard.classList.add('hidden');
+    //         commandCard.classList.remove('hidden');
+    //       }, 500);
+    //     } else {
+    //       // Handle authentication failure
+    //       showAlert(data.message || 'Authentication failed. Please check your credentials.', 'error');
+    //       submitBtn.disabled = false;
+    //       submitBtn.innerHTML = 'Connect';
+    //     }
+    //   } catch (error) {
+    //     console.error('Login error:', error);
+    //     showAlert('Connection error. Please check your network and try again.', 'error');
+    //     submitBtn.disabled = false;
+    //     submitBtn.innerHTML = 'Connect';
+    //   }
+    });
+
+    // Handle Command Selection
+    commandSelect.addEventListener('change', (e) => {
+      const command = e.target.value;
+      
+      if (command) {
+        executeBtn.disabled = false;
+        
+        // Clear previous output and show selected command
+        terminalDisplay.innerHTML = `
+          <div class="terminal-command">
+            <span class="terminal-prompt">$</span>${command}
+          </div>
+        `;
+      } else {
+        executeBtn.disabled = true;
+        terminalDisplay.innerHTML = `
+          <div style="color: #666; text-align: center; padding: 20px;">
+            Select a command to begin
+          </div>
+        `;
+      }
+    });
+
+    // Handle Command Execution
+    executeBtn.addEventListener('click', async () => {
+      const command = commandSelect.value;
+      
+      if (!command) return;
+      
+      executeBtn.disabled = true;
+      executeBtn.innerHTML = '<span class="loading-spinner"></span> Executing...';
+      
+      // Show loading state in terminal
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'terminal-output info';
+      loadingDiv.innerHTML = '<span class="loading-spinner"></span> Executing command...';
+      terminalDisplay.appendChild(loadingDiv);
+      
+      try {
+        // Send command to backend
+        const response = await fetch(API_CONFIG.executeUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}` // Include auth token if needed
+          },
+          body: JSON.stringify({
+            command: command,
+            session: sessionData
+          })
+        });
+        
+        const data = await response.json();
+        
+        // Remove loading message
+        loadingDiv.remove();
+        
+        if (response.ok && data.success) {
+          // Display command output
+          const outputDiv = document.createElement('div');
+          outputDiv.className = 'terminal-output success';
+          outputDiv.textContent = data.output || 'Command executed successfully';
+          terminalDisplay.appendChild(outputDiv);
+          
+          // Scroll to bottom
+          terminalDisplay.scrollTop = terminalDisplay.scrollHeight;
+        } else {
+          // Display error
+          const errorDiv = document.createElement('div');
+          errorDiv.className = 'terminal-output error';
+          errorDiv.textContent = data.error || 'Command execution failed';
+          terminalDisplay.appendChild(errorDiv);
+          
+          showAlert('Command execution failed', 'error');
+        }
+      } catch (error) {
+        console.error('Execution error:', error);
+        
+        // Remove loading message
+        loadingDiv.remove();
+        
+        // Display error in terminal
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'terminal-output error';
+        errorDiv.textContent = 'Error: Unable to execute command. Please try again.';
+        terminalDisplay.appendChild(errorDiv);
+        
+        showAlert('Network error occurred', 'error');
+      } finally {
+        executeBtn.disabled = false;
+        executeBtn.innerHTML = 'Execute';
+      }
+    });
+
+    // Alert Function
+    function showAlert(message, type = 'info') {
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type}`;
+      
+      let icon = 'ℹ';
+      if (type === 'success') icon = '✓';
+      if (type === 'error') icon = '✕';
+      
+      alert.innerHTML = `<span style="font-size: 18px;">${icon}</span><span>${message}</span>`;
+      
+      document.body.appendChild(alert);
+      
+      setTimeout(() => {
+        alert.remove();
+      }, 4000);
+    }
+
+    // Auto-focus on first input
+    document.getElementById('ip').focus();
+  </script>
+</body>
+</html>
