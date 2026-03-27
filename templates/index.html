@@ -567,12 +567,85 @@
                 <h2 class="dashboard-para">Control and monitor your selected devices</h2>
                 
                 <div class="devices-grid">
+
+                    <!--  Camera & Thermal Camera -->
+                    <div class="device-card" data-device-id="001" data-feature="thermal-camera">
+                        <div class="device-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <div class="device-name"> Camera & Thermal Camera</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+
                     <!--  Virtual Desk -->
                     <div class="device-card" data-device-id="001" data-feature="virtual-os">
                         <div class="device-icon">
                             <i class="fas fa-desktop"></i>
                         </div>
                         <div class="device-name"> Virtual Desk & OS Flashing</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+
+                    <!--  Multiple Streaming -->
+                    <div class="device-card" data-device-id="001" data-feature="stream_1">
+                        <div class="device-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div class="device-name"> Stream 1</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+
+                    <!--  Multiple Streaming -->
+                    <div class="device-card" data-device-id="001" data-feature="stream_2">
+                        <div class="device-icon">
+                           <i class="fas fa-video"></i>
+                        </div>
+                        <div class="device-name"> Stream 2</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+
+                    <!--  Android Streaming -->
+                    <div class="device-card" data-device-id="001" data-feature="android-streaming">
+                        <div class="device-icon">
+                            <i class="fab fa-android"></i>
+                        </div>
+                        <div class="device-name"> Android Streaming</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+
+                    <!--  OS Backup & Restore -->
+                    <div class="device-card" data-device-id="001" data-feature="os-backup">
+                        <div class="device-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="device-name"> OS Backup & Restore</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+
+                    <!--  Audio Transition -->
+                    <div class="device-card" data-device-id="001" data-feature="audio-transition">
+                        <div class="device-icon">
+                            <i class="fas fa-volume-up"></i>
+                        </div>
+                        <div class="device-name"> Audio Transition</div>
                         <div class="device-status">
                             <div class="status-indicator"></div>
                             <div class="status-text">Ready</div>
@@ -616,6 +689,18 @@
                             <div class="status-text">Ready</div>
                         </div>
                     </div>
+
+                    <!--  APC power control -->
+                    <div class="device-card" data-feature="apc">
+                        <div class="device-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="device-name">APC power control</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
                     
                     <!--  PDU -->
                     <div class="device-card" data-device-id="001" data-feature="pdu">
@@ -623,6 +708,18 @@
                             <i class="fas fa-plug"></i>
                         </div>
                         <div class="device-name"> PDU</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+
+                    <!--  Serial Driver -->
+                    <div class="device-card" data-device-id="001" data-feature="serial-driver">
+                        <div class="device-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div class="device-name"> Serial Driver</div>
                         <div class="device-status">
                             <div class="status-indicator"></div>
                             <div class="status-text">Ready</div>
@@ -685,6 +782,39 @@
     <script>
         // Device data for each device type
         const deviceData = {
+            "thermal-camera": {
+                name: "Camera & Thermal Camera",
+                ip: "192.168.1.101",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:5E",
+                status: "Ready",
+                lastActive: "2025-11-28 15:42:00",
+                specs: "Common view both standard and thermal camera",
+                htmlFile: "../static/thermal.html"
+            },
+            "stream_1": {
+                name: "Stream 1",
+                ip: "192.168.1.101",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:5E",
+                status: "Ready",
+                lastActive: "2025-11-28 15:42:00",
+                specs: "Virtual Desk",
+                htmlFile: "../static/stream_1.html"
+            },
+            "stream_2": {
+                name: "Stream 2",
+                ip: "192.168.1.101",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:5E",
+                status: "Ready",
+                lastActive: "2025-11-28 15:42:00",
+                specs: "Virtual Desk",
+                htmlFile: "../static/stream_2.html"
+            },
             "virtual-os": {
                 name: "Virtual Desk & OS Flashing",
                 ip: "192.168.1.101",
@@ -761,6 +891,50 @@
                 lastActive: "2025-11-28 16:10:00",
                 specs: "Python Flask Service, REST API, Background Worker",
                 htmlFile: "../static/bmc.html"
+            },
+            "audio-transition": {
+                name: "Audio Transition",
+                ip: "192.168.1.110",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:67",
+                status: "Ready",
+                lastActive: "2025-11-28 16:10:00",
+                specs: "Single channel audio transition with HDMI",
+                htmlFile: "../static/audio.html"
+            },
+            "android-streaming": {
+                name: "Android Streaming",
+                ip: "192.168.1.110",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:67",
+                status: "Ready",
+                lastActive: "2025-11-28 16:10:00",
+                specs: "Android device streaming with control and recording feature",
+                htmlFile: "../static/android.html"
+            },
+            "apc": {
+                name: "APC power control",
+                ip: "192.168.1.110",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:67",
+                status: "Ready",
+                lastActive: "2025-11-28 16:10:00",
+                specs: "APC power control",
+                htmlFile: "../static/apc.html"
+            },
+            "serial-driver": {
+                name: "Serial Driver",
+                ip: "192.168.1.110",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:67",
+                status: "Ready",
+                lastActive: "2025-11-28 16:10:00",
+                specs: "APC power control",
+                htmlFile: "../static/apc.html"
             }
         };
         
@@ -845,8 +1019,8 @@
                     
                     // Open the feature HTML file in modal window
                     setTimeout(() => {
-                        const width = 800;
-                        const height = 600;
+                        const width = 1000;
+                        const height = 620;
 
                         const left = (screen.width - width) / 2;
                         const top = (screen.height - height) / 2;
