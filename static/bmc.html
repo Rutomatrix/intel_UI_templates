@@ -1,356 +1,676 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>PythonSV terminal</title>
-  <link rel="icon" type="image/x-icon" href="/static/images/rutomatrix.ico">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <style>
-    body {
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: #121212;
-      color: #ffffff;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Rutomatrix | BMC Secure Terminal</title>
+<link rel="icon" type="image/x-icon" href="/static/images/rutomatrix.ico">
+<!-- Font Awesome 6 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<!-- Google Fonts Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap%22 rel="stylesheet">
+<style>
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
-
+ 
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0A0C10;
+      color: #E8EDFF;
+      min-height: 100vh;
+    }
+ 
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1A1D24;
+      border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #FF6A2C;
+      border-radius: 8px;
+    }
+ 
+    /* Header - Glassmorphism */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 16px;
-      background: #1e1e1e;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      padding: 12px 24px;
+      background: rgba(18, 22, 28, 0.92);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 106, 0, 0.2);
       position: fixed;
-      top: 15px;
-      left: 15px;
-      right: 15px;
-      z-index: 100;
+      top: 18px;
+      left: 20px;
+      right: 20px;
+      z-index: 1000;
     }
-
+ 
     .device-name {
-      font-size: 18px;
+      font-size: 1.2rem;
       font-weight: 600;
-      color: #ff6a00;
-      word-break: break-word;
+      background: linear-gradient(135deg, #FF8C42, #FF6A00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-
+    .device-name i {
+      color: #FF6A00;
+      background: none;
+    }
+ 
     .btn {
-      background: #ff6a00;
-      color: #121212;
+      background: linear-gradient(105deg, #FF6A00 0%, #FF8C2E 100%);
+      color: #0A0C10;
       border: none;
-      padding: 8px 12px;
+      padding: 8px 18px;
       font-weight: 600;
-      border-radius: 6px;
+      border-radius: 40px;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 0.85rem;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(255, 106, 0, 0.3);
     }
-
     .btn:hover {
+      transform: translateY(-1px);
       filter: brightness(1.05);
+      box-shadow: 0 6px 14px rgba(255, 106, 0, 0.35);
     }
-
-    .close-btn {
+    .btn-outline {
       background: transparent;
-      color: #fff;
-      border: 1px solid #555;
-      padding: 3px 8px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      border: 1px solid #FF6A00;
+      color: #FFA56E;
+      box-shadow: none;
     }
-
+    .btn-outline:hover {
+      background: rgba(255, 106, 0, 0.12);
+    }
+ 
     .container {
-      padding: 16px;
-      box-sizing: border-box;
+      padding: 20px;
       max-width: 2000px;
-      margin: 100px auto 40px;
+      margin: 100px auto 30px;
     }
-
+ 
     .terminal-wrapper {
       width: 100%;
-      background: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
-      padding: 8px;
-      box-sizing: border-box;
-      position: relative;
-      z-index: 1;
+      background: #0F1117;
+      border-radius: 24px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 106, 0, 0.2);
+      overflow: hidden;
     }
-
+ 
     .message {
-      font-size: 1rem;
-      color: #f44336;
-      margin-bottom: 8px;
+      font-size: 0.85rem;
+      padding: 12px 20px;
+      background: rgba(255, 106, 0, 0.08);
+      border-bottom: 1px solid rgba(255, 106, 0, 0.25);
       text-align: center;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-
+ 
     iframe {
       width: 100%;
-      height: calc(100vh - 220px);
+      height: calc(100vh - 240px);
+      min-height: 480px;
       border: none;
-      background: #ffffff;
+      background: #FFFFFF;
       display: block;
-      position: relative;
-      z-index: 1;
     }
-
+ 
+    /* Credentials Modal - Professional */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
       display: none;
-      z-index: 1000;
+      z-index: 2000;
     }
-
-    .modal {
+    .auth-modal {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       width: 90vw;
-      max-width: 500px;
-      background: #1e1e1e;
-      border-radius: 10px;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.5);
-      padding: 14px;
-      z-index: 1001;
+      max-width: 520px;
+      background: #13161F;
+      border-radius: 32px;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 106, 0, 0.3);
+      padding: 28px 28px 36px;
+      z-index: 2001;
       display: none;
     }
-
-    .modal-header {
+    .auth-modal .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 24px;
+    }
+    .auth-modal .modal-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      background: linear-gradient(120deg, #FF9A4A, #FF6A00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .input-group {
+      margin-bottom: 20px;
+    }
+    .input-group label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #C9D1E6;
       margin-bottom: 8px;
     }
-
-    .modal-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: #ff6a00;
+    .input-group label i {
+      color: #FF6A00;
+      width: 20px;
     }
-
-    .section-title {
-      font-size: 16px;
-      font-weight: 600;
-      margin: 10px 0 6px;
-    }
-
-    .command-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      align-items: start;
-    }
-
-    textarea.readonly {
+    .input-field {
       width: 100%;
-      height: 33px;
-      background: #0f0f0f;
-      color: #fff;
-      border: 1px solid #333;
-      border-radius: 6px;
-      padding: 8px;
-      font-size: 13px;
-      resize: none;
-      box-sizing: border-box;
-      caret-color: transparent;
-    }
-
-    textarea.readonly:focus {
+      background: #0A0C12;
+      border: 1px solid #2A2F3A;
+      border-radius: 18px;
+      padding: 12px 18px;
+      color: #F0F3FF;
+      font-size: 0.95rem;
+      font-family: 'Inter', monospace;
+      transition: all 0.2s;
       outline: none;
     }
-
-    .status {
-      margin-top: 8px;
-      font-size: 13px;
-      color: #4caf50;
-      min-height: 16px;
+    .input-field:focus {
+      border-color: #FF6A00;
+      box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.25);
     }
-
-  </style>
-</head>
-
-<body>
-
-<div class="header">
-  <div class="device-name">Rutomatrix - BMC server info</div>
-
-  <button class="btn" id="openGuideBtn">
-    <i class="fa-solid fa-terminal"></i>
-    Commands
-  </button>
-</div>
-
-<div class="container">
-  <div class="terminal-wrapper">
-    <div id="message" class="message"></div>
-    <iframe id="content-frame" src=""></iframe>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modalOverlay"></div>
-
-<div class="modal" id="userGuideModal">
-
-  <div class="modal-header">
-    <div class="modal-title">
-      <i class="fa-solid fa-terminal"></i>
-      Commands
-    </div>
-
-    <button class="close-btn" id="closeGuideBtn">
-      <i class="fa-solid fa-xmark"></i>
-      Close
-    </button>
-  </div>
-
-  <div class="section-title">Command to push</div>
-
-  <div class="command-row">
-    <textarea class="readonly" id="commandPush" readonly>git push</textarea>
-
-    <button class="btn" id="copyPushBtn">
-      <i class="fa-regular fa-copy"></i>
-      Copy
-    </button>
-  </div>
-
-  <div class="section-title">Command to pull</div>
-
-  <div class="command-row">
-    <textarea class="readonly" id="commandPull" readonly>git pull</textarea>
-
-    <button class="btn" id="copyPullBtn">
-      <i class="fa-regular fa-copy"></i>
-      Copy
-    </button>
-  </div>
-
-  <div class="status" id="statusMsg"></div>
-
-</div>
-
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(95deg, #FF6A00, #FF8733);
+      border: none;
+      padding: 12px;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #0A0C10;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 16px;
+      transition: 0.2s;
+    }
+    .submit-btn:hover {
+      transform: scale(0.98);
+      filter: brightness(1.03);
+    }
+    .info-note {
+      font-size: 0.7rem;
+      text-align: center;
+      margin-top: 20px;
+      color: #7B85A1;
+    }
+    .cred-badge {
+      font-size: 0.7rem;
+      background: #1E2A2F;
+      padding: 4px 12px;
+      border-radius: 40px;
+      color: #FFB347;
+    }
+ 
+    /* Commands Modal - Modern & Clean */
+    .commands-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90vw;
+      max-width: 850px;
+      background: #11141E;
+      border-radius: 28px;
+      box-shadow: 0 30px 45px rgba(0, 0, 0, 0.6);
+      z-index: 2002;
+      display: none;
+      flex-direction: column;
+      max-height: 85vh;
+      overflow: hidden;
+      border: 1px solid rgba(255, 106, 0, 0.4);
+    }
+    .commands-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid #232832;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0,0,0,0.25);
+    }
+    .commands-header h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #FF8C42;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .commands-list {
+      padding: 18px 24px 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .command-card {
+      background: #0B0E15;
+      border-radius: 18px;
+      margin-bottom: 14px;
+      padding: 12px 16px;
+      border: 1px solid #20232C;
+      transition: 0.1s;
+    }
+    .command-title {
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+      color: #FFAD73;
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .command-row-flex {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .command-code {
+      flex: 1;
+      background: #010101;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-family: 'Menlo', 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 0.72rem;
+      color: #B9E0FF;
+      word-break: break-all;
+      border: 1px solid #2C313E;
+      line-height: 1.4;
+    }
+    .copy-cmd-btn {
+      background: #202532;
+      border: none;
+      color: #FF9F5B;
+      padding: 8px 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 500;
+      transition: 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .copy-cmd-btn:hover {
+      background: #FF6A00;
+      color: #0A0C10;
+    }
+    .close-modal-btn {
+      background: transparent;
+      border: 1px solid #464E60;
+      color: #ccc;
+      padding: 6px 20px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .close-modal-btn:hover {
+      background: #FF6A00;
+      color: black;
+      border-color: #FF6A00;
+    }
+    .toast-msg {
+      padding: 6px 16px 16px;
+      font-size: 0.7rem;
+      color: #6FCF97;
+      text-align: right;
+    }
+    @media (max-width: 680px) {
+      .command-code { font-size: 0.6rem; }
+      .auth-modal { padding: 20px; }
+    }
+</style>
+<!-- Load config.js (must exist, provides SERVER_CONFIG) -->
 <script src="config.js"></script>
-
+</head>
+<body>
+ 
+<div class="header">
+<div class="device-name">
+<i class="fas fa-server"></i> Rutomatrix · BMC Terminal
+</div>
+<div style="display: flex; gap: 12px;">
+<button class="btn" id="openCommandsBtn">
+<i class="fa-solid fa-terminal"></i> Commands
+</button>
+<button class="btn btn-outline" id="reconfigBtn">
+<i class="fas fa-key"></i> Credentials
+</button>
+</div>
+</div>
+ 
+<div class="container">
+<div class="terminal-wrapper">
+<div id="message" class="message">
+<i class="fas fa-shield-alt"></i> Loading BMC interface...
+</div>
+<iframe id="content-frame" title="BMC Web Interface" src="about:blank"></iframe>
+</div>
+</div>
+ 
+<!-- Credentials Modal -->
+<div class="modal-overlay" id="authOverlay"></div>
+<div class="auth-modal" id="authModal">
+<div class="modal-header">
+<div>
+<div class="modal-title"><i class="fas fa-lock"></i> BMC Authentication</div>
+<div class="info-note" style="text-align:left; margin-top:6px;">Update credentials to refresh Redfish commands</div>
+</div>
+</div>
+<div class="input-group">
+<label><i class="fas fa-user-astronaut"></i> Username</label>
+<input type="text" id="bmcUsername" class="input-field" placeholder="debuguser" value="debuguser">
+</div>
+<div class="input-group">
+<label><i class="fas fa-key"></i> Password</label>
+<input type="password" id="bmcPassword" class="input-field" placeholder="0penBmc1" value="0penBmc1">
+</div>
+<div class="input-group">
+<label><i class="fas fa-network-wired"></i> BMC IP Address</label>
+<input type="text" id="bmcIp" class="input-field" placeholder="10.208.57.154" value="10.208.57.154">
+<div style="font-size:0.65rem; color:#6c7a8e; margin-top:6px;">Used for Redfish commands (curl)</div>
+</div>
+<button class="submit-btn" id="saveCredentialsBtn">
+<i class="fas fa-sync-alt"></i> Update Commands & Save
+</button>
+<div class="info-note">
+<i class="fas fa-info-circle"></i> IFrame URL remains from SERVER_CONFIG. Only commands updated.
+</div>
+</div>
+ 
+<!-- Commands Modal -->
+<div class="modal-overlay" id="commandsOverlay"></div>
+<div class="commands-modal" id="commandsModal">
+<div class="commands-header">
+<h3><i class="fas fa-code-branch"></i> BMC Redfish Commands</h3>
+<button class="close-modal-btn" id="closeCommandsBtn"><i class="fas fa-times"></i> Close</button>
+</div>
+<div class="commands-list" id="dynamicCommandsList">
+<div style="text-align:center; padding:30px;"><i class="fas fa-sync-alt fa-spin"></i> Loading commands...</div>
+</div>
+<div id="cmdStatusMsg" class="toast-msg"></div>
+</div>
+ 
 <script>
-
-const openGuideBtn = document.getElementById('openGuideBtn');
-const closeGuideBtn = document.getElementById('closeGuideBtn');
-const modalOverlay = document.getElementById('modalOverlay');
-const userGuideModal = document.getElementById('userGuideModal');
-
-function openModal() {
-  modalOverlay.style.display = 'block';
-  userGuideModal.style.display = 'block';
-}
-
-function closeModal() {
-  modalOverlay.style.display = 'none';
-  userGuideModal.style.display = 'none';
-}
-
-openGuideBtn.addEventListener('click', openModal);
-closeGuideBtn.addEventListener('click', closeModal);
-modalOverlay.addEventListener('click', closeModal);
-
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeModal();
-});
-
-const statusMsg = document.getElementById('statusMsg');
-
-const copyPushBtn = document.getElementById('copyPushBtn');
-const commandPush = document.getElementById('commandPush');
-
-const copyPullBtn = document.getElementById('copyPullBtn');
-const commandPull = document.getElementById('commandPull');
-
-async function copyText(text) {
-
-  if (!text) {
-    statusMsg.textContent = "Nothing to copy!";
-    statusMsg.style.color = "#f44336";
-    return;
+  // ======================= CONFIGURATION =======================
+  // Credentials storage (initially defaults)
+  let bmcCreds = {
+    username: "debuguser",
+    password: "0penBmc1",
+    ip: "10.208.57.154"
+  };
+ 
+  // Base command templates (Redfish endpoints)
+  const COMMAND_TEMPLATES = [
+    { label: "📡 Service Root", template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/" },
+    { label: "🖥️ Chassis Collection", template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/Chassis" },
+    { label: "📡 Managers", template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/Managers" },
+    { label: "⚙️ Systems", template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/Systems" },
+    { label: "🔧 BMC Details", template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/Managers/bmc" },
+    { label: "🧬 BIOS Settings", template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/Systems/system/Bios" },
+    { label: "🟢 Power On", template: "curl -u {username}:{password} -k -X POST https://{ip}/redfish/v1/Systems/system/Actions/ComputerSystem.Reset -d '{\"ResetType\": \"On\"}'" },
+    { label: "🔻 Graceful Shutdown", template: "curl -u {username}:{password} -k -X POST https://{ip}/redfish/v1/Systems/system/Actions/ComputerSystem.Reset -d '{\"ResetType\": \"GracefulShutdown\"}'" },
+    { label: "⛔ Force Off", template: "curl -u {username}:{password} -k -X POST https://{ip}/redfish/v1/Systems/system/Actions/ComputerSystem.Reset -d '{\"ResetType\": \"ForceOff\"}'" },
+    { label: "🔄 Graceful Restart", template: "curl -k -u {username}:{password} -X POST https://{ip}/redfish/v1/Systems/system/Actions/ComputerSystem.Reset -d '{\"ResetType\": \"GracefulRestart\"}'" },
+    { label: "⚡ Power Metrics", template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/Chassis/WC_Baseboard/Power" },
+    { label: "🌡️ Thermal Sensors", template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/Chassis/WC_Baseboard/Thermal" },
+    { label: "📊 Sensor Data", template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/Chassis/WC_Baseboard/Sensor" }
+  ];
+ 
+  // DOM Elements
+  const authModal = document.getElementById('authModal');
+  const authOverlay = document.getElementById('authOverlay');
+  const commandsModal = document.getElementById('commandsModal');
+  const commandsOverlay = document.getElementById('commandsOverlay');
+  const openCommandsBtn = document.getElementById('openCommandsBtn');
+  const reconfigBtn = document.getElementById('reconfigBtn');
+  const saveCredBtn = document.getElementById('saveCredentialsBtn');
+  const closeCommandsBtn = document.getElementById('closeCommandsBtn');
+  const iframe = document.getElementById('content-frame');
+  const msgDiv = document.getElementById('message');
+  const dynamicCommandsListEl = document.getElementById('dynamicCommandsList');
+  const cmdStatusSpan = document.getElementById('cmdStatusMsg');
+ 
+  // Helper: Generate commands with current credentials
+  function generateCommands() {
+    return COMMAND_TEMPLATES.map(cmd => ({
+      label: cmd.label,
+      command: cmd.template
+        .replace(/{username}/g, bmcCreds.username)
+        .replace(/{password}/g, bmcCreds.password)
+        .replace(/{ip}/g, bmcCreds.ip)
+    }));
   }
-
-  try {
-
-    await navigator.clipboard.writeText(text);
-
-    statusMsg.textContent = "Copied to clipboard!";
-    statusMsg.style.color = "#4caf50";
-
+ 
+  // Escape HTML for safe rendering
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+      return c;
+    });
+  }
+ 
+  function escapeAttr(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+ 
+  // Copy to clipboard
+  async function copyToClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (err) {
+      // fallback
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      const success = document.execCommand('copy');
+      document.body.removeChild(textarea);
+      return success;
+    }
+  }
+ 
+  // Render commands inside modal with fresh credentials
+  function renderCommandsModalContent() {
+    if (!dynamicCommandsListEl) return;
+    const commandsList = generateCommands();
+    dynamicCommandsListEl.innerHTML = '';
+    commandsList.forEach((item, idx) => {
+      const card = document.createElement('div');
+      card.className = 'command-card';
+      const escapedCmd = escapeHtml(item.command);
+      card.innerHTML = `
+<div class="command-title">
+<i class="fas fa-terminal" style="font-size:0.7rem;"></i> ${escapeHtml(item.label)}
+</div>
+<div class="command-row-flex">
+<code class="command-code">${escapedCmd}</code>
+<button class="copy-cmd-btn" data-cmd-original="${escapeAttr(item.command)}">
+<i class="far fa-copy"></i> Copy
+</button>
+</div>
+      `;
+      dynamicCommandsListEl.appendChild(card);
+    });
+    // Attach copy events
+    document.querySelectorAll('.copy-cmd-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const rawCmd = btn.getAttribute('data-cmd-original') || '';
+        const success = await copyToClipboard(rawCmd);
+        if (cmdStatusSpan) {
+          if (success) {
+            cmdStatusSpan.innerHTML = '<i class="fas fa-check-circle"></i> Command copied to clipboard!';
+          } else {
+            cmdStatusSpan.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Copy failed';
+          }
+          setTimeout(() => { if(cmdStatusSpan) cmdStatusSpan.innerHTML = ''; }, 1800);
+        }
+      });
+    });
+  }
+ 
+  // Save credentials from modal, update commands, but DO NOT change iframe src
+  // IFrame remains using SERVER_CONFIG.bmc_url (or fallback)
+  function updateCredentialsAndCommands() {
+    const newUsername = document.getElementById('bmcUsername').value.trim();
+    const newPassword = document.getElementById('bmcPassword').value;
+    const newIp = document.getElementById('bmcIp').value.trim();
+    if (!newUsername) {
+      msgDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Username cannot be empty.';
+      return;
+    }
+    if (!newIp) {
+      msgDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> BMC IP is required for commands.';
+      return;
+    }
+    // Update credential object
+    bmcCreds = {
+      username: newUsername,
+      password: newPassword,
+      ip: newIp
+    };
+    // Save to localStorage for persistence
+    localStorage.setItem('bmc_redfish_creds', JSON.stringify(bmcCreds));
+    // 1. Re-render commands in modal (with updated creds/IP)
+    renderCommandsModalContent();
+    // 2. Update status message to reflect new commands are ready
+    msgDiv.innerHTML = `<i class="fas fa-check-circle"></i> Commands updated with user: ${bmcCreds.username} @ ${bmcCreds.ip} | IFrame unchanged.`;
     setTimeout(() => {
-      statusMsg.textContent = "";
-    }, 2000);
-
-  } catch {
-
-    statusMsg.textContent = "Failed to copy. Please copy manually.";
-    statusMsg.style.color = "#f44336";
-
+      msgDiv.innerHTML = `<i class="fas fa-shield-alt"></i> BMC Terminal Active — Commands ready (${bmcCreds.username})`;
+    }, 2800);
+    // Close auth modal
+    closeAuthModal();
   }
-}
-
-copyPushBtn.addEventListener('click', () => {
-  copyText(commandPush.value.trim());
-});
-
-copyPullBtn.addEventListener('click', () => {
-  copyText(commandPull.value.trim());
-});
-
-const iframe = document.getElementById("content-frame");
-const messageDiv = document.getElementById("message");
-
-const url = `${SERVER_CONFIG.bmc_url}`;
-
-if (!url) {
-
-  messageDiv.textContent = "Unable to get response from the API";
-  iframe.style.display = "none";
-
-} else {
-
-  iframe.src = url;
-
-  let timeout = setTimeout(() => {
-
-    messageDiv.textContent = "Error: Command timed out";
-    iframe.style.display = "none";
-
-  }, 5000);
-
-  iframe.onload = () => {
-
-    clearTimeout(timeout);
-    iframe.style.display = "block";
-    messageDiv.textContent = "";
-
+  // Load stored credentials if any
+  function loadStoredCredentials() {
+    const stored = localStorage.getItem('bmc_redfish_creds');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed.username && parsed.ip) {
+          bmcCreds = parsed;
+        }
+      } catch(e) { console.warn(e); }
+    }
+    // sync input fields
+    const unameField = document.getElementById('bmcUsername');
+    const pwdField = document.getElementById('bmcPassword');
+    const ipField = document.getElementById('bmcIp');
+    if (unameField) unameField.value = bmcCreds.username;
+    if (pwdField) pwdField.value = bmcCreds.password;
+    if (ipField) ipField.value = bmcCreds.ip;
+  }
+  // Initialize IFrame using SERVER_CONFIG.bmc_url (preserve original behavior)
+  function initializeIframeFromConfig() {
+    // Check global SERVER_CONFIG (provided by config.js)
+    let frameUrl = null;
+    if (typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG && SERVER_CONFIG.bmc_url) {
+      frameUrl = SERVER_CONFIG.bmc_url;
+    } else {
+      // Fallback for safety (if config.js missing)
+      console.warn("SERVER_CONFIG.bmc_url not found, using default placeholder");
+      frameUrl = "about:blank";
+      msgDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> config.js missing SERVER_CONFIG.bmc_url';
+    }
+    if (frameUrl && frameUrl !== "about:blank") {
+      iframe.src = frameUrl;
+      msgDiv.innerHTML = `<i class="fas fa-globe"></i> BMC Interface: ${frameUrl} | Commands use separate IP/credentials.`;
+    } else {
+      iframe.src = "about:blank";
+      msgDiv.innerHTML = '<i class="fas fa-plug"></i> Awaiting BMC URL from config. Commands ready.';
+    }
+  }
+  // Modal controls
+  function openAuthModal() {
+    // populate with latest creds
+    document.getElementById('bmcUsername').value = bmcCreds.username;
+    document.getElementById('bmcPassword').value = bmcCreds.password;
+    document.getElementById('bmcIp').value = bmcCreds.ip;
+    authModal.style.display = 'block';
+    authOverlay.style.display = 'block';
+  }
+  function closeAuthModal() {
+    authModal.style.display = 'none';
+    authOverlay.style.display = 'none';
+  }
+  function openCommandsModal() {
+    renderCommandsModalContent();  // always fresh
+    commandsModal.style.display = 'flex';
+    commandsOverlay.style.display = 'block';
+  }
+  function closeCommandsModalFunc() {
+    commandsModal.style.display = 'none';
+    commandsOverlay.style.display = 'none';
+  }
+  // Event bindings
+  saveCredBtn.addEventListener('click', updateCredentialsAndCommands);
+  reconfigBtn.addEventListener('click', openAuthModal);
+  openCommandsBtn.addEventListener('click', openCommandsModal);
+  closeCommandsBtn.addEventListener('click', closeCommandsModalFunc);
+  commandsOverlay.addEventListener('click', closeCommandsModalFunc);
+  authOverlay.addEventListener('click', closeAuthModal);
+  // On window load
+  window.addEventListener('DOMContentLoaded', () => {
+    loadStoredCredentials();
+    initializeIframeFromConfig();      // IFRAME uses SERVER_CONFIG.bmc_url (original requirement)
+    renderCommandsModalContent();      // initial command rendering with loaded creds
+    // Show current status
+    if (bmcCreds.ip) {
+      msgDiv.innerHTML = `<i class="fas fa-check-circle"></i> Commands ready (${bmcCreds.username}@${bmcCreds.ip}) | IFrame: ${typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG?.bmc_url ? 'configured' : 'default'}`;
+    }
+  });
+  // Additional: If config.js is loaded later, ensure iframe gets it (already on load)
+  // Expose function for potential external refresh
+  window.refreshCommandsOnly = function() {
+    renderCommandsModalContent();
+    msgDiv.innerHTML = `<i class="fas fa-sync-alt"></i> Commands refreshed with current credentials.`;
+    setTimeout(() => {
+      msgDiv.innerHTML = `<i class="fas fa-shield-alt"></i> BMC Terminal Active — Commands ready`;
+    }, 1500);
   };
-
-  iframe.onerror = () => {
-
-    clearTimeout(timeout);
-    messageDiv.textContent = "Error: Command timed out";
-
-  };
-}
-
 </script>
-
 </body>
 </html>

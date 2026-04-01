@@ -1,356 +1,510 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>PythonSV terminal</title>
-  <link rel="icon" type="image/x-icon" href="/static/images/rutomatrix.ico">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <style>
-    body {
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: #121212;
-      color: #ffffff;
+<meta charset="utf-8" />
+<title>PythonSV Terminal</title>
+<link rel="icon" type="image/x-icon" href="/static/images/rutomatrix.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<!-- Google Fonts for modern typography -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500&display=swap%22 rel="stylesheet">
+<style>
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
-
+ 
+    body {
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #0a0e1a 0%, #0f1219 100%);
+      color: #e9edf5;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    /* Modern Header */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 16px;
-      background: #1e1e1e;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      padding: 12px 28px;
+      background: rgba(18, 22, 28, 0.85);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), 0 1px 0 0 rgba(255, 255, 255, 0.05);
       position: fixed;
-      top: 15px;
-      left: 15px;
-      right: 15px;
+      top: 20px;
+      left: 20px;
+      right: 20px;
       z-index: 100;
+      border: 1px solid rgba(255, 106, 0, 0.2);
+      transition: all 0.3s ease;
     }
-
     .device-name {
-      font-size: 18px;
-      font-weight: 600;
-      color: #ff6a00;
-      word-break: break-word;
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff8c42, #ff6a00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.3px;
     }
-
+    .device-name i {
+      background: linear-gradient(135deg, #ff8c42, #ff6a00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-size: 1.3rem;
+    }
     .btn {
-      background: #ff6a00;
-      color: #121212;
+      background: linear-gradient(105deg, #ff6a00 0%, #ff8733 100%);
+      color: #0a0e1a;
       border: none;
-      padding: 8px 12px;
+      padding: 8px 20px;
       font-weight: 600;
-      border-radius: 6px;
+      border-radius: 40px;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 0.85rem;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(255, 106, 0, 0.3);
+      letter-spacing: -0.2px;
     }
-
     .btn:hover {
-      filter: brightness(1.05);
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+      box-shadow: 0 6px 20px rgba(255, 106, 0, 0.4);
     }
-
+    .btn:active {
+      transform: translateY(0);
+    }
     .close-btn {
-      background: transparent;
-      color: #fff;
-      border: 1px solid #555;
-      padding: 3px 8px;
-      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #e9edf5;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 6px 16px;
+      border-radius: 40px;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 0.8rem;
+      font-weight: 500;
       display: flex;
       align-items: center;
       gap: 6px;
+      transition: all 0.2s ease;
     }
-
+    .close-btn:hover {
+      background: rgba(255, 106, 0, 0.2);
+      border-color: #ff6a00;
+      color: #ff8c42;
+    }
+    /* Main Container */
     .container {
-      padding: 16px;
+      padding: 20px;
       box-sizing: border-box;
       max-width: 2000px;
-      margin: 100px auto 40px;
+      margin: 100px auto 30px;
     }
-
+    /* Terminal Wrapper - Glass morphism */
     .terminal-wrapper {
       width: 100%;
       background: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
-      padding: 8px;
+      border-radius: 28px;
+      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 106, 0, 0.15);
       box-sizing: border-box;
       position: relative;
       z-index: 1;
+      overflow: hidden;
+      transition: all 0.3s ease;
     }
-
-    .message {
-      font-size: 1rem;
-      color: #f44336;
-      margin-bottom: 8px;
-      text-align: center;
+    .terminal-wrapper:hover {
+      box-shadow: 0 25px 45px -12px rgba(255, 106, 0, 0.2), 0 0 0 1px rgba(255, 106, 0, 0.3);
     }
-
     iframe {
       width: 100%;
-      height: calc(100vh - 220px);
+      height: calc(100vh - 240px);
+      min-height: 500px;
       border: none;
       background: #ffffff;
       display: block;
       position: relative;
       z-index: 1;
     }
-
+    /* Modern Modal Styles */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
       display: none;
       z-index: 1000;
+      animation: fadeIn 0.2s ease;
     }
-
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
     .modal {
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(0.95);
       width: 90vw;
-      max-width: 500px;
-      background: #1e1e1e;
-      border-radius: 10px;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.5);
-      padding: 14px;
+      max-width: 560px;
+      background: linear-gradient(135deg, #171b24 0%, #12141c 100%);
+      border-radius: 28px;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 106, 0, 0.25);
+      padding: 0;
       z-index: 1001;
       display: none;
+      animation: modalSlideIn 0.25s cubic-bezier(0.34, 1.2, 0.64, 1);
+      overflow: hidden;
     }
-
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.92);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.2);
     }
-
     .modal-title {
-      font-size: 18px;
-      font-weight: 600;
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff8c42, #ff6a00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-title i {
       color: #ff6a00;
+      background: none;
+      -webkit-background-clip: unset;
+      background-clip: unset;
     }
-
     .section-title {
-      font-size: 16px;
+      font-size: 0.85rem;
       font-weight: 600;
-      margin: 10px 0 6px;
+      margin: 0 0 12px 0;
+      color: #ff9f5b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-
+    .section-title i {
+      font-size: 0.8rem;
+    }
     .command-row {
       display: grid;
       grid-template-columns: 1fr auto;
-      gap: 8px;
-      align-items: start;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 28px;
     }
-
     textarea.readonly {
       width: 100%;
-      height: 33px;
-      background: #0f0f0f;
-      color: #fff;
-      border: 1px solid #333;
-      border-radius: 6px;
-      padding: 8px;
-      font-size: 13px;
+      background: #0a0c12;
+      color: #b9e0ff;
+      border: 1px solid #2a2f3a;
+      border-radius: 16px;
+      padding: 12px 16px;
+      font-size: 0.8rem;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
       resize: none;
       box-sizing: border-box;
-      caret-color: transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      letter-spacing: -0.2px;
+      line-height: 1.4;
     }
-
+    textarea.readonly:hover {
+      border-color: #ff6a00;
+      background: #0f1119;
+    }
     textarea.readonly:focus {
       outline: none;
+      border-color: #ff6a00;
+      box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.2);
     }
-
+    .command-row .btn {
+      padding: 10px 18px;
+      white-space: nowrap;
+      background: rgba(255, 106, 0, 0.15);
+      color: #ff9f5b;
+      box-shadow: none;
+      border: 1px solid rgba(255, 106, 0, 0.3);
+    }
+    .command-row .btn:hover {
+      background: #ff6a00;
+      color: #0a0e1a;
+      transform: translateY(-1px);
+    }
     .status {
-      margin-top: 8px;
-      font-size: 13px;
+      margin-top: 20px;
+      font-size: 0.75rem;
       color: #4caf50;
-      min-height: 16px;
+      min-height: 32px;
+      text-align: center;
+      padding: 8px;
+      border-radius: 40px;
+      background: rgba(76, 175, 80, 0.1);
+      transition: all 0.2s ease;
     }
-
-  </style>
+    /* Custom scrollbar for modal */
+    .modal::-webkit-scrollbar {
+      width: 5px;
+    }
+    .modal::-webkit-scrollbar-track {
+      background: #1e1e2a;
+    }
+    .modal::-webkit-scrollbar-thumb {
+      background: #ff6a00;
+      border-radius: 10px;
+    }
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header {
+        padding: 10px 18px;
+        top: 12px;
+        left: 12px;
+        right: 12px;
+      }
+      .device-name {
+        font-size: 0.9rem;
+      }
+      .btn {
+        padding: 6px 14px;
+        font-size: 0.75rem;
+      }
+      .container {
+        margin: 88px auto 20px;
+        padding: 12px;
+      }
+      .modal {
+        width: 95vw;
+        max-width: 95vw;
+      }
+      .command-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .command-row .btn {
+        justify-content: center;
+      }
+      textarea.readonly {
+        font-size: 0.7rem;
+        padding: 10px 12px;
+      }
+      iframe {
+        height: calc(100vh - 200px);
+        min-height: 400px;
+      }
+    }
+    /* Status animation */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .status:not(:empty) {
+      animation: pulse 0.3s ease;
+    }
+</style>
 </head>
-
 <body>
-
 <div class="header">
-  <div class="device-name">Rutomatrix - PythonSV</div>
-
-  <button class="btn" id="openGuideBtn">
-    <i class="fa-solid fa-terminal"></i>
+<div class="device-name">
+<i class="fa-solid fa-terminal"></i>
+    PythonSV Terminal
+</div>
+<button class="btn" id="openGuideBtn">
+<i class="fa-solid fa-code-branch"></i>
     Commands
-  </button>
+</button>
 </div>
-
 <div class="container">
-  <div class="terminal-wrapper">
-    <div id="message" class="message"></div>
-    <iframe id="content-frame" src=""></iframe>
-  </div>
+<div class="terminal-wrapper">
+<iframe id="content-frame" src=""></iframe>
 </div>
-
+</div>
 <div class="modal-overlay" id="modalOverlay"></div>
-
 <div class="modal" id="userGuideModal">
-
-  <div class="modal-header">
-    <div class="modal-title">
-      <i class="fa-solid fa-terminal"></i>
-      Commands
-    </div>
-
-    <button class="close-btn" id="closeGuideBtn">
-      <i class="fa-solid fa-xmark"></i>
-      Close
-    </button>
-  </div>
-
-  <div class="section-title">Command to push</div>
-
-  <div class="command-row">
-    <textarea class="readonly" id="commandPush" readonly>git push</textarea>
-
-    <button class="btn" id="copyPushBtn">
-      <i class="fa-regular fa-copy"></i>
-      Copy
-    </button>
-  </div>
-
-  <div class="section-title">Command to pull</div>
-
-  <div class="command-row">
-    <textarea class="readonly" id="commandPull" readonly>git pull</textarea>
-
-    <button class="btn" id="copyPullBtn">
-      <i class="fa-regular fa-copy"></i>
-      Copy
-    </button>
-  </div>
-
-  <div class="status" id="statusMsg"></div>
-
+<div class="modal-header">
+<div class="modal-title">
+<i class="fa-solid fa-terminal"></i>
+      Git Commands
 </div>
-
+<button class="close-btn" id="closeGuideBtn">
+<i class="fa-solid fa-xmark"></i>
+      Close
+</button>
+</div>
+<div style="padding: 20px 24px 24px;">
+<div class="section-title">
+<i class="fa-solid fa-cloud-upload-alt"></i>
+      Push Changes
+</div>
+<div class="command-row">
+<textarea class="readonly" id="commandPush" readonly>git push</textarea>
+<button class="btn" id="copyPushBtn">
+<i class="fa-regular fa-copy"></i>
+        Copy
+</button>
+</div>
+<div class="section-title">
+<i class="fa-solid fa-cloud-download-alt"></i>
+      Pull Updates
+</div>
+<div class="command-row">
+<textarea class="readonly" id="commandPull" readonly>git pull</textarea>
+<button class="btn" id="copyPullBtn">
+<i class="fa-regular fa-copy"></i>
+        Copy
+</button>
+</div>
+<div class="status" id="statusMsg"></div>
+</div>
+</div>
 <script src="config.js"></script>
-
 <script>
-
+// Modal functionality
 const openGuideBtn = document.getElementById('openGuideBtn');
 const closeGuideBtn = document.getElementById('closeGuideBtn');
 const modalOverlay = document.getElementById('modalOverlay');
 const userGuideModal = document.getElementById('userGuideModal');
-
 function openModal() {
   modalOverlay.style.display = 'block';
   userGuideModal.style.display = 'block';
+  document.body.style.overflow = 'hidden';
 }
-
 function closeModal() {
   modalOverlay.style.display = 'none';
   userGuideModal.style.display = 'none';
+  document.body.style.overflow = '';
 }
-
 openGuideBtn.addEventListener('click', openModal);
 closeGuideBtn.addEventListener('click', closeModal);
 modalOverlay.addEventListener('click', closeModal);
-
 window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Escape' && userGuideModal.style.display === 'block') {
+    closeModal();
+  }
 });
-
+// Copy functionality
 const statusMsg = document.getElementById('statusMsg');
-
 const copyPushBtn = document.getElementById('copyPushBtn');
 const commandPush = document.getElementById('commandPush');
-
 const copyPullBtn = document.getElementById('copyPullBtn');
 const commandPull = document.getElementById('commandPull');
-
-async function copyText(text) {
-
-  if (!text) {
-    statusMsg.textContent = "Nothing to copy!";
+async function copyText(text, type) {
+  if (!text || text.trim() === "") {
+    statusMsg.innerHTML = '<i class="fa-solid fa-exclamation-circle"></i> Nothing to copy!';
     statusMsg.style.color = "#f44336";
+    statusMsg.style.background = "rgba(244, 67, 54, 0.1)";
+    setTimeout(() => {
+      statusMsg.innerHTML = '';
+      statusMsg.style.background = "rgba(76, 175, 80, 0.1)";
+    }, 2000);
     return;
   }
-
   try {
-
-    await navigator.clipboard.writeText(text);
-
-    statusMsg.textContent = "Copied to clipboard!";
+    await navigator.clipboard.writeText(text.trim());
+    statusMsg.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${type === 'push' ? 'git push' : 'git pull'} command copied!`;
     statusMsg.style.color = "#4caf50";
-
+    statusMsg.style.background = "rgba(76, 175, 80, 0.15)";
+    // Visual feedback on the textarea
+    const activeTextarea = type === 'push' ? commandPush : commandPull;
+    activeTextarea.style.transform = 'scale(1.01)';
     setTimeout(() => {
-      statusMsg.textContent = "";
+      activeTextarea.style.transform = '';
+    }, 200);
+    setTimeout(() => {
+      statusMsg.innerHTML = '';
+      statusMsg.style.background = "rgba(76, 175, 80, 0.1)";
     }, 2000);
-
-  } catch {
-
-    statusMsg.textContent = "Failed to copy. Please copy manually.";
+  } catch (err) {
+    statusMsg.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Failed to copy. Please copy manually.';
     statusMsg.style.color = "#f44336";
-
+    statusMsg.style.background = "rgba(244, 67, 54, 0.1)";
+    setTimeout(() => {
+      statusMsg.innerHTML = '';
+      statusMsg.style.background = "rgba(76, 175, 80, 0.1)";
+    }, 2000);
   }
 }
-
 copyPushBtn.addEventListener('click', () => {
-  copyText(commandPush.value.trim());
+  copyText(commandPush.value, 'push');
 });
-
 copyPullBtn.addEventListener('click', () => {
-  copyText(commandPull.value.trim());
+  copyText(commandPull.value, 'pull');
 });
-
+// Iframe loading - simple and clean
 const iframe = document.getElementById("content-frame");
-const messageDiv = document.getElementById("message");
-
-const url = `${SERVER_CONFIG.pythonsv_url}`;
-
-if (!url) {
-
-  messageDiv.textContent = "Unable to get response from the API";
+const url = typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG.pythonsv_url ? SERVER_CONFIG.pythonsv_url : null;
+if (!url || url === '') {
   iframe.style.display = "none";
-
+  // Create a placeholder message if needed (optional)
+  const wrapper = document.querySelector('.terminal-wrapper');
+  const errorMsg = document.createElement('div');
+  errorMsg.style.cssText = 'display: flex; align-items: center; justify-content: center; height: 400px; color: #f44336; background: #0a0c12; font-size: 0.9rem; gap: 10px;';
+  errorMsg.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Unable to load terminal interface';
+  wrapper.appendChild(errorMsg);
 } else {
-
   iframe.src = url;
-
-  let timeout = setTimeout(() => {
-
-    messageDiv.textContent = "Error: Command timed out";
-    iframe.style.display = "none";
-
-  }, 5000);
-
-  iframe.onload = () => {
-
-    clearTimeout(timeout);
-    iframe.style.display = "block";
-    messageDiv.textContent = "";
-
-  };
-
-  iframe.onerror = () => {
-
-    clearTimeout(timeout);
-    messageDiv.textContent = "Error: Command timed out";
-
-  };
+  iframe.style.display = "block";
 }
-
+// Add click-to-copy functionality on textareas (double-click or click)
+const textareas = document.querySelectorAll('textarea.readonly');
+textareas.forEach(textarea => {
+  textarea.addEventListener('click', function(e) {
+    e.stopPropagation();
+    this.select();
+    const type = this.id === 'commandPush' ? 'push' : 'pull';
+    copyText(this.value, type);
+  });
+  // Add tooltip hint
+  textarea.setAttribute('title', 'Click to copy command');
+});
+// Keyboard shortcut for modal (Ctrl/Cmd + K)
+window.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    openModal();
+  }
+});
+// Smooth iframe appearance
+iframe.style.opacity = '0';
+iframe.style.transition = 'opacity 0.4s ease';
+iframe.onload = function() {
+  iframe.style.opacity = '1';
+};
+// Set opacity after a short delay if already loaded
+setTimeout(() => {
+  if (iframe.src && iframe.src !== 'about:blank') {
+    iframe.style.opacity = '1';
+  }
+}, 100);
 </script>
-
 </body>
 </html>

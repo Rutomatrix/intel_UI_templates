@@ -593,23 +593,11 @@
                     </div>
 
                     <!--  Multiple Streaming -->
-                    <div class="device-card" data-device-id="001" data-feature="stream_1">
-                        <div class="device-icon">
-                            <i class="fas fa-video"></i>
-                        </div>
-                        <div class="device-name"> Stream 1</div>
-                        <div class="device-status">
-                            <div class="status-indicator"></div>
-                            <div class="status-text">Ready</div>
-                        </div>
-                    </div>
-
-                    <!--  Multiple Streaming -->
-                    <div class="device-card" data-device-id="001" data-feature="stream_2">
+                    <div class="device-card" data-device-id="001" data-feature="multiple_streaming">
                         <div class="device-icon">
                            <i class="fas fa-video"></i>
                         </div>
-                        <div class="device-name"> Stream 2</div>
+                        <div class="device-name"> Multiple Streaming</div>
                         <div class="device-status">
                             <div class="status-indicator"></div>
                             <div class="status-text">Ready</div>
@@ -793,27 +781,16 @@
                 specs: "Common view both standard and thermal camera",
                 htmlFile: "../static/thermal.html"
             },
-            "stream_1": {
-                name: "Stream 1",
+            "multiple_streaming": {
+                name: "Multiple Streaming",
                 ip: "192.168.1.101",
                 subnet: "255.255.255.0",
                 gateway: "192.168.1.1",
                 mac: "00:1A:2B:3C:4D:5E",
                 status: "Ready",
                 lastActive: "2025-11-28 15:42:00",
-                specs: "Virtual Desk",
-                htmlFile: "../static/stream_1.html"
-            },
-            "stream_2": {
-                name: "Stream 2",
-                ip: "192.168.1.101",
-                subnet: "255.255.255.0",
-                gateway: "192.168.1.1",
-                mac: "00:1A:2B:3C:4D:5E",
-                status: "Ready",
-                lastActive: "2025-11-28 15:42:00",
-                specs: "Virtual Desk",
-                htmlFile: "../static/stream_2.html"
+                specs: "Multiple Streaming",
+                htmlFile: "../static/multiple_streaming.html"
             },
             "virtual-os": {
                 name: "Virtual Desk & OS Flashing",
@@ -934,7 +911,7 @@
                 status: "Ready",
                 lastActive: "2025-11-28 16:10:00",
                 specs: "APC power control",
-                htmlFile: "../static/apc.html"
+                htmlFile: "../static/serial_driver.html"
             }
         };
         

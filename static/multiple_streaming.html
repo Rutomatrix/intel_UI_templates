@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Rutomatrix - Streams</title>
+      <link rel="icon" type="image/x-icon" href="/static/images/rutomatrix.ico">
+      <style>
+         body {
+         font-family: 'Segoe UI', Arial, sans-serif;
+         background: #121212;
+         color: #FFFFFF;
+         margin: 0;
+         padding: 0;
+         height: 100vh;
+         overflow: hidden;
+         }
+         .pc-container {
+         display: flex;
+         flex-direction: column;
+         height: 100%;
+         padding: 16px;
+         box-sizing: border-box;
+         gap: 16px;
+         max-width: 2000px;
+         margin: 0 auto;
+         }
+         .header {
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         padding: 12px 16px;
+         background: #1E1E1E;
+         border-radius: 8px;
+         box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+         }
+         .device-info {
+         display: flex;
+         flex-direction: column;
+         }
+         .device-name-row {
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         }
+         #device-timer {
+         margin-left: 10px;
+         }
+         .device-name {
+         font-size: 18px;
+         font-weight: 600;
+         color: #FF6A00;
+         white-space: normal;
+         overflow: visible;
+         text-overflow: unset;
+         word-break: break-word;
+         line-height: 1.2;
+         text-align: center;
+         }
+         .controls {
+         display: flex;
+         gap: 12px;
+         }
+         .control-btn {
+         background: #2A2A2A;
+         border: none;
+         color: #FFFFFF;
+         padding: 8px 16px;
+         border-radius: 6px;
+         cursor: pointer;
+         display: flex;
+         align-items: center;
+         gap: 6px;
+         transition: all 0.2s;
+         }
+         .control-btn:hover {
+         background: #FF6A00;
+         }
+         .control-btn.active {
+         background: #FF6A00;
+         }
+         /* Tab Bar */
+         .tab-bar {
+         display: flex;
+         gap: 4px;
+         background: #1E1E1E;
+         padding: 6px 8px;
+         border-radius: 8px;
+         }
+         .tab-btn {
+         background: #2A2A2A;
+         border: none;
+         color: #BBBBBB;
+         padding: 8px 20px;
+         border-radius: 6px;
+         cursor: pointer;
+         font-size: 14px;
+         font-weight: 500;
+         transition: all 0.2s;
+         display: flex;
+         align-items: center;
+         gap: 8px;
+         }
+         .tab-btn:hover {
+         background: #333333;
+         color: #FFFFFF;
+         }
+         .tab-btn.active {
+         background: #FF6A00;
+         color: #FFFFFF;
+         }
+         .tab-indicator {
+         width: 8px;
+         height: 8px;
+         border-radius: 50%;
+         background: currentColor;
+         opacity: 0.4;
+         }
+         .tab-btn.connected .tab-indicator {
+         opacity: 1;
+         background: #4caf50;
+         }
+         /* Tab Panels */
+         .tab-panel {
+         display: none;
+         flex: 1;
+         flex-direction: column;
+         gap: 16px;
+         }
+         .tab-panel.active {
+         display: flex;
+         }
+         /* PC Content */
+         .pc-content {
+         flex: 1;
+         display: flex;
+         flex-direction: column;
+         gap: 16px;
+         }
+         .remote-desktop-container {
+         flex: 1;
+         background: #1E1E1E;
+         border: groove 1px #7c7c7c;
+         border-radius: 8px;
+         overflow: hidden;
+         display: flex;
+         flex-direction: column;
+         position: relative;
+         }
+         .remote-desktop-header {
+         padding: 8px 12px;
+         background: rgba(0,0,0,0.3);
+         font-size: 14px;
+         }
+         .remote-desktop-content {
+         flex: 1;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         position: relative;
+         }
+         .remote-desktop-placeholder {
+         color: #BBBBBB;
+         font-size: 16px;
+         }
+         .remote-desktop-iframe {
+         width: 100%;
+         height: 100%;
+         border: none;
+         }
+         .remote-desktop-btn {
+         background: rgba(0,0,0,0.7);
+         border: none;
+         color: white;
+         width: 36px;
+         height: 36px;
+         border-radius: 50%;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         cursor: pointer;
+         transition: all 0.2s;
+         }
+         .remote-desktop-btn:hover {
+         background: #FF6A00;
+         transform: scale(1.1);
+         }
+         /* Fullscreen button styling */
+         .fullscreen-btn {
+         position: absolute;
+         top: 16px;
+         right: 16px;
+         background: rgba(0,0,0,0.7);
+         border: none;
+         color: white;
+         width: 40px;
+         height: 40px;
+         border-radius: 6px;
+         display: none;
+         align-items: center;
+         justify-content: center;
+         cursor: pointer;
+         transition: all 0.2s;
+         z-index: 1000;
+         }
+         .fullscreen-btn:hover {
+         background: #FF6A00;
+         }
+         .fullscreen-btn.show {
+         display: flex;
+         }
+         /* Fullscreen styles */
+         .remote-desktop-container.fullscreen {
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100vw;
+         height: 100vh;
+         z-index: 9999;
+         border-radius: 0;
+         }
+         .remote-desktop-container.fullscreen .remote-desktop-header {
+         display: none;
+         }
+         @keyframes spin {
+         0% { transform: rotate(0deg); }
+         100% { transform: rotate(360deg); }
+         }
+      </style>
+   </head>
+   <body>
+      <div class="pc-container">
+         <!-- Header -->
+         <div class="header">
+            <div class="device-info">
+               <div class="device-name-row">
+                  <div class="device-name">Rutomatrix</div>
+                  <div id="device-timer"></div>
+               </div>
+            </div>
+            <div class="controls">
+               <button class="control-btn" id="connect-btn-active">
+                  <svg viewBox="0 0 24 24" width="16" height="16">
+                     <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  Connect
+               </button>
+            </div>
+         </div>
+         <!-- Tab Bar -->
+         <div class="tab-bar">
+            <button class="tab-btn active" id="tab-stream1" onclick="switchTab('stream1')">
+            <span class="tab-indicator" id="indicator-stream1"></span>
+            Stream 1
+            </button>
+            <button class="tab-btn" id="tab-stream2" onclick="switchTab('stream2')">
+            <span class="tab-indicator" id="indicator-stream2"></span>
+            Stream 2
+            </button>
+         </div>
+         <!-- Stream 1 Panel -->
+         <div class="tab-panel active" id="panel-stream1">
+            <div class="pc-content">
+               <div class="remote-desktop-container" id="rdc-stream1">
+                  <button class="fullscreen-btn" id="fullscreen-btn-stream1">
+                     <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                     </svg>
+                  </button>
+                  <div class="remote-desktop-header"><span>Remote Desktop — Stream 1</span></div>
+                  <div class="remote-desktop-content">
+                     <div class="remote-desktop-placeholder" id="feed-stream1">Not connected</div>
+                     <iframe id="iframe-stream1" class="remote-desktop-iframe" allow="fullscreen" style="display:none;"></iframe>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- Stream 2 Panel -->
+         <div class="tab-panel" id="panel-stream2">
+            <div class="pc-content">
+               <div class="remote-desktop-container" id="rdc-stream2">
+                  <button class="fullscreen-btn" id="fullscreen-btn-stream2">
+                     <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                     </svg>
+                  </button>
+                  <div class="remote-desktop-header"><span>Remote Desktop — Stream 2</span></div>
+                  <div class="remote-desktop-content">
+                     <div class="remote-desktop-placeholder" id="feed-stream2">Not connected</div>
+                     <iframe id="iframe-stream2" class="remote-desktop-iframe" allow="fullscreen" style="display:none;"></iframe>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <script src="config.js"></script>
+      <script>
+         // ─── Tab State ───────────────────────────────────────────────────────────
+         let currentTab = 'stream1';
+         
+         function switchTab(tab) {
+           currentTab = tab;
+           document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+           document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+           document.getElementById('tab-' + tab).classList.add('active');
+           document.getElementById('panel-' + tab).classList.add('active');
+           // Sync the header connect button to the active stream
+           syncHeaderBtn();
+         }
+         
+         function syncHeaderBtn() {
+           const state = streams[currentTab];
+           const btn = document.getElementById('connect-btn-active');
+           if (state.isConnected) {
+             btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Disconnect`;
+             btn.classList.add('active');
+           } else {
+             btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Connect`;
+             btn.classList.remove('active');
+           }
+         }
+         
+         // ─── Stream Configs ───────────────────────────────────────────────────────
+         document.addEventListener('DOMContentLoaded', () => {
+           const ip_add = SERVER_CONFIG.ip;
+         
+           const streamConfigs = {
+             stream1: {
+               testUrl: `http://${ip_add}:9003/start_stream1`,
+               streamUrl: `http://${ip_add}:9002/stream?advance_headers=1&dual_final_frames=1`,
+             },
+             stream2: {
+               testUrl: `http://${ip_add}:8888/start_stream2`,
+               streamUrl: `http://${ip_add}:8080/stream?advance_headers=1&dual_final_frames=1`,
+             }
+           };
+         
+           window.streams = {
+             stream1: { isConnected: false },
+             stream2: { isConnected: false }
+           };
+         
+           // ─── Header Connect Button ──────────────────────────────────────────────
+           document.getElementById('connect-btn-active').addEventListener('click', async () => {
+             const tab = currentTab;
+             const state = streams[tab];
+             if (!state.isConnected) {
+               await connectStream(tab, streamConfigs[tab]);
+             } else {
+               await disconnectStream(tab);
+             }
+           });
+         
+           // ─── Fullscreen Buttons ─────────────────────────────────────────────────
+           ['stream1', 'stream2'].forEach(tab => {
+             const fsBtn = document.getElementById('fullscreen-btn-' + tab);
+             const container = document.getElementById('rdc-' + tab);
+         
+             fsBtn.addEventListener('click', () => toggleFullscreen(tab));
+         
+             document.addEventListener('keydown', (e) => {
+               if (e.key === 'Escape' && container.classList.contains('fullscreen')) {
+                 exitFullscreen(tab);
+               }
+             });
+         
+             document.addEventListener('fullscreenchange', () => {
+               if (!document.fullscreenElement) {
+                 container.classList.remove('fullscreen');
+                 updateFullscreenButton(tab, false);
+               }
+             });
+           });
+         
+           // ─── Connect ────────────────────────────────────────────────────────────
+           async function connectStream(tab, config) {
+             const feed = document.getElementById('feed-' + tab);
+             feed.innerHTML = `
+         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
+         <div style="border:4px solid rgba(255,255,255,0.3);border-radius:50%;border-top:4px solid #FF6A00;width:40px;height:40px;animation:spin 1s linear infinite;"></div>
+         <p style="margin-top:10px;">Connecting to ${ip_add}...</p>
+         </div>`;
+             feed.style.display = 'block';
+         
+             try {
+               const data = await testConnection1(config.testUrl);
+               if (data.status !== 'failed') {
+                 feed.innerHTML = `<img src="${config.streamUrl}" style="width:100%;height:100%;object-fit:contain;">`;
+                 streams[tab].isConnected = true;
+                 document.getElementById('fullscreen-btn-' + tab).classList.add('show');
+                 // Mark tab indicator green
+                 document.getElementById('tab-' + tab).classList.add('connected');
+               } else {
+                 throw new Error('Stream failed to start');
+               }
+             } catch (error) {
+               console.error(error.message);
+               feed.innerHTML = `<div class="remote-desktop-placeholder">Connection failed</div>`;
+             }
+         
+             syncHeaderBtn();
+           }
+         
+           // ─── Disconnect ─────────────────────────────────────────────────────────
+           async function disconnectStream(tab) {
+             const feed = document.getElementById('feed-' + tab);
+             const iframe = document.getElementById('iframe-' + tab);
+             const container = document.getElementById('rdc-' + tab);
+         
+             iframe.src = '';
+             iframe.style.display = 'none';
+             feed.style.display = 'block';
+             feed.innerHTML = `<div class="remote-desktop-placeholder">Not connected</div>`;
+             streams[tab].isConnected = false;
+             document.getElementById('fullscreen-btn-' + tab).classList.remove('show');
+             document.getElementById('tab-' + tab).classList.remove('connected');
+         
+             if (container.classList.contains('fullscreen')) exitFullscreen(tab);
+         
+             syncHeaderBtn();
+           }
+         
+           // ─── Fullscreen Helpers ─────────────────────────────────────────────────
+           function toggleFullscreen(tab) {
+             const container = document.getElementById('rdc-' + tab);
+             if (container.classList.contains('fullscreen')) {
+               exitFullscreen(tab);
+             } else {
+               enterFullscreen(tab);
+             }
+           }
+         
+           function enterFullscreen(tab) {
+             const container = document.getElementById('rdc-' + tab);
+             container.classList.add('fullscreen');
+             container.requestFullscreen().catch(err => console.error('Fullscreen error:', err));
+             updateFullscreenButton(tab, true);
+           }
+         
+           function exitFullscreen(tab) {
+             const container = document.getElementById('rdc-' + tab);
+             container.classList.remove('fullscreen');
+             if (document.fullscreenElement) {
+               document.exitFullscreen().catch(err => console.error('Exit fullscreen error:', err));
+             }
+             updateFullscreenButton(tab, false);
+           }
+         
+           function updateFullscreenButton(tab, isFullscreen) {
+             const btn = document.getElementById('fullscreen-btn-' + tab);
+             if (isFullscreen) {
+               btn.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+             } else {
+               btn.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+             }
+           }
+         
+           // ─── Fetch Helpers ───────────────────────────────────────────────────────
+           async function testConnection1(url) {
+             try {
+               const response = await fetch(url, {
+                 method: 'GET',
+                 cache: 'no-store',
+                 headers: { 'Accept': 'application/json' }
+               });
+               const data = await response.json();
+               console.log('Parsed data:', data);
+               return data;
+             } catch (error) {
+               console.error('Connection failed for ' + url + ':', error);
+               return { ok: false, status: 0, statusText: error.message };
+             }
+           }
+         });
+      </script>
+   </body>
+</html>
