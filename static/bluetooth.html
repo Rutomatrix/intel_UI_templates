@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Android Streaming</title>
+  <title>Serial Driver</title>
   <link rel="icon" type="image/x-icon" href="/static/images/rutomatrix.ico">
   <style>
       body {
@@ -85,7 +85,7 @@
       <div class="header">
         <div class="device-info">
           <div class="device-name-row">
-            <div class="device-name">Rutomatrix - Android Streaming</div>
+            <div class="device-name">Rutomatrix - Serial Driver</div>
             <div id="device-timer"></div>
           </div>
         </div>
@@ -99,7 +99,7 @@
 <script>
   const iframe = document.getElementById('content-frame');
   const messageDiv = document.getElementById('message');
-  const url = `http://${SERVER_CONFIG.ip}:7123/`;
+  const url = `http://${SERVER_CONFIG.rpi_ip}:9004/`;
 
   if (!url) {
     messageDiv.textContent = 'Unable to get response from the API';

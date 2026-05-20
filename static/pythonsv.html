@@ -363,10 +363,10 @@
 <div style="padding: 20px 24px 24px;">
 <div class="section-title">
 <i class="fa-solid fa-cloud-upload-alt"></i>
-      Push Changes
+      Activate Environment
 </div>
 <div class="command-row">
-<textarea class="readonly" id="commandPush" readonly>git push</textarea>
+<textarea class="readonly" id="commandPush" readonly>source pythonsv_env_ICL.bash</textarea>
 <button class="btn" id="copyPushBtn">
 <i class="fa-regular fa-copy"></i>
         Copy
@@ -374,10 +374,10 @@
 </div>
 <div class="section-title">
 <i class="fa-solid fa-cloud-download-alt"></i>
-      Pull Updates
+      Start Application
 </div>
 <div class="command-row">
-<textarea class="readonly" id="commandPull" readonly>git pull</textarea>
+<textarea class="readonly" id="commandPull" readonly>python startgnr.py</textarea>
 <button class="btn" id="copyPullBtn">
 <i class="fa-regular fa-copy"></i>
         Copy
@@ -386,7 +386,7 @@
 <div class="status" id="statusMsg"></div>
 </div>
 </div>
-<script src="config.js"></script>
+
 <script>
 // Modal functionality
 const openGuideBtn = document.getElementById('openGuideBtn');
@@ -461,7 +461,7 @@ copyPullBtn.addEventListener('click', () => {
 });
 // Iframe loading - simple and clean
 const iframe = document.getElementById("content-frame");
-const url = typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG.pythonsv_url ? SERVER_CONFIG.pythonsv_url : null;
+const url = `http://${window.location.hostname}:3000/terminal_1`;
 if (!url || url === '') {
   iframe.style.display = "none";
   // Create a placeholder message if needed (optional)

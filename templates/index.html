@@ -355,7 +355,7 @@
         
         .modal-btn:hover {
             background-color: rgba(255, 106, 0, 0.1);
-            color: #ff6a00;
+            color: #fc8701;
         }
         
         .modal-body {
@@ -714,6 +714,42 @@
                         </div>
                     </div>
 
+                    <!--  Bluetooth -->
+                    <div class="device-card" data-device-id="002" data-feature="bluetooth">
+                        <div class="device-icon">
+                            <i class="fab fa-bluetooth-b"></i>
+                        </div>
+                        <div class="device-name">Bluetooth</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+
+                    <!--  Wifi -->
+                    <div class="device-card" data-device-id="003" data-feature="wifi">
+                        <div class="device-icon">
+                            <i class="fas fa-wifi"></i>
+                        </div>
+                        <div class="device-name">WiFi</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+
+                    <!--  Ethernet -->
+                    <div class="device-card" data-device-id="004" data-feature="ethernet">
+                        <div class="device-icon">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <div class="device-name">Ethernet</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+
                     <!--  PythonSV -->
                     <div class="device-card" data-feature="python-service">
                         <div class="device-icon">
@@ -912,6 +948,17 @@
                 lastActive: "2025-11-28 16:10:00",
                 specs: "APC power control",
                 htmlFile: "../static/serial_driver.html"
+            },
+            "bluetooth": {
+                name: "Bluetooth",
+                ip: "192.168.1.110",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:67",
+                status: "Ready",
+                lastActive: "2025-11-28 16:10:00",
+                specs: "APC power control",
+                htmlFile: "../static/bluetooth.html"
             }
         };
         

@@ -357,8 +357,8 @@
       .auth-modal { padding: 20px; }
     }
 </style>
-<!-- Load config.js (must exist, provides SERVER_CONFIG) -->
-<script src="config.js"></script>
+<!-- Load scripts/config.js (must exist, provides SERVER_CONFIG) -->
+<script src="scripts/config.js"></script>
 </head>
 <body>
  
@@ -605,23 +605,10 @@
   }
   // Initialize IFrame using SERVER_CONFIG.bmc_url (preserve original behavior)
   function initializeIframeFromConfig() {
-    // Check global SERVER_CONFIG (provided by config.js)
-    let frameUrl = null;
-    if (typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG && SERVER_CONFIG.bmc_url) {
-      frameUrl = SERVER_CONFIG.bmc_url;
-    } else {
-      // Fallback for safety (if config.js missing)
-      console.warn("SERVER_CONFIG.bmc_url not found, using default placeholder");
-      frameUrl = "about:blank";
-      msgDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> config.js missing SERVER_CONFIG.bmc_url';
-    }
-    if (frameUrl && frameUrl !== "about:blank") {
-      iframe.src = frameUrl;
-      msgDiv.innerHTML = `<i class="fas fa-globe"></i> BMC Interface: ${frameUrl} | Commands use separate IP/credentials.`;
-    } else {
-      iframe.src = "about:blank";
-      msgDiv.innerHTML = '<i class="fas fa-plug"></i> Awaiting BMC URL from config. Commands ready.';
-    }
+    const frameUrl = `http://${window.location.hostname}:3000/terminal_2`;
+
+    iframe.src = frameUrl;
+    msgDiv.innerHTML = `<i class="fas fa-globe"></i> BMC Interface: ${frameUrl}`;
   }
   // Modal controls
   function openAuthModal() {
@@ -662,7 +649,7 @@
       msgDiv.innerHTML = `<i class="fas fa-check-circle"></i> Commands ready (${bmcCreds.username}@${bmcCreds.ip}) | IFrame: ${typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG?.bmc_url ? 'configured' : 'default'}`;
     }
   });
-  // Additional: If config.js is loaded later, ensure iframe gets it (already on load)
+  // Additional: If scripts/config.js is loaded later, ensure iframe gets it (already on load)
   // Expose function for potential external refresh
   window.refreshCommandsOnly = function() {
     renderCommandsModalContent();
