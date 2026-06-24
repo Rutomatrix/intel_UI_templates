@@ -1,0 +1,15 @@
+[Unit]
+Description=Main UI Web Server (Port 8080)
+After=network.target
+ 
+[Service]
+User=root
+Group=root
+ExecStart=/bin/bash -c 'USER=$(cat /boot/firmware/rutomatrix_user); cd /home/$USER/intel_UI_templates && exec /usr/bin/python3 /home/$USER/intel_UI_templates/app.py'
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+ 
+[Install]
+WantedBy=multi-user.target

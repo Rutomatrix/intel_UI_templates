@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Postcode, Bios serial log, System state Reading and ATX</title>
+  <script src="/static/ui-global.js"></script>
+  <link rel="icon" type="image/x-icon" href="/static/images/rutomatrix.ico">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #121212;
+      color: #FFFFFF;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 16px;
+      box-sizing: border-box;
+      gap: 16px;
+      max-width: 2000px;
+      margin: 0 auto;
+    }
+
+    /* Power Control Header */
+    .power-control-header {
+      background: #1E1E1E;
+      border-radius: 8px;
+      padding: 16px 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #333;
+      flex-shrink: 0;
+    }
+
+    .device-info {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .device-name-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .device-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #FF6A00;
+    }
+
+    #device-timer {
+      font-size: 14px;
+      color: #BBBBBB;
+      background: #252525;
+      padding: 4px 12px;
+      border-radius: 4px;
+    }
+
+    .power-controls-container {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .power-status-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-label {
+      font-size: 14px;
+      color: #BBBBBB;
+    }
+
+    .power-status {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 140px;
+    }
+
+    .status-active {
+      background: rgba(39, 174, 96, 0.15);
+      color: #2ecc71;
+      border: 1px solid rgba(39, 174, 96, 0.3);
+    }
+
+    .status-off {
+      background: rgba(231, 76, 60, 0.15);
+      color: #e74c3c;
+      border: 1px solid rgba(231, 76, 60, 0.3);
+    }
+
+    .status-unknown {
+      background: rgba(243, 156, 18, 0.15);
+      color: #f39c12;
+      border: 1px solid rgba(243, 156, 18, 0.3);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .status-active .status-dot {
+      background: #2ecc71;
+      box-shadow: 0 0 8px #2ecc71;
+    }
+
+    .status-off .status-dot {
+      background: #e74c3c;
+      box-shadow: 0 0 8px #e74c3c;
+    }
+
+    .status-unknown .status-dot {
+      background: #f39c12;
+      box-shadow: 0 0 8px #f39c12;
+    }
+
+    .power-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .power-btn {
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+    }
+
+    .power-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .power-btn:active {
+      transform: translateY(0);
+    }
+
+    .power-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    .btn-on {
+      background: linear-gradient(135deg, #ff6a00, #ff8533);
+      box-shadow: 0 4px 14px rgba(255, 106, 0, 0.35);
+    }
+
+    .btn-off {
+      background: linear-gradient(135deg, #e74c3c, #ff6b6b);
+      box-shadow: 0 4px 14px rgba(231, 76, 60, 0.35);
+    }
+
+    .btn-reset {
+      background: linear-gradient(135deg, #0971b3, #3498db);
+      box-shadow: 0 4px 14px rgba(9, 113, 179, 0.35);
+    }
+
+    .bios-control-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 100px;
+    }
+
+    .bios-control-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .bios-control-btn:active {
+      transform: translateY(0);
+    }
+
+    .bios-control-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    .btn-start {
+      background: linear-gradient(135deg, #0971b3, #3498db);
+      box-shadow: 0 4px 14px rgba(9, 113, 179, 0.35);
+    }
+
+    .btn-stop {
+      background: linear-gradient(135deg, #d32f2f, #f44336);
+      box-shadow: 0 4px 14px rgba(211, 47, 47, 0.35);
+    }
+
+    .btn-clear {
+      background: linear-gradient(135deg, #666, #888);
+      box-shadow: 0 4px 14px rgba(102, 102, 102, 0.35);
+    }
+
+    /* Tabs Styling */
+    .tabs-container {
+      display: flex;
+      background: #1E1E1E;
+      border-radius: 8px;
+      padding: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      flex-shrink: 0;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #BBBBBB;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 106, 0, 0.1);
+      color: #FFFFFF;
+    }
+
+    .tab-btn.active {
+      background: #FF6A00;
+      color: #FFFFFF;
+    }
+
+    .tab-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .tab-content {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* Content Layouts */
+    .bios-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .bios-tabs {
+      display: flex;
+      background: #1E1E1E;
+      border-radius: 6px;
+      padding: 2px;
+      flex-shrink: 0;
+      margin-bottom: 16px;
+    }
+
+    .bios-tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #BBBBBB;
+      padding: 10px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .bios-tab-btn:hover {
+      background: rgba(255, 106, 0, 0.1);
+    }
+
+    .bios-tab-btn.active {
+      background: #FF6A00;
+      color: #FFFFFF;
+    }
+
+    .log-controls {
+      margin-bottom: 15px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .log-status {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 13px;
+      gap: 8px;
+    }
+
+    .log-status.connected {
+      background: #27ae60;
+      color: white;
+    }
+
+    .log-status.disconnected {
+      background: #555;
+      color: white;
+    }
+
+    .log-container {
+      flex: 1;
+      background: #0d0e0f;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      border: 1px solid #333;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bios-log-content {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    .log-entry {
+      margin-bottom: 4px;
+      padding: 4px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .log-entry:hover {
+      background: #1a1b1c;
+    }
+
+    .log-timestamp {
+      color: #888;
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+
+    /* Saved Logs Styles */
+    .logs-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      gap: 16px;
+      min-height: 0;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .logs-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .logs-title {
+      font-size: 18px;
+      color: #BBB;
+    }
+
+    .log-path {
+      color: #666;
+      font-size: 14px;
+      font-family: monospace;
+      background: #2A2A2A;
+      padding: 8px 16px;
+      border-radius: 6px;
+      max-width: 600px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-list-container {
+      flex: 1;
+      background: #1E1E1E;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .file-list-header {
+      padding: 16px;
+      background: #2A2A2A;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .file-list-title {
+      font-size: 16px;
+      color: #BBB;
+    }
+
+    .file-count {
+      background: #0971b3;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
+    .file-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      min-height: 0;
+    }
+
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background: #2A2A2A;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+    }
+
+    .file-item:hover {
+      background: #3A3A3A;
+      border-color: #0971b3;
+      transform: translateY(-2px);
+    }
+
+    .file-info {
+      flex: 1;
+    }
+
+    .file-name {
+      font-weight: 500;
+      margin-bottom: 6px;
+      word-break: break-all;
+      color: #FFF;
+    }
+
+    .file-details {
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+      color: #BBB;
+    }
+
+    .file-size {
+      font-family: monospace;
+    }
+
+    .file-date {
+      font-style: italic;
+    }
+
+    .file-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .file-action-btn {
+      padding: 8px 16px;
+      background: #3A3A3A;
+      border: none;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s ease;
+    }
+
+    .file-action-btn:hover {
+      background: #4A4A4A;
+    }
+
+    .file-action-btn.download {
+      background: #4CAF50;
+    }
+
+    .file-action-btn.download:hover {
+      background: #45a049;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      color: #666;
+      font-style: italic;
+      font-size: 16px;
+      text-align: center;
+      height: 100%;
+      gap: 8px;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      opacity: 0.5;
+    }
+
+    /* Modal Styling */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 1000;
+    }
+
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: #1e2022;
+      width: 90%;
+      max-width: 1000px;
+      max-height: 90vh;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid #0971b3;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+
+    .modal-header {
+      background: #0971b3;
+      color: white;
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .modal-header h2 {
+      font-size: 1.5em;
+      font-weight: 600;
+      margin: 0;
+      flex: 1;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-btn {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+
+    .modal-btn:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .modal-btn.download {
+      background: #27ae60;
+    }
+
+    .modal-btn.download:hover {
+      background: #219653;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 28px;
+      cursor: pointer;
+      padding: 0;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .close-btn:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .modal-body {
+      padding: 20px;
+      max-height: calc(90vh - 100px);
+      overflow-y: auto;
+    }
+
+    .file-content {
+      background: #0d0e0f;
+      color: #d4d4d4;
+      padding: 20px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      border: 1px solid #333;
+      min-height: 300px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    .alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 16px 20px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 1050;
+      max-width: 400px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      animation: slideIn 0.3s ease-out;
+      transition: all 0.3s ease;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    .alert-success { background: #4CAF50; color: white; border-left: 4px solid #2E7D32; }
+    .alert-error { background: #F44336; color: white; border-left: 4px solid #C62828; }
+    .alert-info { background: #2196F3; color: white; border-left: 4px solid #1565C0; }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #2A2A2A; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #666; }
+
+    @media (max-width: 768px) {
+      .power-control-header { flex-direction: column; gap: 16px; }
+      .power-controls-container { width: 100%; justify-content: space-between; }
+      .tabs-container { flex-direction: column; }
+      .file-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .file-actions { width: 100%; justify-content: flex-end; }
+    }
+
+    .server-name-tag {
+        font-size: 14px;
+        font-weight: 500;
+        color: #FFFFFF;
+        background: rgba(255, 106, 0, 0.2);
+        padding: 4px 14px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 106, 0, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <div class="power-control-header">
+      <div class="device-info">
+        <div class="device-name-row">
+            <div class="device-name">Rutomatrix</div>
+            <span class="server-name-tag" id="serverTag">
+                <span id="serverName">SPR</span>
+            </span>
+            <div id="device-timer">--:--:--</div>
+        </div>
+      </div>
+
+      <div class="power-controls-container">
+        <div class="power-status-container">
+          <span class="status-label">System Status:</span>
+          <div id="power-status" class="power-status status-unknown">
+            <span class="status-dot"></span>
+            <span id="status-text">Checking...</span>
+          </div>
+        </div>
+
+        <div class="power-buttons">
+          <button id="btn-on" class="power-btn btn-on" title="Power ON">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>
+            </svg>
+          </button>
+          <button id="btn-off" class="power-btn btn-off" title="Power OFF">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z"/>
+            </svg>
+          </button>
+          <button id="btn-reset" class="power-btn btn-reset" title="Reset">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs-container">
+      <button class="tab-btn active" id="postcode-tab" onclick="switchMainTab('postcode')">
+        <svg class="tab-icon" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+        Postcode Scanner
+      </button>
+      <button class="tab-btn" id="bios-tab" onclick="switchMainTab('bios')">
+        <svg class="tab-icon" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M20 18H4V6h16m0-2H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2m-8 6h-2v2h2m0 2h-2v2h2m0-6h-2v2h2m4 2h-2v2h2m0-6h-2v2h2z"/>
+        </svg>
+        BIOS Logs
+      </button>
+    </div>
+
+    <div class="tab-content active" id="postcode-content" style="padding:0;">
+        <iframe
+            src=""
+            id="postcode-frame"
+            style="width:100%;height:calc(100vh - 140px);border:0;background:#121212;"
+        ></iframe>
+    </div>
+
+    <div class="tab-content" id="bios-content">
+      <div class="bios-tabs">
+        <button class="bios-tab-btn active" onclick="switchBiosTab('logs')">Live Logs</button>
+        <button class="bios-tab-btn" onclick="switchBiosTab('files')">Log Files</button>
+      </div>
+
+      <div class="bios-content">
+        <div id="bios-logs" style="display: flex; flex-direction: column; gap: 16px; height: 100%;">
+          <div class="log-controls">
+            <button id="bios-connect-btn" class="bios-control-btn btn-on">Connect</button>
+            <button id="bios-disconnect-btn" class="bios-control-btn btn-off" style="display:none;">Disconnect</button>
+            <button id="bios-clear-btn" class="bios-control-btn btn-reset">Clear Logs</button>
+            <span id="bios-status" class="log-status disconnected">
+              <span class="status-dot" style="width:8px; height:8px; border-radius:50%; background:#e74c3c; display:inline-block;"></span>
+              <span id="bios-status-text">Disconnected</span>
+            </span>
+          </div>
+
+          <div id="bios-log-container" class="log-container">
+            <div class="bios-log-content" id="bios-log-content-area">
+              <div class="empty-state">
+                <div class="empty-state-icon">📄</div>
+                <p>Click "Connect" to start monitoring BIOS logs...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="bios-files" class="logs-container" style="display: none;">
+          <div class="logs-header">
+            <div class="logs-title">BIOS Log Files</div>
+            <div class="log-path" id="bios-log-path">/serial_logs/</div>
+          </div>
+
+          <div class="file-list-container">
+            <div class="file-list-header">
+              <div class="file-list-title">BIOS Log Files</div>
+              <div class="file-count" id="bios-file-count">0 files</div>
+            </div>
+
+            <div class="file-list" id="bios-files-list">
+              <div class="empty-state">Loading log files...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="file-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title">File Content</h2>
+        <div class="modal-actions">
+          <button class="modal-btn download" id="download-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+            </svg>
+            Download .txt
+          </button>
+          <button class="close-btn" id="modal-close-x">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div id="modal-content" class="file-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/scripts/config.js"></script>
+  <script>
+    let currentFile = null;
+    let currentFileType = null;
+    let isFileLoaded = false;
+
+    // Base URL discovery dynamically generated from parent page window frame properties
+    const BIOS_BASE_URL = `http://${SERVER_CONFIG.rpiIp}:1818`;
+    document.getElementById('postcode-frame').src = `http://${SERVER_CONFIG.rpiIp}:5015/`;
+
+    function switchMainTab(tabName) {
+      document.getElementById('postcode-tab').classList.toggle('active', tabName === 'postcode');
+      document.getElementById('bios-tab').classList.toggle('active', tabName === 'bios');
+
+      document.getElementById('postcode-content').classList.toggle('active', tabName === 'postcode');
+      document.getElementById('bios-content').classList.toggle('active', tabName === 'bios');
+    }
+
+    function switchBiosTab(tab) {
+      const tabs = document.querySelectorAll('.bios-tab-btn');
+      if(tabs.length >= 2) {
+        tabs[0].classList.toggle('active', tab === 'logs');
+        tabs[1].classList.toggle('active', tab === 'files');
+      }
+
+      document.getElementById('bios-logs').style.display = tab === 'logs' ? 'flex' : 'none';
+      document.getElementById('bios-files').style.display = tab === 'files' ? 'flex' : 'none';
+
+      if (tab === 'files' && typeof window.loadBiosFiles === 'function') {
+        window.loadBiosFiles();
+      }
+    }
+
+    // ============================================================
+    // SERVER NAME LOADING FROM CONFIG.JS
+    // ============================================================
+
+    // Function to parse server name from config.js content
+    function parseServerNameFromConfig(content) {
+        try {
+            const match = content.match(/serverName:\s*['"]([^'"]+)['"]/);
+            if (match && match[1]) {
+                return match[1];
+            }
+            return null;
+        } catch (e) {
+            console.error('Error parsing server name:', e);
+            return null;
+        }
+    }
+
+    // Function to update server name display
+    function updateServerNameDisplay(serverName) {
+        const serverNameEl = document.getElementById('serverName');
+        if (serverNameEl) {
+            serverNameEl.textContent = serverName;
+        }
+        localStorage.setItem('selectedServer', serverName);
+    }
+
+    // Method 1: Load via script tag
+    function loadConfigFromScript() {
+        return new Promise((resolve) => {
+            try {
+                const script = document.createElement('script');
+                script.src = '../static/scripts/config.js?_=' + Date.now();
+                script.onload = function() {
+                    if (typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG.serverName) {
+                        resolve(SERVER_CONFIG.serverName);
+                    } else {
+                        resolve(null);
+                    }
+                };
+                script.onerror = function() {
+                    resolve(null);
+                };
+                document.head.appendChild(script);
+            } catch (e) {
+                resolve(null);
+            }
+        });
+    }
+
+    // Method 2: Load via direct fetch
+    async function loadConfigDirect() {
+        try {
+            const response = await fetch('../static/scripts/config.js?_=' + Date.now(), {
+                cache: 'no-store'
+            });
+            if (response.ok) {
+                const content = await response.text();
+                return parseServerNameFromConfig(content);
+            }
+            return null;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    // Method 3: Load via API
+    async function loadConfigViaAPI() {
+        try {
+            const response = await fetch('/get-config', {
+                cache: 'no-store'
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.serverName) {
+                    return data.serverName;
+                }
+            }
+            return null;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    // Main function to load server name
+    async function loadServerName() {
+        // Try localStorage first
+        const savedServer = localStorage.getItem('selectedServer');
+        if (savedServer && (savedServer === 'SPR' || savedServer === 'GNR')) {
+            updateServerNameDisplay(savedServer);
+            console.log('Server loaded from localStorage:', savedServer);
+            return;
+        }
+        
+        // Try API
+        let serverName = await loadConfigViaAPI();
+        if (serverName) {
+            updateServerNameDisplay(serverName);
+            console.log('Server loaded via API:', serverName);
+            return;
+        }
+        
+        // Try direct fetch
+        serverName = await loadConfigDirect();
+        if (serverName) {
+            updateServerNameDisplay(serverName);
+            console.log('Server loaded via direct fetch:', serverName);
+            return;
+        }
+        
+        // Try script tag
+        serverName = await loadConfigFromScript();
+        if (serverName) {
+            updateServerNameDisplay(serverName);
+            console.log('Server loaded via script tag:', serverName);
+            return;
+        }
+        
+        // Default
+        console.warn('All config loading methods failed, using default SPR');
+        updateServerNameDisplay('SPR');
+    }
+
+    // Poll for config changes every 5 seconds
+    function startConfigPolling() {
+        setInterval(async () => {
+            try {
+                const response = await fetch('../static/scripts/config.js?_=' + Date.now(), {
+                    cache: 'no-store'
+                });
+                if (response.ok) {
+                    const content = await response.text();
+                    const serverName = parseServerNameFromConfig(content);
+                    const currentDisplay = document.getElementById('serverName')?.textContent || 'SPR';
+                    if (serverName && serverName !== currentDisplay) {
+                        console.log('Config file changed! New server:', serverName);
+                        updateServerNameDisplay(serverName);
+                    }
+                }
+            } catch (error) {
+                // Silent fail
+            }
+        }, 5000);
+    }
+
+    // ============================================================
+    // END SERVER NAME LOADING
+    // ============================================================
+
+    // Power Control Setup
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // Load server name
+      loadServerName();
+      
+      // Start polling for config changes
+      startConfigPolling();
+
+      const powerStatus = document.getElementById('power-status');
+      const statusText = document.getElementById('status-text');
+      const btnOn = document.getElementById('btn-on');
+      const btnOff = document.getElementById('btn-off');
+      const btnReset = document.getElementById('btn-reset');
+
+      let powerCooldown = false;
+
+      function startPowerCooldown() {
+        if (powerCooldown) return;
+        powerCooldown = true;
+        [btnOn, btnOff, btnReset].forEach(btn => btn.disabled = true);
+        setTimeout(() => {
+          [btnOn, btnOff, btnReset].forEach(btn => btn.disabled = false);
+          powerCooldown = false;
+        }, 10000);
+      }
+
+      async function sendPowerCommand(action) {
+        const btn = document.getElementById(`btn-${action}`);
+        const originalHTML = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner"></span>`;
+
+        try {
+          const response = await fetch(`http://${SERVER_CONFIG.rpiIp}:3433/power/${action}`);
+          if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+          const data = await response.json();
+          if (data.status !== 'success') throw new Error(data.message || 'Unknown server fault');
+
+          statusText.textContent = `${action.toUpperCase()} sent`;
+          powerStatus.className = 'power-status status-active';
+          setTimeout(checkPowerStatus, 2000);
+          showAlert(`Power ${action} command targeted successfully.`, 'success');
+          startPowerCooldown();
+        } catch (error) {
+          statusText.textContent = `Failed: ${error.message}`;
+          powerStatus.className = 'power-status status-unknown';
+          showAlert(`Command delivery failed: ${error.message}`, 'error');
+        } finally {
+          btn.innerHTML = originalHTML;
+          if(!powerCooldown) btn.disabled = false;
+        }
+      }
+
+      async function checkPowerStatus() {
+        try {
+          const response = await fetch(`http://${SERVER_CONFIG.rpiIp}:3433/state`);
+          if (!response.ok) throw new Error();
+          const data = await response.json();
+          const currentStatus = data.status || 'unknown';
+          statusText.textContent = data.state || currentStatus;
+
+          powerStatus.className = 'power-status';
+          const indicatorDot = powerStatus.querySelector('.status-dot');
+          
+          if (currentStatus === 'active') {
+            powerStatus.classList.add('status-active');
+            if(indicatorDot) indicatorDot.style.background = '#2ecc71';
+          } else if (currentStatus === 'off') {
+            powerStatus.classList.add('status-off');
+            if(indicatorDot) indicatorDot.style.background = '#e74c3c';
+          } else {
+            powerStatus.classList.add('status-unknown');
+            if(indicatorDot) indicatorDot.style.background = '#f39c12';
+          }
+        } catch (error) {
+          statusText.textContent = 'Status Unreachable';
+          powerStatus.className = 'power-status status-unknown';
+        }
+      }
+
+      btnOn.addEventListener('click', () => sendPowerCommand('on'));
+      btnOff.addEventListener('click', () => sendPowerCommand('off'));
+      btnReset.addEventListener('click', () => sendPowerCommand('reset'));
+
+      checkPowerStatus();
+      setInterval(() => { const now = new Date(); document.getElementById('device-timer').textContent = now.toLocaleTimeString(); }, 1000);
+      setInterval(checkPowerStatus, 30000);
+    });
+
+    // BIOS Realtime Streaming Logging Setup
+    document.addEventListener('DOMContentLoaded', () => {
+      const connectBtn = document.getElementById('bios-connect-btn');
+      const disconnectBtn = document.getElementById('bios-disconnect-btn');
+      const clearBtn = document.getElementById('bios-clear-btn');
+      const biosStatus = document.getElementById('bios-status');
+      const biosStatusText = document.getElementById('bios-status-text');
+      const logContainer = document.getElementById('bios-log-content-area');
+      const biosFilesList = document.getElementById('bios-files-list');
+      const biosFileCount = document.getElementById('bios-file-count');
+
+      let isBiosConnected = false;
+      let biosLogInterval = null;
+
+      window.loadBiosFiles = async function() {
+        biosFilesList.innerHTML = '<div class="empty-state"><div class="spinner"></div><p>Querying filesystem entries...</p></div>';
+        try {
+          const response = await fetch(`${BIOS_BASE_URL}/list-files`);
+          const data = await response.json();
+
+          if (data.files && Array.isArray(data.files)) {
+            biosFilesList.innerHTML = '';
+            biosFileCount.textContent = `${data.files.length} file${data.files.length !== 1 ? 's' : ''}`;
+
+            if (data.files.length === 0) {
+              biosFilesList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📁</div><p>No log records discovered</p></div>';
+              return;
+            }
+
+            data.files.forEach(file => {
+              const fileItem = document.createElement('div');
+              fileItem.className = 'file-item';
+              const sizeKB = (file.size / 1024).toFixed(2);
+              const formattedDate = new Date(file.modified * 1000).toLocaleString();
+
+              fileItem.innerHTML = `
+                <div class="file-info">
+                  <div class="file-name">${file.name}</div>
+                  <div class="file-details">
+                    <span class="file-size">${sizeKB} KB</span>
+                    <span class="file-date">${formattedDate}</span>
+                  </div>
+                </div>
+                <div class="file-actions">
+                  <button class="file-action-btn view-trigger" data-filename="${file.name}">View</button>
+                  <button class="file-action-btn download download-trigger" data-filename="${file.name}">Download</button>
+                </div>
+              `;
+              biosFilesList.appendChild(fileItem);
+            });
+
+            // Delegate events cleanly without re-binding loops
+            biosFilesList.querySelectorAll('.view-trigger').forEach(btn => {
+              btn.addEventListener('click', () => openBiosFile(btn.getAttribute('data-filename')));
+            });
+            biosFilesList.querySelectorAll('.download-trigger').forEach(btn => {
+              btn.addEventListener('click', () => downloadBiosFile(btn.getAttribute('data-filename')));
+            });
+          }
+        } catch (error) {
+          biosFilesList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><p>Failed to collect remote directory files.</p></div>';
+        }
+      };
+
+      async function openBiosFile(filename) {
+        currentFile = { name: filename };
+        currentFileType = 'bios';
+        isFileLoaded = false;
+
+        const modal = document.getElementById('file-modal');
+        const modalContent = document.getElementById('modal-content');
+        document.getElementById('modal-title').textContent = filename;
+        modalContent.innerHTML = '<div class="empty-state"><div class="spinner"></div><p>Fetching content logs from target disk block...</p></div>';
+        modal.classList.add('active');
+
+        try {
+          const response = await fetch(`${BIOS_BASE_URL}/get-file/${encodeURIComponent(filename)}`);
+          const data = await response.json();
+          modalContent.textContent = data.content || data.error || 'Empty document payload returned.';
+          isFileLoaded = true;
+        } catch (error) {
+          modalContent.textContent = 'Error during transaction lookup processing: ' + error.message;
+        }
+      }
+
+      async function downloadBiosFile(filename) {
+  	try {
+    		const response = await fetch(
+      		`${BIOS_BASE_URL}/get-file/${encodeURIComponent(filename)}`
+    		);
+
+    	const data = await response.json();
+
+    	if (data.error) {
+      		throw new Error(data.error);
+    	}
+
+    	const content = data.content || '';
+
+    	const blob = new Blob([content], {
+      		type: 'text/plain'
+   	 });
+
+   	 const url = URL.createObjectURL(blob);
+
+    	const a = document.createElement('a');
+   	 a.href = url;
+   	 a.download = filename;
+
+   	 document.body.appendChild(a);
+   	 a.click();
+
+   	 document.body.removeChild(a);
+   	 URL.revokeObjectURL(url);
+
+ 	 } catch (error) {
+   		 showAlert(`Download failed: ${error.message}`, 'error');
+ 	 }
+	}
+
+      async function connectBios() {
+        if (isBiosConnected) return;
+        connectBtn.disabled = true;
+
+        try {
+          const response = await fetch(`${BIOS_BASE_URL}/start-logging`, { method: 'POST' });
+          if (response.status === 409) {
+            showAlert('Logging stack is already busy on another remote terminal thread.', 'error');
+            return;
+          }
+          const data = await response.json();
+          if (data.status === 'started') {
+            isBiosConnected = true;
+            connectBtn.style.display = 'none';
+            disconnectBtn.style.display = 'inline-block';
+            biosStatus.className = 'log-status connected';
+            biosStatus.querySelector('.status-dot').style.background = '#27ae60';
+            biosStatusText.textContent = 'Connected';
+            logContainer.innerHTML = '';
+            biosLogInterval = setInterval(fetchBiosLogs, 1000);
+            showAlert('Active listening connection spawned.', 'success');
+          }
+        } catch (error) {
+          showAlert('Failed to anchor local logging stack hook context.', 'error');
+        } finally {
+          connectBtn.disabled = false;
+        }
+      }
+
+      async function disconnectBios() {
+        if (!isBiosConnected) return;
+        disconnectBtn.disabled = true;
+
+        try {
+          await fetch(`${BIOS_BASE_URL}/stop-logging`, { method: 'POST' });
+          isBiosConnected = false;
+          clearInterval(biosLogInterval);
+          connectBtn.style.display = 'inline-block';
+          disconnectBtn.style.display = 'none';
+          biosStatus.className = 'log-status disconnected';
+          biosStatus.querySelector('.status-dot').style.background = '#e74c3c';
+          biosStatusText.textContent = 'Disconnected';
+          showAlert('Logging listener session closed.', 'info');
+        } catch (error) {
+          showAlert('Disconnection hook dropped dirty.', 'error');
+        } finally {
+          disconnectBtn.disabled = false;
+        }
+      }
+
+      async function fetchBiosLogs() {
+        try {
+          const response = await fetch(`${BIOS_BASE_URL}/get-logs`);
+          const data = await response.json();
+
+          if (data.logs && data.logs.length > 0) {
+            // Clear baseline empty state wrapper text blocks if needed
+            if(logContainer.querySelector('.empty-state')) logContainer.innerHTML = '';
+
+            data.logs.forEach(log => {
+              const entry = document.createElement('div');
+              entry.className = 'log-entry';
+              entry.innerHTML = `<span class="log-timestamp">[${new Date().toLocaleTimeString()}]</span>${escapeHtml(log)}`;
+              logContainer.appendChild(entry);
+            });
+            logContainer.scrollTop = logContainer.scrollHeight;
+          }
+        } catch (e) { console.error(e); }
+      }
+
+      connectBtn.addEventListener('click', connectBios);
+      disconnectBtn.addEventListener('click', disconnectBios);
+      clearBtn.addEventListener('click', () => {
+        logContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📄</div><p>Terminal frame flushed clear.</p></div>';
+      });
+    });
+
+    // Unified Document Exporter File Trigger Hooks
+    document.getElementById('download-btn').addEventListener('click', function() {
+      if (!currentFile || !isFileLoaded) {
+        showAlert('Cannot export an incomplete data block segment context.', 'error');
+        return;
+      }
+      const content = document.getElementById('modal-content').textContent;
+      const filename = currentFile.name.endsWith('.txt') ? currentFile.name : currentFile.name + '.txt';
+
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    function closeModal() {
+      document.getElementById('file-modal').classList.remove('active');
+      currentFile = null;
+      currentFileType = null;
+      isFileLoaded = false;
+    }
+
+    // Modal Global Closing Binding Handlers
+    document.getElementById('modal-close-x').addEventListener('click', closeModal);
+    document.getElementById('file-modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+
+    function showAlert(message, type = 'info') {
+      const alertBox = document.createElement('div');
+      alertBox.className = `alert alert-${type}`;
+      alertBox.innerHTML = `<span>${message}</span>`;
+      document.body.appendChild(alertBox);
+      setTimeout(() => { alertBox.style.opacity = '0'; setTimeout(() => alertBox.remove(), 300); }, 4000);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

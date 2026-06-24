@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Rutomatrix | BMC Secure Terminal</title>
+<link rel="icon" type="image/x-icon" href="/static/images/rutomatrix.ico">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+<style>
+  /* ===================== RESET & BASE ===================== */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0A0C10;
+    color: #E8EDFF;
+    min-height: 100vh;
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #1A1D24; border-radius: 8px; }
+  ::-webkit-scrollbar-thumb { background: #FF6A2C; border-radius: 8px; }
+
+  /* ===================== HEADER ===================== */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: rgba(18, 22, 28, 0.92);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,106,0,0.2);
+    position: fixed;
+    top: 18px; left: 20px; right: 20px;
+    z-index: 1000;
+  }
+
+  .device-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #FF8C42, #FF6A00);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .device-name i { color: #FF6A00; background: none; }
+
+  /* ===================== BUTTONS ===================== */
+  .btn {
+    background: linear-gradient(105deg, #FF6A00 0%, #FF8C2E 100%);
+    color: #0A0C10;
+    border: none;
+    padding: 8px 18px;
+    font-weight: 600;
+    border-radius: 40px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(255,106,0,0.3);
+  }
+  .btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow: 0 6px 14px rgba(255,106,0,0.35);
+  }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid #FF6A00;
+    color: #FFA56E;
+    box-shadow: none;
+  }
+  .btn-outline:hover { background: rgba(255,106,0,0.12); }
+
+  /* ===================== LAYOUT ===================== */
+  .container {
+    padding: 20px;
+    max-width: 2000px;
+    margin: 100px auto 30px;
+  }
+
+  .terminal-wrapper {
+    width: 100%;
+    background: #0F1117;
+    border-radius: 24px;
+    box-shadow: 0 20px 35px -12px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,106,0,0.2);
+    overflow: hidden;
+  }
+
+  .message {
+    font-size: 0.85rem;
+    padding: 12px 20px;
+    background: rgba(255,106,0,0.08);
+    border-bottom: 1px solid rgba(255,106,0,0.25);
+    text-align: center;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  iframe {
+    width: 100%;
+    height: calc(100vh - 240px);
+    min-height: 480px;
+    border: none;
+    background: #FFFFFF;
+    display: block;
+  }
+
+  /* ===================== OVERLAY ===================== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(6px);
+    display: none;
+    z-index: 2000;
+  }
+
+  /* ===================== AUTH MODAL ===================== */
+  .auth-modal {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 520px;
+    background: #13161F;
+    border-radius: 32px;
+    box-shadow: 0 30px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,106,0,0.3);
+    padding: 28px 28px 36px;
+    z-index: 2001;
+    display: none;
+  }
+  .auth-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .auth-modal .modal-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    background: linear-gradient(120deg, #FF9A4A, #FF6A00);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .input-group { margin-bottom: 20px; }
+  .input-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #C9D1E6;
+    margin-bottom: 8px;
+  }
+  .input-group label i { color: #FF6A00; width: 20px; }
+  .input-field {
+    width: 100%;
+    background: #0A0C12;
+    border: 1px solid #2A2F3A;
+    border-radius: 18px;
+    padding: 12px 18px;
+    color: #F0F3FF;
+    font-size: 0.95rem;
+    font-family: 'Inter', monospace;
+    transition: all 0.2s;
+    outline: none;
+  }
+  .input-field:focus {
+    border-color: #FF6A00;
+    box-shadow: 0 0 0 3px rgba(255,106,0,0.25);
+  }
+  textarea.input-field {
+    resize: vertical;
+    min-height: 90px;
+    font-family: 'Menlo', 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  .submit-btn {
+    width: 100%;
+    background: linear-gradient(95deg, #FF6A00, #FF8733);
+    border: none;
+    padding: 12px;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #0A0C10;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 16px;
+    transition: 0.2s;
+  }
+  .submit-btn:hover { transform: scale(0.98); filter: brightness(1.03); }
+  .info-note {
+    font-size: 0.7rem;
+    text-align: center;
+    margin-top: 20px;
+    color: #7B85A1;
+  }
+
+  /* ===================== COMMANDS MODAL ===================== */
+  .commands-modal {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 900px;
+    background: #11141E;
+    border-radius: 28px;
+    box-shadow: 0 30px 45px rgba(0,0,0,0.6);
+    z-index: 2002;
+    display: none;
+    flex-direction: column;
+    max-height: 88vh;
+    overflow: hidden;
+    border: 1px solid rgba(255,106,0,0.4);
+  }
+  .commands-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid #232832;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0,0,0,0.25);
+    flex-shrink: 0;
+  }
+  .commands-header h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #FF8C42;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .commands-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .commands-list {
+    padding: 18px 24px 24px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  /* ---- Section Headers inside Commands Modal ---- */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 6px 0 14px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .section-label.predefined { color: #6B7699; }
+  .section-label.custom { color: #FF9A4A; }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.25;
+  }
+  .section-badge {
+    font-size: 0.62rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  .badge-predefined {
+    background: rgba(107,118,153,0.2);
+    color: #8899BB;
+    border: 1px solid rgba(107,118,153,0.3);
+  }
+  .badge-custom {
+    background: rgba(255,106,0,0.15);
+    color: #FF9A4A;
+    border: 1px solid rgba(255,106,0,0.3);
+  }
+
+  /* ---- Command Cards ---- */
+  .command-card {
+    background: #0B0E15;
+    border-radius: 18px;
+    margin-bottom: 12px;
+    padding: 12px 16px;
+    border: 1px solid #20232C;
+    transition: border-color 0.15s;
+  }
+  .command-card.custom-card {
+    border-color: rgba(255,106,0,0.15);
+  }
+  .command-card.custom-card:hover {
+    border-color: rgba(255,106,0,0.35);
+  }
+  .command-title {
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    color: #FFAD73;
+    letter-spacing: -0.2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .command-desc {
+    font-size: 0.72rem;
+    color: #5A6480;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    font-style: italic;
+  }
+  .command-row-flex {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .command-code {
+    flex: 1;
+    background: #010101;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-family: 'Menlo', 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 0.72rem;
+    color: #B9E0FF;
+    word-break: break-all;
+    border: 1px solid #2C313E;
+    line-height: 1.4;
+  }
+  .command-code.custom-code { color: #FFD199; }
+  .cmd-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .copy-cmd-btn {
+    background: #202532;
+    border: none;
+    color: #FF9F5B;
+    padding: 8px 14px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .copy-cmd-btn:hover { background: #FF6A00; color: #0A0C10; }
+
+  /* Icon-only action buttons for custom commands */
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    transition: 0.15s;
+    flex-shrink: 0;
+  }
+  .edit-btn {
+    background: rgba(70, 140, 255, 0.12);
+    color: #6AABFF;
+    border: 1px solid rgba(70,140,255,0.25);
+  }
+  .edit-btn:hover { background: #3B6FD4; color: #fff; border-color: #3B6FD4; }
+  .delete-btn {
+    background: rgba(255, 70, 70, 0.1);
+    color: #FF7070;
+    border: 1px solid rgba(255,70,70,0.25);
+  }
+  .delete-btn:hover { background: #C0392B; color: #fff; border-color: #C0392B; }
+
+  /* Associated credential tag on custom commands */
+  .cred-tag {
+    font-size: 0.63rem;
+    background: rgba(255,163,0,0.1);
+    color: #FFA040;
+    border: 1px solid rgba(255,163,0,0.25);
+    padding: 2px 10px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  /* Empty state for custom commands */
+  .empty-custom {
+    text-align: center;
+    padding: 28px 20px;
+    color: #3A4058;
+    font-size: 0.82rem;
+  }
+  .empty-custom i { font-size: 1.8rem; margin-bottom: 10px; display: block; }
+
+  /* Toast / status */
+  .toast-msg {
+    padding: 6px 16px 16px;
+    font-size: 0.7rem;
+    color: #6FCF97;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* Close / utility buttons in modal headers */
+  .close-modal-btn {
+    background: transparent;
+    border: 1px solid #464E60;
+    color: #ccc;
+    padding: 6px 20px;
+    border-radius: 40px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.82rem;
+    transition: 0.15s;
+  }
+  .close-modal-btn:hover { background: #FF6A00; color: black; border-color: #FF6A00; }
+
+  /* Add Command button inside modal header */
+  .add-cmd-btn {
+    background: linear-gradient(95deg, #FF6A00, #FF8C2E);
+    color: #0A0C10;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 40px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: 0.2s;
+    box-shadow: 0 2px 8px rgba(255,106,0,0.3);
+  }
+  .add-cmd-btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+
+  /* ===================== CUSTOM COMMAND MODAL ===================== */
+  .custom-cmd-modal {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 560px;
+    background: #13161F;
+    border-radius: 28px;
+    box-shadow: 0 30px 50px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,106,0,0.35);
+    padding: 28px 28px 32px;
+    z-index: 2100;
+    display: none;
+  }
+  .custom-cmd-modal-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    background: linear-gradient(120deg, #FF9A4A, #FF6A00);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .field-hint {
+    font-size: 0.65rem;
+    color: #6c7a8e;
+    margin-top: 5px;
+  }
+  .required-star { color: #FF6060; margin-left: 2px; }
+
+  /* ===================== CONFIRM DIALOG ===================== */
+  .confirm-dialog {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 420px;
+    background: #13161F;
+    border-radius: 24px;
+    box-shadow: 0 24px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,70,70,0.35);
+    padding: 28px 28px 26px;
+    z-index: 2200;
+    display: none;
+    text-align: center;
+  }
+  .confirm-dialog .confirm-icon {
+    font-size: 2.2rem;
+    color: #FF5050;
+    margin-bottom: 14px;
+  }
+  .confirm-dialog h4 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #F0F3FF;
+    margin-bottom: 8px;
+  }
+  .confirm-dialog p {
+    font-size: 0.82rem;
+    color: #7B85A1;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .confirm-dialog .confirm-name {
+    color: #FF9A4A;
+    font-weight: 600;
+  }
+  .confirm-actions { display: flex; gap: 12px; justify-content: center; }
+  .cancel-btn {
+    background: transparent;
+    border: 1px solid #464E60;
+    color: #C0C8DF;
+    padding: 9px 22px;
+    border-radius: 40px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: 0.15s;
+  }
+  .cancel-btn:hover { background: #1E2233; }
+  .confirm-delete-btn {
+    background: linear-gradient(95deg, #C0392B, #E74C3C);
+    border: none;
+    color: #fff;
+    padding: 9px 22px;
+    border-radius: 40px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .confirm-delete-btn:hover { filter: brightness(1.08); }
+
+  /* ===================== VALIDATION ===================== */
+  .field-error {
+    font-size: 0.68rem;
+    color: #FF6060;
+    margin-top: 5px;
+    display: none;
+  }
+  .input-field.invalid { border-color: #FF4444 !important; box-shadow: 0 0 0 3px rgba(255,68,68,0.2) !important; }
+
+  /* ===================== RESPONSIVE ===================== */
+  @media (max-width: 680px) {
+    .command-code { font-size: 0.6rem; }
+    .auth-modal { padding: 20px; }
+    .custom-cmd-modal { padding: 20px; }
+    .commands-header-actions { gap: 6px; }
+    .add-cmd-btn span { display: none; }
+  }
+
+  .server-name-tag {
+            font-size: 14px;
+            font-weight: 500;
+            color: #FFFFFF;
+            background: rgba(255, 106, 0, 0.2);
+            padding: 4px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 106, 0, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+</style>
+<!-- SERVER_CONFIG must be provided by scripts/config.js -->
+<script src="scripts/config.js"></script>
+</head>
+<body>
+
+<!-- ==================== HEADER ==================== -->
+<div class="header">
+  <div class="device-name">
+    <i class="fas fa-server"></i> Rutomatrix · BMC Terminal
+    <span class="server-name-tag" id="pcServerTag">
+                  <span id="pcServerName">SPR</span>
+              </span>
+  </div>
+  <div style="display:flex; gap:12px;">
+    <button class="btn" id="openCommandsBtn">
+      <i class="fa-solid fa-terminal"></i> Commands
+    </button>
+    <button class="btn btn-outline" id="reconfigBtn">
+      <i class="fas fa-key"></i> Credentials
+    </button>
+  </div>
+</div>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<div class="container">
+  <div class="terminal-wrapper">
+    <div id="message" class="message">
+      <i class="fas fa-shield-alt"></i> Loading BMC interface...
+    </div>
+    <iframe id="content-frame" title="BMC Web Interface" src="about:blank"></iframe>
+  </div>
+</div>
+
+<!-- ==================== SHARED OVERLAY ==================== -->
+<div class="modal-overlay" id="sharedOverlay"></div>
+
+<!-- ==================== CREDENTIALS MODAL ==================== -->
+<div class="auth-modal" id="authModal">
+  <div class="modal-header">
+    <div>
+      <div class="modal-title"><i class="fas fa-lock"></i> BMC Authentication</div>
+      <div class="info-note" style="text-align:left; margin-top:6px;">Update credentials to refresh Redfish commands</div>
+    </div>
+  </div>
+  <div class="input-group">
+    <label><i class="fas fa-user-astronaut"></i> Username</label>
+    <input type="text" id="bmcUsername" class="input-field" placeholder="debuguser" value="debuguser">
+  </div>
+  <div class="input-group">
+    <label><i class="fas fa-key"></i> Password</label>
+    <input type="password" id="bmcPassword" class="input-field" placeholder="0penBmc1" value="0penBmc1">
+  </div>
+  <div class="input-group">
+    <label><i class="fas fa-network-wired"></i> BMC IP Address</label>
+    <input type="text" id="bmcIp" class="input-field" placeholder="10.208.57.154" value="10.208.57.154">
+    <div class="field-hint">Used for Redfish commands (curl)</div>
+  </div>
+  <button class="submit-btn" id="saveCredentialsBtn">
+    <i class="fas fa-sync-alt"></i> Update Commands & Save
+  </button>
+  <div class="info-note">
+    <i class="fas fa-info-circle"></i> IFrame URL remains from SERVER_CONFIG. Only commands updated.
+  </div>
+</div>
+
+<!-- ==================== COMMANDS MODAL ==================== -->
+<div class="commands-modal" id="commandsModal">
+  <div class="commands-header">
+    <h3><i class="fas fa-code-branch"></i> BMC Redfish Commands</h3>
+    <div class="commands-header-actions">
+      <button class="add-cmd-btn" id="addCustomCmdBtn" title="Add custom command">
+        <i class="fas fa-plus"></i>
+        <span>Add Command</span>
+      </button>
+      <button class="close-modal-btn" id="closeCommandsBtn">
+        <i class="fas fa-times"></i> Close
+      </button>
+    </div>
+  </div>
+
+  <div class="commands-list" id="dynamicCommandsList">
+    <div style="text-align:center; padding:30px;">
+      <i class="fas fa-sync-alt fa-spin"></i> Loading commands...
+    </div>
+  </div>
+
+  <div id="cmdStatusMsg" class="toast-msg"></div>
+</div>
+
+<!-- ==================== CUSTOM COMMAND FORM MODAL ==================== -->
+<div class="custom-cmd-modal" id="customCmdModal">
+  <div class="custom-cmd-modal-title" id="customCmdModalTitle">
+    <i class="fas fa-plus-circle"></i> Add Custom Command
+  </div>
+
+  <div class="input-group">
+    <label>
+      <i class="fas fa-tag"></i> Command Name <span class="required-star">*</span>
+    </label>
+    <input type="text" id="customCmdName" class="input-field" placeholder="e.g. Check Fan Speed" maxlength="80">
+    <div class="field-error" id="customCmdNameErr"><i class="fas fa-exclamation-circle"></i> Name is required.</div>
+  </div>
+
+  <div class="input-group">
+    <label><i class="fas fa-align-left"></i> Description (optional)</label>
+    <input type="text" id="customCmdDesc" class="input-field" placeholder="Brief description of what this command does" maxlength="200">
+  </div>
+
+  <div class="input-group">
+    <label>
+      <i class="fas fa-terminal"></i> Command / Value <span class="required-star">*</span>
+    </label>
+    <textarea id="customCmdValue" class="input-field" placeholder="curl -k -u user:pass https://..."></textarea>
+    <div class="field-error" id="customCmdValueErr"><i class="fas fa-exclamation-circle"></i> Command value is required.</div>
+    <div class="field-hint">Use {username}, {password}, {ip} as placeholders to auto-fill from current credentials.</div>
+  </div>
+
+  <!-- Hidden field for edit mode: stores index of command being edited -->
+  <input type="hidden" id="customCmdEditIndex" value="-1">
+
+  <div style="display:flex; gap:12px; margin-top:6px;">
+    <button class="cancel-btn" id="cancelCustomCmdBtn" style="flex:1;">Cancel</button>
+    <button class="submit-btn" id="saveCustomCmdBtn" style="flex:2; margin-top:0;">
+      <i class="fas fa-save"></i> <span id="saveBtnLabel">Save Command</span>
+    </button>
+  </div>
+</div>
+
+<!-- ==================== DELETE CONFIRM DIALOG ==================== -->
+<div class="confirm-dialog" id="confirmDialog">
+  <div class="confirm-icon"><i class="fas fa-trash-alt"></i></div>
+  <h4>Delete Command?</h4>
+  <p>Are you sure you want to delete <span class="confirm-name" id="confirmDeleteName"></span>? This action cannot be undone.</p>
+  <div class="confirm-actions">
+    <button class="cancel-btn" id="cancelDeleteBtn">Cancel</button>
+    <button class="confirm-delete-btn" id="confirmDeleteBtn">
+      <i class="fas fa-trash"></i> Delete
+    </button>
+  </div>
+</div>
+
+<!-- ==================== HIGH Z OVERLAY for nested modals ==================== -->
+<div class="modal-overlay" id="nestedOverlay" style="z-index:2090;"></div>
+
+<script src="./scripts/config.js"></script>
+<script>
+  /* ============================================================
+   *  SECTION 1 — PREDEFINED COMMAND TEMPLATES (read-only)
+   * ============================================================ */
+  const COMMAND_TEMPLATES = [
+    { label: "Service Root",       template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/" },
+    { label: "Chassis Collection", template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/Chassis" },
+    { label: "Managers",           template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/Managers" },
+    { label: "Systems",            template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/Systems" },
+    { label: "BMC Details",        template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/Managers/bmc" },
+    { label: "BIOS Settings",      template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/Systems/system/Bios" },
+    { label: "Power On",           template: "curl -u {username}:{password} -k -X POST https://{ip}/redfish/v1/Systems/system/Actions/ComputerSystem.Reset -d '{\"ResetType\": \"On\"}'" },
+    { label: "Graceful Shutdown",  template: "curl -u {username}:{password} -k -X POST https://{ip}/redfish/v1/Systems/system/Actions/ComputerSystem.Reset -d '{\"ResetType\": \"GracefulShutdown\"}'" },
+    { label: "Force Off",          template: "curl -u {username}:{password} -k -X POST https://{ip}/redfish/v1/Systems/system/Actions/ComputerSystem.Reset -d '{\"ResetType\": \"ForceOff\"}'" },
+    { label: "Graceful Restart",   template: "curl -k -u {username}:{password} -X POST https://{ip}/redfish/v1/Systems/system/Actions/ComputerSystem.Reset -d '{\"ResetType\": \"GracefulRestart\"}'" },
+    { label: "Power Metrics",      template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/Chassis/WC_Baseboard/Power" },
+    { label: "Thermal Sensors",    template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/Chassis/WC_Baseboard/Thermal" },
+    { label: "Sensor Data",        template: "curl -k -u {username}:{password} https://{ip}/redfish/v1/Chassis/WC_Baseboard/Sensor" }
+  ];
+
+  /* ============================================================
+   *  SECTION 2 — STATE
+   * ============================================================ */
+  const CUSTOM_CMDS_KEY = 'bmc_custom_commands';  // localStorage key
+  const CREDS_KEY       = 'bmc_redfish_creds';    // localStorage key
+
+  /** Active BMC credentials */
+  let bmcCreds = { username: "debuguser", password: "0penBmc1", ip: "10.208.57.154" };
+
+  /**
+   * User-added commands array. Each item:
+   * {
+   *   id:          string (UUID-ish, generated on creation)
+   *   name:        string
+   *   desc:        string (optional)
+   *   value:       string (raw template, may contain {username}/{password}/{ip})
+   *   credLabel:   string (optional display label)
+   *   createdAt:   ISO string
+   * }
+   */
+  let customCommands = [];
+
+  /** Index of the custom command scheduled for deletion (confirmed via dialog) */
+  let pendingDeleteIndex = -1;
+
+  /* ============================================================
+   *  SECTION 3 — DOM REFS
+   * ============================================================ */
+  const authModal          = document.getElementById('authModal');
+  const commandsModal      = document.getElementById('commandsModal');
+  const customCmdModal     = document.getElementById('customCmdModal');
+  const confirmDialog      = document.getElementById('confirmDialog');
+  const sharedOverlay      = document.getElementById('sharedOverlay');
+  const nestedOverlay      = document.getElementById('nestedOverlay');
+
+  const openCommandsBtn    = document.getElementById('openCommandsBtn');
+  const reconfigBtn        = document.getElementById('reconfigBtn');
+  const saveCredBtn        = document.getElementById('saveCredentialsBtn');
+  const closeCommandsBtn   = document.getElementById('closeCommandsBtn');
+  const addCustomCmdBtn    = document.getElementById('addCustomCmdBtn');
+  const saveCustomCmdBtn   = document.getElementById('saveCustomCmdBtn');
+  const cancelCustomCmdBtn = document.getElementById('cancelCustomCmdBtn');
+  const cancelDeleteBtn    = document.getElementById('cancelDeleteBtn');
+  const confirmDeleteBtn   = document.getElementById('confirmDeleteBtn');
+
+  const iframe             = document.getElementById('content-frame');
+  const msgDiv             = document.getElementById('message');
+  const dynamicCommandsListEl = document.getElementById('dynamicCommandsList');
+  const cmdStatusSpan      = document.getElementById('cmdStatusMsg');
+
+  /* ============================================================
+   *  SECTION 4 — UTILITY HELPERS
+   * ============================================================ */
+
+  /** Escape for safe innerHTML rendering */
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  /** Escape for HTML attribute values */
+  function escapeAttr(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /** Generate a simple unique ID */
+  function generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  /** Copy text to clipboard (with fallback) */
+  async function copyToClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    }
+  }
+
+  /** Show a transient status toast in the commands footer */
+  function showStatus(html, duration = 2000) {
+    if (!cmdStatusSpan) return;
+    cmdStatusSpan.innerHTML = html;
+    clearTimeout(cmdStatusSpan._timer);
+    cmdStatusSpan._timer = setTimeout(() => { cmdStatusSpan.innerHTML = ''; }, duration);
+  }
+
+  /** Apply credential placeholders to a command template string */
+  function interpolate(template) {
+    return template
+      .replace(/{username}/g, bmcCreds.username)
+      .replace(/{password}/g, bmcCreds.password)
+      .replace(/{ip}/g,       bmcCreds.ip);
+  }
+
+  /* ============================================================
+   *  SECTION 5 — PERSISTENCE (localStorage)
+   * ============================================================ */
+
+  function loadStoredCredentials() {
+    try {
+      const stored = localStorage.getItem(CREDS_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.username && parsed.ip) bmcCreds = parsed;
+      }
+    } catch(e) { console.warn('Creds load error:', e); }
+
+    // Sync credential input fields
+    document.getElementById('bmcUsername').value = bmcCreds.username;
+    document.getElementById('bmcPassword').value = bmcCreds.password;
+    document.getElementById('bmcIp').value        = bmcCreds.ip;
+  }
+
+  function saveCredentialsToStorage() {
+    localStorage.setItem(CREDS_KEY, JSON.stringify(bmcCreds));
+  }
+
+  function loadCustomCommands() {
+    try {
+      const stored = localStorage.getItem(CUSTOM_CMDS_KEY);
+      if (stored) customCommands = JSON.parse(stored) || [];
+    } catch(e) {
+      console.warn('Custom commands load error:', e);
+      customCommands = [];
+    }
+  }
+
+  function saveCustomCommands() {
+    localStorage.setItem(CUSTOM_CMDS_KEY, JSON.stringify(customCommands));
+  }
+
+  /* ============================================================
+   *  SECTION 6 — RENDER COMMANDS LIST
+   * ============================================================ */
+
+  /**
+   * Renders both predefined (read-only) and user-added (editable) commands
+   * into the commands modal list.
+   */
+  function renderCommandsModalContent() {
+    if (!dynamicCommandsListEl) return;
+    dynamicCommandsListEl.innerHTML = '';
+
+    // ---- 6a. PREDEFINED section ----
+    const preLabel = document.createElement('div');
+    preLabel.className = 'section-label predefined';
+    preLabel.innerHTML = `
+      <span class="section-badge badge-predefined"><i class="fas fa-lock" style="font-size:0.55rem;"></i> Read-Only</span>
+      Predefined Commands
+    `;
+    dynamicCommandsListEl.appendChild(preLabel);
+
+    COMMAND_TEMPLATES.forEach(tmpl => {
+      const resolvedCmd = interpolate(tmpl.template);
+      const card = document.createElement('div');
+      card.className = 'command-card';
+      card.innerHTML = `
+        <div class="command-title">
+          <i class="fas fa-terminal" style="font-size:0.7rem;"></i>
+          ${escapeHtml(tmpl.label)}
+        </div>
+        <div class="command-row-flex">
+          <code class="command-code">${escapeHtml(resolvedCmd)}</code>
+          <div class="cmd-actions">
+            <button class="copy-cmd-btn" data-cmd="${escapeAttr(resolvedCmd)}">
+              <i class="far fa-copy"></i> Copy
+            </button>
+          </div>
+        </div>
+      `;
+      dynamicCommandsListEl.appendChild(card);
+    });
+
+    // ---- 6b. CUSTOM section ----
+    const customLabel = document.createElement('div');
+    customLabel.className = 'section-label custom';
+    customLabel.style.marginTop = '24px';
+    customLabel.innerHTML = `
+      <span class="section-badge badge-custom"><i class="fas fa-user-edit" style="font-size:0.55rem;"></i> Editable</span>
+      User-Added Commands
+    `;
+    dynamicCommandsListEl.appendChild(customLabel);
+
+    if (customCommands.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'empty-custom';
+      empty.innerHTML = `
+        <i class="fas fa-plus-circle"></i>
+        No custom commands yet.<br>
+        Click <strong style="color:#FF8C42;">+ Add Command</strong> to create one.
+      `;
+      dynamicCommandsListEl.appendChild(empty);
+    } else {
+      customCommands.forEach((cmd, idx) => {
+        const resolvedValue = interpolate(cmd.value);
+
+        const card = document.createElement('div');
+        card.className = 'command-card custom-card';
+        card.setAttribute('data-custom-idx', idx);
+        card.innerHTML = `
+          <div class="command-title">
+            <i class="fas fa-user-cog" style="font-size:0.7rem; color:#FF9F5B;"></i>
+            ${escapeHtml(cmd.name)}
+          </div>
+          ${cmd.desc ? `<div class="command-desc">${escapeHtml(cmd.desc)}</div>` : ''}
+          <div class="command-row-flex">
+            <code class="command-code custom-code">${escapeHtml(resolvedValue)}</code>
+            <div class="cmd-actions">
+              <button class="copy-cmd-btn" data-cmd="${escapeAttr(resolvedValue)}" title="Copy">
+                <i class="far fa-copy"></i> Copy
+              </button>
+              <button class="icon-btn edit-btn" data-edit-idx="${idx}" title="Edit command">
+                <i class="fas fa-pen"></i>
+              </button>
+              <button class="icon-btn delete-btn" data-delete-idx="${idx}" title="Delete command">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        `;
+        dynamicCommandsListEl.appendChild(card);
+      });
+    }
+
+    // ---- 6c. Attach event listeners ----
+    // Copy buttons (predefined + custom)
+    dynamicCommandsListEl.querySelectorAll('.copy-cmd-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const text = btn.getAttribute('data-cmd') || '';
+        const ok = await copyToClipboard(text);
+        showStatus(ok
+          ? '<i class="fas fa-check-circle"></i> Copied to clipboard!'
+          : '<i class="fas fa-exclamation-triangle"></i> Copy failed');
+      });
+    });
+
+    // Edit buttons (custom only)
+    dynamicCommandsListEl.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-edit-idx'), 10);
+        openEditCustomCmd(idx);
+      });
+    });
+
+    // Delete buttons (custom only)
+    dynamicCommandsListEl.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-delete-idx'), 10);
+        openDeleteConfirm(idx);
+      });
+    });
+  }
+
+  /* ============================================================
+   *  SECTION 7 — CREDENTIALS MODAL
+   * ============================================================ */
+
+  function openAuthModal() {
+    document.getElementById('bmcUsername').value = bmcCreds.username;
+    document.getElementById('bmcPassword').value = bmcCreds.password;
+    document.getElementById('bmcIp').value        = bmcCreds.ip;
+    authModal.style.display  = 'block';
+    sharedOverlay.style.display = 'block';
+  }
+
+  function closeAuthModal() {
+    authModal.style.display  = 'none';
+    sharedOverlay.style.display = 'none';
+  }
+
+  function updateCredentialsAndCommands() {
+    const newUsername = document.getElementById('bmcUsername').value.trim();
+    const newPassword = document.getElementById('bmcPassword').value;
+    const newIp       = document.getElementById('bmcIp').value.trim();
+
+    if (!newUsername) {
+      msgDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Username cannot be empty.';
+      return;
+    }
+    if (!newIp) {
+      msgDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> BMC IP is required for commands.';
+      return;
+    }
+
+    bmcCreds = { username: newUsername, password: newPassword, ip: newIp };
+    saveCredentialsToStorage();
+    renderCommandsModalContent();
+
+    msgDiv.innerHTML = `<i class="fas fa-check-circle"></i> Commands updated — ${bmcCreds.username}@${bmcCreds.ip} | IFrame unchanged.`;
+    setTimeout(() => {
+      msgDiv.innerHTML = `<i class="fas fa-shield-alt"></i> BMC Terminal Active — Commands ready (${bmcCreds.username})`;
+    }, 2800);
+
+    closeAuthModal();
+  }
+
+  /* ============================================================
+   *  SECTION 8 — COMMANDS MODAL
+   * ============================================================ */
+
+  function openCommandsModal() {
+    renderCommandsModalContent();
+    commandsModal.style.display = 'flex';
+    sharedOverlay.style.display = 'block';
+  }
+
+  function closeCommandsModal() {
+    commandsModal.style.display = 'none';
+    sharedOverlay.style.display = 'none';
+  }
+
+  /* ============================================================
+   *  SECTION 9 — CUSTOM COMMAND FORM MODAL
+   * ============================================================ */
+
+  /** Clear and reset the custom command form */
+  function resetCustomCmdForm() {
+    document.getElementById('customCmdName').value       = '';
+    document.getElementById('customCmdDesc').value       = '';
+    document.getElementById('customCmdValue').value      = '';
+    document.getElementById('customCmdEditIndex').value  = '-1';
+
+    // Clear validation states
+    ['customCmdName', 'customCmdValue'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('invalid');
+    });
+    document.getElementById('customCmdNameErr').style.display  = 'none';
+    document.getElementById('customCmdValueErr').style.display = 'none';
+  }
+
+  /** Open the form for ADDING a new custom command */
+  function openAddCustomCmd() {
+    resetCustomCmdForm();
+    document.getElementById('customCmdModalTitle').innerHTML =
+      '<i class="fas fa-plus-circle"></i> Add Custom Command';
+    document.getElementById('saveBtnLabel').textContent = 'Save Command';
+    customCmdModal.style.display  = 'block';
+    nestedOverlay.style.display   = 'block';
+    document.getElementById('customCmdName').focus();
+  }
+
+  /** Open the form pre-populated for EDITING an existing custom command */
+  function openEditCustomCmd(idx) {
+    if (idx < 0 || idx >= customCommands.length) return;
+    const cmd = customCommands[idx];
+
+    resetCustomCmdForm();
+    document.getElementById('customCmdName').value       = cmd.name;
+    document.getElementById('customCmdDesc').value       = cmd.desc || '';
+    document.getElementById('customCmdValue').value      = cmd.value;
+    document.getElementById('customCmdEditIndex').value  = idx;
+
+    document.getElementById('customCmdModalTitle').innerHTML =
+      '<i class="fas fa-pen"></i> Edit Custom Command';
+    document.getElementById('saveBtnLabel').textContent = 'Update Command';
+    customCmdModal.style.display  = 'block';
+    nestedOverlay.style.display   = 'block';
+    document.getElementById('customCmdName').focus();
+  }
+
+  function closeCustomCmdModal() {
+    customCmdModal.style.display = 'none';
+    nestedOverlay.style.display  = 'none';
+  }
+
+  /** Validate and save (add or update) a custom command */
+  function saveCustomCommand() {
+    const name      = document.getElementById('customCmdName').value.trim();
+    const desc      = document.getElementById('customCmdDesc').value.trim();
+    const value     = document.getElementById('customCmdValue').value.trim();
+    const editIdx   = parseInt(document.getElementById('customCmdEditIndex').value, 10);
+
+    // Validation
+    let valid = true;
+
+    const nameEl    = document.getElementById('customCmdName');
+    const nameErr   = document.getElementById('customCmdNameErr');
+    const valueEl   = document.getElementById('customCmdValue');
+    const valueErr  = document.getElementById('customCmdValueErr');
+
+    if (!name) {
+      nameEl.classList.add('invalid');
+      nameErr.style.display = 'block';
+      valid = false;
+    } else {
+      nameEl.classList.remove('invalid');
+      nameErr.style.display = 'none';
+    }
+
+    if (!value) {
+      valueEl.classList.add('invalid');
+      valueErr.style.display = 'block';
+      valid = false;
+    } else {
+      valueEl.classList.remove('invalid');
+      valueErr.style.display = 'none';
+    }
+
+    if (!valid) return;
+
+    if (editIdx >= 0 && editIdx < customCommands.length) {
+      // UPDATE existing
+      customCommands[editIdx] = {
+        ...customCommands[editIdx],
+        name, desc, value,
+        updatedAt: new Date().toISOString()
+      };
+      showStatus('<i class="fas fa-check-circle"></i> Command updated!');
+    } else {
+      // ADD new
+      customCommands.push({
+        id:        generateId(),
+        name, desc, value,
+        createdAt: new Date().toISOString()
+      });
+      showStatus('<i class="fas fa-check-circle"></i> Command added!');
+    }
+
+    saveCustomCommands();
+    closeCustomCmdModal();
+    renderCommandsModalContent(); // Refresh the list
+  }
+
+  /* ============================================================
+   *  SECTION 10 — DELETE CONFIRMATION DIALOG
+   * ============================================================ */
+
+  function openDeleteConfirm(idx) {
+    if (idx < 0 || idx >= customCommands.length) return;
+    pendingDeleteIndex = idx;
+    document.getElementById('confirmDeleteName').textContent =
+      '"' + customCommands[idx].name + '"';
+    confirmDialog.style.display = 'block';
+    nestedOverlay.style.display = 'block';
+  }
+
+  function closeDeleteConfirm() {
+    confirmDialog.style.display = 'none';
+    nestedOverlay.style.display = 'none';
+    pendingDeleteIndex = -1;
+  }
+
+  function executeDelete() {
+    if (pendingDeleteIndex < 0 || pendingDeleteIndex >= customCommands.length) return;
+    const name = customCommands[pendingDeleteIndex].name;
+    customCommands.splice(pendingDeleteIndex, 1);
+    saveCustomCommands();
+    closeDeleteConfirm();
+    renderCommandsModalContent();
+    showStatus(`<i class="fas fa-check-circle"></i> "${escapeHtml(name)}" deleted.`);
+  }
+
+  /* ============================================================
+   *  SECTION 11 — IFRAME INIT
+   * ============================================================ */
+
+  function initializeIframeFromConfig() {
+    const frameUrl = `http://${SERVER_CONFIG.rpiIp}:3000/terminal_2`;
+    iframe.src = frameUrl;
+    msgDiv.innerHTML = `<i class="fas fa-globe"></i> BMC Interface: ${escapeHtml(frameUrl)}`;
+  }
+
+  /* ============================================================
+   *  SECTION 12 — EVENT BINDINGS
+   * ============================================================ */
+
+  // Header buttons
+  reconfigBtn.addEventListener('click', openAuthModal);
+  openCommandsBtn.addEventListener('click', openCommandsModal);
+
+  // Credentials modal
+  saveCredBtn.addEventListener('click', updateCredentialsAndCommands);
+  sharedOverlay.addEventListener('click', () => {
+    // Close whichever top-level modal is open
+    if (authModal.style.display    === 'block') closeAuthModal();
+    if (commandsModal.style.display === 'flex') closeCommandsModal();
+  });
+
+  // Commands modal
+  closeCommandsBtn.addEventListener('click', closeCommandsModal);
+  addCustomCmdBtn.addEventListener('click', openAddCustomCmd);
+
+  // Custom command form modal
+  saveCustomCmdBtn.addEventListener('click', saveCustomCommand);
+  cancelCustomCmdBtn.addEventListener('click', closeCustomCmdModal);
+
+  // Delete confirmation dialog
+  confirmDeleteBtn.addEventListener('click', executeDelete);
+  cancelDeleteBtn.addEventListener('click', closeDeleteConfirm);
+
+  // Close nested modals when nested overlay is clicked
+  nestedOverlay.addEventListener('click', () => {
+    if (customCmdModal.style.display === 'block') closeCustomCmdModal();
+    if (confirmDialog.style.display  === 'block') closeDeleteConfirm();
+  });
+
+  // Allow Enter key to submit the custom command form
+  document.getElementById('customCmdName').addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveCustomCommand();
+  });
+
+  /* ============================================================
+   *  SECTION 13 — INITIALISATION
+   * ============================================================ */
+
+  window.addEventListener('DOMContentLoaded', () => {
+    loadStoredCredentials();   // Load saved BMC creds
+    loadCustomCommands();      // Load saved user-added commands
+    initializeIframeFromConfig();
+    renderCommandsModalContent(); // Pre-render so modal is ready on first open
+
+    if (bmcCreds.ip) {
+      msgDiv.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        Commands ready (${escapeHtml(bmcCreds.username)}@${escapeHtml(bmcCreds.ip)})
+        | IFrame: ${typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG?.bmc_url ? 'configured' : 'default'}
+      `;
+    }
+  });
+
+  /* ============================================================
+   *  SECTION 14 — PUBLIC API (for external scripts if needed)
+   * ============================================================ */
+
+  /** Refresh predefined commands with new credentials (called externally) */
+  window.refreshCommandsOnly = function() {
+    renderCommandsModalContent();
+    msgDiv.innerHTML = `<i class="fas fa-sync-alt"></i> Commands refreshed with current credentials.`;
+    setTimeout(() => {
+      msgDiv.innerHTML = `<i class="fas fa-shield-alt"></i> BMC Terminal Active — Commands ready`;
+    }, 1500);
+  };
+
+  /** Read current custom commands from JS (for debugging/integration) */
+  window.getCustomCommands = function() {
+    return [...customCommands];
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Load server name from config.js
+    loadServerName();
+    startConfigPolling();
+
+  });
+
+  // ============================================================
+  // SERVER NAME LOADING FROM CONFIG.JS
+  // ============================================================
+
+  function parseServerNameFromConfig(content) {
+      try {
+          const match = content.match(/serverName:\s*['"]([^'"]+)['"]/);
+          if (match && match[1]) return match[1];
+          return null;
+      } catch (e) {
+          console.error('Error parsing server name:', e);
+          return null;
+      }
+  }
+
+  function updateServerNameDisplay(serverName) {
+      const serverNameEl = document.getElementById('pcServerName');
+      if (serverNameEl) serverNameEl.textContent = serverName;
+      localStorage.setItem('selectedServer', serverName);
+  }
+
+  function loadConfigFromScript() {
+      return new Promise((resolve) => {
+          try {
+              const script = document.createElement('script');
+              script.src = '../static/scripts/config.js?_=' + Date.now();
+              script.onload = function() {
+                  if (typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG.serverName) {
+                      resolve(SERVER_CONFIG.serverName);
+                  } else {
+                      resolve(null);
+                  }
+              };
+              script.onerror = function() { resolve(null); };
+              document.head.appendChild(script);
+          } catch (e) { resolve(null); }
+      });
+  }
+
+  async function loadConfigDirect() {
+      try {
+          const response = await fetch('../static/scripts/config.js?_=' + Date.now(), { cache: 'no-store' });
+          if (response.ok) {
+              const content = await response.text();
+              return parseServerNameFromConfig(content);
+          }
+          return null;
+      } catch (error) { return null; }
+  }
+
+  async function loadConfigViaAPI() {
+      try {
+          const response = await fetch('/get-config', { cache: 'no-store' });
+          if (response.ok) {
+              const data = await response.json();
+              if (data.success && data.serverName) return data.serverName;
+          }
+          return null;
+      } catch (error) { return null; }
+  }
+
+  async function loadServerName() {
+      const savedServer = localStorage.getItem('selectedServer');
+      if (savedServer && (savedServer === 'SPR' || savedServer === 'GNR')) {
+          updateServerNameDisplay(savedServer);
+          return;
+      }
+      
+      let serverName = await loadConfigViaAPI();
+      if (serverName) { updateServerNameDisplay(serverName); return; }
+      
+      serverName = await loadConfigDirect();
+      if (serverName) { updateServerNameDisplay(serverName); return; }
+      
+      serverName = await loadConfigFromScript();
+      if (serverName) { updateServerNameDisplay(serverName); return; }
+      
+      updateServerNameDisplay('SPR');
+  }
+
+  function startConfigPolling() {
+      setInterval(async () => {
+          try {
+              const response = await fetch('../static/scripts/config.js?_=' + Date.now(), { cache: 'no-store' });
+              if (response.ok) {
+                  const content = await response.text();
+                  const serverName = parseServerNameFromConfig(content);
+                  const currentDisplay = document.getElementById('pcServerName')?.textContent || 'SPR';
+                  if (serverName && serverName !== currentDisplay) {
+                      updateServerNameDisplay(serverName);
+                  }
+              }
+          } catch (error) {}
+      }, 5000);
+  }
+
+  // ============================================================
+  // END SERVER NAME LOADING
+  // ============================================================
+</script>
+</body>
+</html>

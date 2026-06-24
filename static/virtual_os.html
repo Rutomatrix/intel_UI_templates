@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Virtual desk and OS Flashing</title>
+  <link rel="icon" type="image/x-icon" href="/static/images/rutomatrix.ico">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #121212;
+      color: #FFFFFF;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 16px;
+      box-sizing: border-box;
+      gap: 16px;
+      max-width: 2000px;
+      margin: 0 auto;
+    }
+
+    /* Tabs Styling */
+    .tabs-container {
+      display: flex;
+      background: #1E1E1E;
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #BBBBBB;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 106, 0, 0.1);
+      color: #FFFFFF;
+    }
+
+    .tab-btn.active {
+      background: #FF6A00;
+      color: #FFFFFF;
+    }
+
+    .tab-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .tab-content {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* Shared Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: #1E1E1E;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .device-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .device-name-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .device-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #FF6A00;
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
+      word-break: break-word;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    #device-timer, #os-device-timer {
+      margin-left: 10px;
+      font-size: 14px;
+      color: #BBBBBB;
+    }
+
+    /* PC Remote Desktop Specific Styles */
+    .pc-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .control-btn {
+      background: #2A2A2A;
+      border: none;
+      color: #FFFFFF;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .control-btn:hover {
+      background: #FF6A00;
+    }
+
+    .control-btn.active {
+      background: #FF6A00;
+    }
+
+    .control-btn.restart-btn {
+      background: #2A2A2A;
+      border: 1px solid #FF6A00;
+      color: #FF6A00;
+    }
+
+    .control-btn.restart-btn:hover {
+      background: #FF6A00;
+      color: #FFFFFF;
+    }
+
+    .control-btn.restart-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: #2A2A2A;
+      color: #666;
+      border-color: #666;
+    }
+
+    .control-btn.delete-btn {
+      background: #2A2A2A;
+      border: 1px solid #dc3545;
+      color: #dc3545;
+    }
+
+    .control-btn.delete-btn:hover:not(:disabled) {
+      background: #dc3545;
+      color: #FFFFFF;
+    }
+
+    .control-btn.delete-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: #2A2A2A;
+      color: #666;
+      border-color: #666;
+    }
+
+    .dropdown-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 180px;
+    }
+
+    .dropdown-label {
+      font-size: 12px;
+      color: #BBBBBB;
+      font-weight: 500;
+    }
+
+    .dropdown-select {
+      background: #2A2A2A;
+      border: 1px solid #404040;
+      color: #FFFFFF;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+      outline: none;
+    }
+
+    .dropdown-select:hover {
+      border-color: #FF6A00;
+      background: #333333;
+    }
+
+    .dropdown-select:focus {
+      border-color: #FF6A00;
+      box-shadow: 0 0 0 2px rgba(255, 106, 0, 0.2);
+    }
+
+    .dropdown-select option {
+      background: #2A2A2A;
+      color: #FFFFFF;
+      padding: 8px;
+    }
+
+    /* Remote Desktop Container */
+    .remote-desktop-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #000000;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #404040;
+    }
+
+    .remote-desktop-header {
+      padding: 12px 16px;
+      background: #1E1E1E;
+      font-size: 14px;
+      color: #FFFFFF;
+      border-bottom: 1px solid #404040;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .remote-desktop-content {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #000000;
+    }
+
+    .desktop-view {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .desktop-placeholder {
+      color: #888888;
+      font-size: 16px;
+      font-style: italic;
+    }
+
+    #remoteDesktopImg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      cursor: pointer;
+    }
+
+    /* Shortcut Feedback Popup */
+    .shortcut-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .shortcut-popup {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.85);
+      color: #FF6A00;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 16px;
+      z-index: 101;
+      display: none;
+      animation: slideDown 0.3s ease-out;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+      border: 2px solid #FF6A00;
+      white-space: nowrap;
+    }
+
+    @keyframes slideDown {
+      0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+      100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    .connection-status {
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 4px;
+      font-size: 12px;
+      color: #BBBBBB;
+    }
+
+    .connected { color: #00FF00; }
+    .disconnected { color: #FF4444; }
+    .restarting { color: #FFA500; }
+
+    .loading-spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid #FF6A00;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Fullscreen Button */
+    .fullscreen-btn {
+      background: #2A2A2A;
+      border: 1px solid #404040;
+      color: #BBBBBB;
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      margin-left: 8px;
+      flex-shrink: 0;
+    }
+
+    .fullscreen-btn:hover {
+      background: #FF6A00;
+      border-color: #FF6A00;
+      color: #FFFFFF;
+    }
+
+    .fullscreen-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .header-right-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Floating Exit Fullscreen Button (visible only in fullscreen) */
+    .exit-fullscreen-btn {
+      display: none;
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 10000;
+      background: rgba(30, 30, 30, 0.92);
+      border: 1px solid #FF6A00;
+      color: #FF6A00;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+      transition: background 0.2s, color 0.2s;
+      opacity: 0;
+      animation: fadeInExit 0.3s ease-out forwards;
+    }
+
+    .exit-fullscreen-btn:hover {
+      background: #FF6A00;
+      color: #FFFFFF;
+    }
+
+    .exit-fullscreen-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    @keyframes fadeInExit {
+      0% { opacity: 0; transform: translateY(-8px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Fullscreen state styling */
+    .remote-desktop-wrapper:fullscreen,
+    .remote-desktop-wrapper:-webkit-full-screen {
+      border-radius: 0;
+      border: none;
+    }
+
+    .remote-desktop-wrapper:fullscreen .exit-fullscreen-btn,
+    .remote-desktop-wrapper:-webkit-full-screen .exit-fullscreen-btn {
+      display: flex;
+    }
+
+    .remote-desktop-wrapper:fullscreen .remote-desktop-header,
+    .remote-desktop-wrapper:-webkit-full-screen .remote-desktop-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .remote-desktop-wrapper:fullscreen .remote-desktop-header:hover,
+    .remote-desktop-wrapper:-webkit-full-screen .remote-desktop-header:hover {
+      opacity: 1;
+    }
+
+    .remote-desktop-wrapper:fullscreen .remote-desktop-content,
+    .remote-desktop-wrapper:-webkit-full-screen .remote-desktop-content {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* OS Mounting and Layout Adjustments */
+    .os-container {
+      background: #1E1E1E;
+      border: 2px solid #0971b3;
+      border-radius: 12px;
+      padding: 24px;
+      width: 100%;
+      max-width: 650px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      text-align: center;
+      margin: 0 auto;
+      overflow-y: auto;
+      max-height: calc(100vh - 180px);
+    }
+
+    .os-controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    h2 {
+      color: #FFFFFF;
+      font-size: 18px;
+      font-weight: 500;
+      margin: 15px 0 10px 0;
+      text-align: left;
+    }
+
+    /* Dedicated Upload Zone Box Styles */
+    .upload-zone {
+      border: 2px dashed #444;
+      padding: 20px;
+      border-radius: 8px;
+      background: #1A1A1A;
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+    }
+    
+    .upload-zone input[type="file"] {
+      display: none;
+    }
+    
+    .upload-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+      color: #888;
+    }
+
+    .os-btn {
+      background: #ff6a00;
+      border: none;
+      color: #FFFFFF;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      min-width: 100px;
+    }
+
+    .os-btn:hover:not(:disabled) {
+      background: #e55a00;
+    }
+
+    .os-btn:disabled {
+      background: #666;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    
+    .progress-container {
+      display: none;
+      margin-top: 15px;
+      background-color: #2A2A2A;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      width: 0%;
+      height: 10px;
+      background-color: #ff6a00;
+      transition: width 0.1s linear;
+    }
+
+    .iso-container {
+      background: #2A2A2A;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 12px;
+      margin: 10px 0;
+      min-height: 150px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    ul { list-style: none; padding: 0; margin: 0; }
+
+    .iso-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border: 1px solid #444;
+      margin: 8px 0;
+      border-radius: 6px;
+      background: #1A1A1A;
+      transition: all 0.3s ease;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .iso-item:hover { border-color: #ff6a00; background: #333; }
+    .iso-item.selected { background: #0971b3; border-color: #0971b3; color: #FFFFFF; font-weight: bold; }
+    
+    .iso-item .iso-name {
+      flex: 1;
+      word-break: break-word;
+    }
+    
+    .iso-item .iso-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+    
+    .iso-item .delete-iso-btn {
+      background: transparent;
+      border: none;
+      color: #dc3545;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .iso-item .delete-iso-btn:hover {
+      background: #dc3545;
+      color: #FFFFFF;
+    }
+    
+    .iso-item .delete-iso-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .status {
+      background: #2A2A2A;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 12px;
+      margin-top: 15px;
+      min-height: 20px;
+      color: #ff6a00;
+      font-weight: 500;
+    }
+
+    .empty-state { color: #888; font-style: italic; padding: 30px 20px; }
+
+    /* Delete Confirmation Modal */
+    .delete-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .delete-modal-content {
+      background-color: #1E1E1E;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 450px;
+      width: 90%;
+      text-align: center;
+      border: 1px solid #dc3545;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .delete-modal-content h3 {
+      color: #dc3545;
+      margin-top: 0;
+      font-size: 20px;
+    }
+
+    .delete-modal-content p {
+      color: #BBBBBB;
+      margin: 15px 0;
+      font-size: 14px;
+    }
+
+    .delete-modal-content .file-name {
+      color: #FF6A00;
+      font-weight: bold;
+      word-break: break-word;
+    }
+
+    .delete-modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    .delete-modal-actions button {
+      padding: 10px 24px;
+      border-radius: 6px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+
+    .delete-modal-actions .confirm-delete-btn {
+      background: #dc3545;
+      color: white;
+    }
+
+    .delete-modal-actions .confirm-delete-btn:hover {
+      background: #c82333;
+      transform: translateY(-2px);
+    }
+
+    .delete-modal-actions .cancel-delete-btn {
+      background: #333;
+      color: white;
+    }
+
+    .delete-modal-actions .cancel-delete-btn:hover {
+      background: #444;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 1200px) {
+      .pc-controls {
+        gap: 8px;
+      }
+      .dropdown-container {
+        min-width: 140px;
+      }
+      .os-controls {
+        gap: 8px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .pc-controls {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+      }
+      .control-btn {
+        justify-content: center;
+      }
+      .dropdown-container {
+        min-width: 100%;
+      }
+      .header {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .device-name {
+        font-size: 14px;
+      }
+      .os-controls {
+        flex-direction: column;
+        width: 100%;
+      }
+      .os-controls .control-btn {
+        width: 100%;
+        justify-content: center;
+      }
+      .iso-item {
+        flex-wrap: wrap;
+      }
+      .iso-item .iso-actions {
+        margin-left: 0;
+        margin-top: 8px;
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+
+    .server-name-tag {
+        font-size: 14px;
+        font-weight: 500;
+        color: #FFFFFF;
+        background: rgba(255, 106, 0, 0.2);
+        padding: 4px 14px;
+        margin-left: 10px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 106, 0, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <div class="tabs-container">
+      <button class="tab-btn active" id="pc-tab" onclick="switchTab('pc')">
+        <svg class="tab-icon" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M20,18H4V6H20M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z"/>
+        </svg>
+        Remote Desktop
+      </button>
+      <button class="tab-btn" id="os-tab" onclick="switchTab('os')">
+        <svg class="tab-icon" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+        </svg>
+        OS Flashing
+      </button>
+    </div>
+
+    <div class="tab-content active" id="pc-content">
+      <div class="header">
+        <div class="device-info">
+          <div class="device-name-row">
+            <div class="device-name">Rutomatrix</div>
+              <span class="server-name-tag" id="pcServerTag">
+                  <span id="pcServerName">SPR</span>
+              </span>
+            <div id="device-timer"></div>
+          </div>
+        </div>
+        <div class="pc-controls">
+          <button class="control-btn" id="connect-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16">
+              <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Connect
+          </button>
+          
+          <button class="control-btn restart-btn" id="restart-stream-btn" title="Restart the stream if the feed freezes or stops">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 4v6h6"/>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+            </svg>
+          </button>
+          
+          <div class="dropdown-container">
+            <label class="dropdown-label" for="shortcutSelect">System Shortcuts</label>
+            <select class="dropdown-select" id="shortcutSelect" onchange="sendShortcut(this.value)">
+              <option value="">-- Select a Shortcut --</option>
+              <option value="esc">Esc</option>
+              <option value="ctrl_alt_del">Ctrl + Alt + Del</option>
+              <option value="ctrl_shift_esc">Ctrl + Shift + Esc</option>
+              <option value="alt_f4">Alt + F4</option>
+              <option value="win_l">Win + L</option>
+              <option value="win_d">Win + D</option>
+              <option value="win_tab">Win + Tab</option>
+              <option value="alt_tab">Alt + Tab</option>
+              <option value="alt_esc">Alt + Esc</option>
+              <option value="win_ctrl_d">Win + Ctrl + D</option>
+              <option value="win_ctrl_left">Win + Ctrl + Left</option>
+              <option value="win_ctrl_right">Win + Ctrl + Right</option>
+              <option value="win_up">Win + Up</option>
+              <option value="win_down">Win + Down</option>
+              <option value="win_left">Win + Left</option>
+              <option value="win_right">Win + Right</option>
+              <option value="fn_f1_f12">Fn + F1–F12</option>
+              <option value="ctrl_alt_right">Ctrl + Alt + →</option>
+              <option value="ctrl_alt_left">Ctrl + Alt + ←</option>
+              <option value="ctrl_n">Ctrl + N</option>
+              <option value="ctrl_w">Ctrl + W</option>
+              <option value="ctrl_t">Ctrl + T</option>
+              <option value="ctrl_shift_t">Ctrl + Shift + T</option>
+            </select>
+          </div>
+
+          <div class="dropdown-container">
+            <label class="dropdown-label" for="functionKeySelect">Function Keys</label>
+            <select class="dropdown-select" id="functionKeySelect" onchange="sendShortcut(this.value)">
+              <option value="">-- Select Function Key --</option>
+              <option value="f1">F1</option>
+              <option value="f2">F2</option>
+              <option value="f3">F3</option>
+              <option value="f4">F4</option>
+              <option value="f5">F5</option>
+              <option value="f6">F6</option>
+              <option value="f7">F7</option>
+              <option value="f8">F8</option>
+              <option value="f9">F9</option>
+              <option value="f10">F10</option>
+              <option value="f11">F11</option>
+              <option value="f12">F12</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="remote-desktop-wrapper" id="remote-desktop-wrapper">
+        <div class="remote-desktop-header">
+          <span>Remote Desktop</span>
+          <div class="header-right-group">
+            <div class="connection-status disconnected" id="connection-status">Disconnected</div>
+            <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen">
+              <!-- Enter fullscreen icon -->
+              <svg id="fs-enter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+                <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+                <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+                <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+              </svg>
+              <!-- Exit fullscreen icon (hidden by default) -->
+              <svg id="fs-exit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                <path d="M8 3v3a2 2 0 0 1-2 2H3"/>
+                <path d="M21 8h-3a2 2 0 0 1-2-2V3"/>
+                <path d="M3 16h3a2 2 0 0 1 2 2v3"/>
+                <path d="M16 21v-3a2 2 0 0 1 2-2h3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="remote-desktop-content">
+          <div class="shortcut-overlay">
+            <div class="shortcut-popup" id="shortcut-popup"></div>
+          </div>
+          <div class="desktop-view" id="desktop-view">
+            <div class="desktop-placeholder" id="remote-desktop-feed">Not connected</div>
+          </div>
+        </div>
+        <!-- Floating exit fullscreen button (only visible in fullscreen) -->
+        <button class="exit-fullscreen-btn" id="exit-fullscreen-btn" onclick="toggleFullscreen()" title="Exit Fullscreen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3v3a2 2 0 0 1-2 2H3"/>
+            <path d="M21 8h-3a2 2 0 0 1-2-2V3"/>
+            <path d="M3 16h3a2 2 0 0 1 2 2v3"/>
+            <path d="M16 21v-3a2 2 0 0 1 2-2h3"/>
+          </svg>
+          Exit Fullscreen
+        </button>
+      </div>
+    </div>
+
+    <div class="tab-content" id="os-content">
+      <div class="header">
+        <div class="device-info">
+          <div class="device-name-row">
+              <div class="device-name">Rutomatrix</div>
+              <span class="server-name-tag" id="osServerTag">
+                  <span id="osServerName">SPR</span>
+              </span>
+            <div id="os-device-timer"></div>
+          </div>
+        </div>
+        <div class="os-controls">
+          <button class="control-btn" onclick="fetchList()">List OS</button>
+          <button class="control-btn" onclick="mountSelected()" id="mountBtn" disabled>Mount</button>
+          <button class="control-btn" onclick="unmount()" id="unmountBtn" disabled>Unmount</button>
+          <button class="control-btn delete-btn" onclick="deleteSelected()" id="deleteBtn" disabled>Delete</button>
+        </div>
+      </div>
+
+      <div class="os-container">
+        <h2>Upload OS Image File:</h2>
+        <div class="upload-zone" id="dropZone">
+          <div class="upload-icon">⇪</div>
+          <p id="uploadPrompt">Drag & Drop file here or <span style="color:#ff6a00; cursor:pointer;" onclick="document.getElementById('fileInput').click()">Browse</span></p>
+          <p style="font-size:11px; color:#777; margin-top:5px;">Allowed Formats: .iso, .img</p>
+          <input type="file" id="fileInput" accept=".iso,.img" onchange="stageFile(this.files[0])">
+          
+          <div id="uploadActions" style="display: none; gap: 10px; justify-content: center; margin-top: 15px;">
+            <button class="os-btn" id="startUploadBtn" style="padding: 6px 16px; font-size: 14px;" onclick="startStreamingUpload()">Upload</button>
+            <button class="os-btn" id="cancelUploadBtn" style="padding: 6px 16px; font-size: 14px; background: #666;" onclick="cancelStreamingUpload()">Cancel</button>
+          </div>
+
+          <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+
+        <h2>Available ISO files:</h2>
+        <div class="iso-container">
+          <ul id="isoList">
+            <div class="empty-state">Click "List OS" to load available ISO files</div>
+          </ul>
+        </div>
+        <div class="status" id="status">Ready</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="delete-modal" id="deleteModal">
+    <div class="delete-modal-content">
+      <h3><i class="fas fa-exclamation-triangle" style="margin-right: 10px;"></i>Delete ISO File</h3>
+      <p>Are you sure you want to delete <span class="file-name" id="deleteFileName"></span>?</p>
+      <p style="font-size: 12px; color: #888;">This action cannot be undone.</p>
+      <div class="delete-modal-actions">
+        <button class="confirm-delete-btn" id="confirmDeleteBtn">Yes, Delete</button>
+        <button class="cancel-delete-btn" id="cancelDeleteBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="static/scripts/config.js"></script>
+  <script>
+    // Tab switching architecture
+    function switchTab(tabName) {
+      document.getElementById('pc-tab').classList.toggle('active', tabName === 'pc');
+      document.getElementById('os-tab').classList.toggle('active', tabName === 'os');
+      document.getElementById('pc-content').classList.toggle('active', tabName === 'pc');
+      document.getElementById('os-content').classList.toggle('active', tabName === 'os');
+      
+      if (tabName === 'os') {
+        const osTimerElement = document.getElementById('os-device-timer');
+        const mainTimerElement = document.getElementById('device-timer');
+        if (mainTimerElement && osTimerElement) {
+          osTimerElement.innerHTML = mainTimerElement.innerHTML;
+        }
+      }
+    }
+
+    // Fullscreen Toggle Logic
+    function toggleFullscreen() {
+      const wrapper = document.getElementById('remote-desktop-wrapper');
+
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (wrapper.requestFullscreen) {
+          wrapper.requestFullscreen();
+        } else if (wrapper.webkitRequestFullscreen) {
+          wrapper.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    }
+
+    // Sync icon state and exit button on fullscreen change
+    function onFullscreenChange() {
+      const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      document.getElementById('fs-enter-icon').style.display = isFullscreen ? 'none' : 'block';
+      document.getElementById('fs-exit-icon').style.display = isFullscreen ? 'block' : 'none';
+      document.getElementById('fullscreen-btn').title = isFullscreen ? 'Exit Fullscreen' : 'Toggle Fullscreen';
+    }
+
+    // ============================================================
+    // SERVER NAME LOADING FROM CONFIG.JS
+    // ============================================================
+
+    // Function to parse server name from config.js content
+    function parseServerNameFromConfig(content) {
+        try {
+            const match = content.match(/serverName:\s*['"]([^'"]+)['"]/);
+            if (match && match[1]) {
+                return match[1];
+            }
+            return null;
+        } catch (e) {
+            console.error('Error parsing server name:', e);
+            return null;
+        }
+    }
+
+    // Function to update server name display on both tabs
+    function updateServerNameDisplay(serverName) {
+        // Update PC tab server name
+        const pcServerName = document.getElementById('pcServerName');
+        if (pcServerName) {
+            pcServerName.textContent = serverName;
+        }
+        
+        // Update OS tab server name
+        const osServerName = document.getElementById('osServerName');
+        if (osServerName) {
+            osServerName.textContent = serverName;
+        }
+        
+        // Store in localStorage for persistence
+        localStorage.setItem('selectedServer', serverName);
+    }
+
+    // Method 1: Load via script tag
+    function loadConfigFromScript() {
+        return new Promise((resolve) => {
+            try {
+                const script = document.createElement('script');
+                script.src = '../static/scripts/config.js?_=' + Date.now();
+                script.onload = function() {
+                    if (typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG.serverName) {
+                        resolve(SERVER_CONFIG.serverName);
+                    } else {
+                        resolve(null);
+                    }
+                };
+                script.onerror = function() {
+                    resolve(null);
+                };
+                document.head.appendChild(script);
+            } catch (e) {
+                resolve(null);
+            }
+        });
+    }
+
+    // Method 2: Load via direct fetch
+    async function loadConfigDirect() {
+        try {
+            const response = await fetch('../static/scripts/config.js?_=' + Date.now(), {
+                cache: 'no-store'
+            });
+            if (response.ok) {
+                const content = await response.text();
+                return parseServerNameFromConfig(content);
+            }
+            return null;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    // Method 3: Load via API
+    async function loadConfigViaAPI() {
+        try {
+            const response = await fetch('/get-config', {
+                cache: 'no-store'
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.serverName) {
+                    return data.serverName;
+                }
+            }
+            return null;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    // Main function to load server name
+    async function loadServerName() {
+        // Try localStorage first
+        const savedServer = localStorage.getItem('selectedServer');
+        if (savedServer && (savedServer === 'SPR' || savedServer === 'GNR')) {
+            updateServerNameDisplay(savedServer);
+            console.log('Server loaded from localStorage:', savedServer);
+            return;
+        }
+        
+        // Try API
+        let serverName = await loadConfigViaAPI();
+        if (serverName) {
+            updateServerNameDisplay(serverName);
+            console.log('Server loaded via API:', serverName);
+            return;
+        }
+        
+        // Try direct fetch
+        serverName = await loadConfigDirect();
+        if (serverName) {
+            updateServerNameDisplay(serverName);
+            console.log('Server loaded via direct fetch:', serverName);
+            return;
+        }
+        
+        // Try script tag
+        serverName = await loadConfigFromScript();
+        if (serverName) {
+            updateServerNameDisplay(serverName);
+            console.log('Server loaded via script tag:', serverName);
+            return;
+        }
+        
+        // Default
+        console.warn('All config loading methods failed, using default SPR');
+        updateServerNameDisplay('SPR');
+    }
+
+    // Poll for config changes every 5 seconds
+    function startConfigPolling() {
+        setInterval(async () => {
+            try {
+                const response = await fetch('../static/scripts/config.js?_=' + Date.now(), {
+                    cache: 'no-store'
+                });
+                if (response.ok) {
+                    const content = await response.text();
+                    const serverName = parseServerNameFromConfig(content);
+                    const currentDisplay = document.getElementById('pcServerName')?.textContent || 'SPR';
+                    if (serverName && serverName !== currentDisplay) {
+                        console.log('Config file changed! New server:', serverName);
+                        updateServerNameDisplay(serverName);
+                    }
+                }
+            } catch (error) {
+                // Silent fail
+            }
+        }, 5000);
+    }
+
+    // ============================================================
+    // END SERVER NAME LOADING
+    // ============================================================
+
+
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+
+    // Remote Desktop Engine Operations Block
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // Load server name
+      loadServerName();
+      
+      // Start polling for config changes
+      startConfigPolling();
+      
+      const connectBtn = document.getElementById('connect-btn');
+      const restartBtn = document.getElementById('restart-stream-btn');
+      const remoteDesktopFeed = document.getElementById('remote-desktop-feed');
+      const desktopView = document.getElementById('desktop-view');
+      const connectionStatus = document.getElementById('connection-status');
+      let isConnected = false;
+      let videoElement = null;
+      let refreshInterval = null;
+      
+      // Connect button logic
+      connectBtn.addEventListener('click', async () => {
+        if (!isConnected) {
+          remoteDesktopFeed.innerHTML = '<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;">' +
+            '<div class="loading-spinner"></div>' +
+            '<p style="color: #FF6A00; font-weight: bold;">Connecting ...</p>' +
+            '</div>';
+          
+          connectionStatus.textContent = 'Connecting...';
+          connectionStatus.className = 'connection-status';
+
+          try {
+            await testConnection(`/start_stream`);
+            const data1 = await testConnection1(`/start_stream`);
+            
+            if (data1.status === 'already running' || data1.status === 'started') {
+              videoElement = document.createElement('img');
+              videoElement.id = 'remoteDesktopImg';
+              videoElement.src = `http://${SERVER_CONFIG.rpiIp}:9000/stream?advance_headers=1&dual_final_frames=1&t=` + Date.now();
+              videoElement.style.width = '100%';
+              videoElement.style.height = '100%';
+              videoElement.style.objectFit = 'contain';
+              videoElement.style.cursor = 'pointer';
+              
+              remoteDesktopFeed.remove();
+              desktopView.appendChild(videoElement);
+              
+              connectBtn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Disconnect';
+              connectBtn.classList.add('active');
+              connectionStatus.textContent = 'Connected';
+              connectionStatus.className = 'connection-status connected';
+              isConnected = true;
+              restartBtn.disabled = false;
+              
+              setupMouseAndKeyboard();
+              
+              refreshInterval = setInterval(() => {
+                if (videoElement && isConnected) {
+                  videoElement.src = `http://${SERVER_CONFIG.rpiIp}:9000/stream?advance_headers=1&dual_final_frames=1&t=` + Date.now();
+                }
+              }, 30000);
+            } else {
+              throw new Error('Stream failed to start');
+            }
+          } catch (error) {
+            desktopView.innerHTML = '<div class="desktop-placeholder" id="remote-desktop-feed" style="color: #FF4444;">Connection failed: ' + error.message + '</div>';
+            connectionStatus.textContent = 'Connection failed';
+            connectionStatus.className = 'connection-status';
+          }
+        } else {
+          clearInterval(refreshInterval);
+          if (videoElement) videoElement.remove();
+          desktopView.innerHTML = '<div class="desktop-placeholder" id="remote-desktop-feed">Not connected</div>';
+          connectBtn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Connect';
+          connectBtn.classList.remove('active');
+          connectionStatus.textContent = 'Disconnected';
+          connectionStatus.className = 'connection-status disconnected';
+          isConnected = false;
+          restartBtn.disabled = true;
+        }
+      });
+
+      // Restart Stream button logic
+      restartBtn.addEventListener('click', async () => {
+        if (!isConnected) {
+          showToast('Please connect to the stream first', true);
+          return;
+        }
+
+        // Disable button during restart
+        restartBtn.disabled = true;
+        const originalText = restartBtn.innerHTML;
+        restartBtn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" class="fa-spin" style="animation: spin 1s linear infinite;"><path d="M1 4v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Restarting...';
+        
+        connectionStatus.textContent = 'Restarting...';
+        connectionStatus.className = 'connection-status restarting';
+
+        try {
+          // Call the restart_stream API
+          const response = await fetch(`http://${SERVER_CONFIG.rpiIp}:5000/restart_stream`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.status === 'restarted') {
+            // Successfully restarted
+            showToast(`Stream restarted successfully on device: ${data.device || 'unknown'}`, false);
+            
+            // Refresh the video feed
+            if (videoElement && isConnected) {
+              videoElement.src = `http://${SERVER_CONFIG.rpiIp}:9000/stream?advance_headers=1&dual_final_frames=1&t=` + Date.now();
+            }
+            
+            connectionStatus.textContent = 'Connected';
+            connectionStatus.className = 'connection-status connected';
+          } else {
+            throw new Error(data.detail || 'Restart failed');
+          }
+        } catch (error) {
+          console.error('Restart stream error:', error);
+          showToast(`Restart failed: ${error.message}`, true);
+          connectionStatus.textContent = 'Restart failed';
+          connectionStatus.className = 'connection-status disconnected';
+        } finally {
+          // Restore button
+          restartBtn.disabled = false;
+          restartBtn.innerHTML = originalText;
+        }
+      });
+
+      function setupMouseAndKeyboard() {
+        if (!videoElement) return;
+        videoElement.addEventListener('click', () => { videoElement.requestPointerLock(); });
+ 
+        // Helper function to extract keys
+        function getActiveJsCodes(e) {
+          const jsCodes = [];
+          if (e.ctrlKey) jsCodes.push(17);
+          if (e.shiftKey) jsCodes.push(16);
+          if (e.altKey) jsCodes.push(18);
+          if (e.keyCode && ![16, 17, 18].includes(e.keyCode)) jsCodes.push(e.keyCode);
+          return jsCodes;
+        }
+ 
+        // 1. Handle Key Down (Press)
+        document.addEventListener('keydown', (e) => {
+          if (document.pointerLockElement === videoElement) {
+            e.preventDefault(); // Stop browser shortcuts from triggering locally
+            const jsCodes = getActiveJsCodes(e);
+ 
+            if (jsCodes.length > 0) {
+              fetch(`http://${SERVER_CONFIG.rpiIp}:5000/keyboard`, {
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ keycodes: jsCodes, action: 'down' }) 
+              });
+            }
+          }
+        });
+ 
+        // 2. Handle Key Up (Release) - CRUCIAL TO STOP KEY REPEATING
+        document.addEventListener('keyup', (e) => {
+          if (document.pointerLockElement === videoElement) {
+            e.preventDefault();
+            // Send empty keycodes array or explicit release indicator to let go of the key
+            fetch(`http://${SERVER_CONFIG.rpiIp}:5000/keyboard`, {
+              method: 'POST', 
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ keycodes: [], action: 'up' }) 
+            });
+          }
+        });
+      }
+    });
+
+    // Toast notification helper
+    function showToast(message, isError = false) {
+      // Create toast element if it doesn't exist
+      let toast = document.getElementById('custom-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'custom-toast';
+        toast.style.cssText = `
+          position: fixed;
+          bottom: 30px;
+          right: 30px;
+          background: #1E1E1E;
+          color: #FFFFFF;
+          padding: 16px 24px;
+          border-radius: 10px;
+          border-left: 4px solid #00FF00;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+          z-index: 10000;
+          font-size: 14px;
+          font-family: 'Segoe UI', Arial, sans-serif;
+          transform: translateY(100px);
+          opacity: 0;
+          transition: all 0.4s ease;
+          max-width: 400px;
+        `;
+        document.body.appendChild(toast);
+      }
+
+      toast.textContent = message;
+      toast.style.borderLeftColor = isError ? '#FF4444' : '#00FF00';
+      
+      // Show toast
+      setTimeout(() => {
+        toast.style.transform = 'translateY(0)';
+        toast.style.opacity = '1';
+      }, 10);
+
+      // Hide toast after 4 seconds
+      clearTimeout(toast._timeout);
+      toast._timeout = setTimeout(() => {
+        toast.style.transform = 'translateY(100px)';
+        toast.style.opacity = '0';
+      }, 4000);
+    }
+
+    async function testConnection(url) {
+      const absolute_url = `${window.location.protocol}//${SERVER_CONFIG.rpiIp}:8000${url}`;
+      try { return await (await fetch(absolute_url, { method: 'POST', cache: 'no-store' })).json(); } 
+      catch (e) { return { ok: false, statusText: e.message }; }
+    }
+
+    async function testConnection1(url) {
+      const absolute_url = `${window.location.protocol}//${SERVER_CONFIG.rpiIp}:5000${url}`;
+      try { return await (await fetch(absolute_url, { method: 'GET', cache: 'no-store' })).json(); } 
+      catch (e) { return { ok: false, statusText: e.message }; }
+    }
+
+    function sendShortcut(action) {
+      if (!action) return;
+      showShortcutPopup(action);
+      fetch(`http://${SERVER_CONFIG.rpiIp}:5000/shortcut/` + action, { method: 'POST' })
+        .then(() => {
+          document.getElementById('shortcutSelect').value = '';
+          document.getElementById('functionKeySelect').value = '';
+        });
+    }
+
+    function showShortcutPopup(shortcutName) {
+      const popup = document.getElementById('shortcut-popup');
+      if (!popup) return;
+      popup.textContent = shortcutName.replace(/_/g, ' ').toUpperCase() + ' ✓';
+      popup.style.display = 'block';
+      setTimeout(() => { popup.style.display = 'none'; }, 1500);
+    }
+
+    // High Speed File Upload Staging Architecture Blocks
+    let currentStagedFile = null;
+    let activeXhrSession = null;
+    const dropZone = document.getElementById('dropZone');
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = '#ff6a00';
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = '#444';
+        if (eventName === 'drop' && e.dataTransfer.files.length > 0) {
+          stageFile(e.dataTransfer.files[0]);
+        }
+      }, false);
+    });
+
+    function stageFile(file) {
+      if (!file) return;
+      const allowedExtensions = /(\.iso|\.img)$/i;
+      if (!allowedExtensions.exec(file.name)) {
+        document.getElementById('status').textContent = 'Error: Only .iso and .img files are supported.';
+        return;
+      }
+
+      currentStagedFile = file;
+      document.getElementById('uploadPrompt').innerHTML = `Selected File: <span style="color:#ff6a00; font-weight:bold;">${file.name}</span>`;
+      document.getElementById('uploadActions').style.display = 'flex';
+      document.getElementById('startUploadBtn').disabled = false;
+      document.getElementById('progressContainer').style.display = 'none';
+      document.getElementById('status').textContent = 'File staged. Click Upload to process.';
+    }
+
+    function startStreamingUpload() {
+      if (!currentStagedFile) return;
+
+      const uploadUrl = `${window.location.protocol}//${SERVER_CONFIG.rpiIp}:9001/upload`;
+      const formData = new FormData();
+      formData.append("file", currentStagedFile);
+
+      const progressContainer = document.getElementById('progressContainer');
+      const progressBar = document.getElementById('progressBar');
+      const uploadPrompt = document.getElementById('uploadPrompt');
+      const statusDiv = document.getElementById('status');
+
+      progressContainer.style.display = 'block';
+      progressBar.style.width = '0%';
+      document.getElementById('startUploadBtn').disabled = true;
+      statusDiv.textContent = 'Uploading file: This may take some time. Do not close the tab';
+
+      activeXhrSession = new XMLHttpRequest();
+      activeXhrSession.open("POST", uploadUrl, true);
+
+      activeXhrSession.upload.onprogress = function (e) {
+        if (e.lengthComputable) {
+          const percentComplete = Math.round((e.loaded / e.total) * 100);
+          progressBar.style.width = percentComplete + '%';
+          uploadPrompt.innerHTML = `Uploading: <span style="color:#ff6a00;">${currentStagedFile.name}</span> (${percentComplete}%)`;
+        }
+      };
+
+      activeXhrSession.onload = function () {
+        if (activeXhrSession.status === 200) {
+          statusDiv.textContent = 'Success: Image written out completely!';
+          resetUploadUI();
+          fetchList(); 
+        } else {
+          let errorMsg = 'Upload execution interrupted.';
+          try { errorMsg = JSON.parse(activeXhrSession.responseText).detail || errorMsg; } catch(e) {}
+          statusDiv.textContent = `Error: ${errorMsg}`;
+          resetUploadUI();
+        }
+        activeXhrSession = null;
+      };
+
+      activeXhrSession.onerror = function () {
+        statusDiv.textContent = 'Hardware network connection failure.';
+        resetUploadUI();
+        activeXhrSession = null;
+      };
+
+      activeXhrSession.send(formData);
+    }
+
+    function cancelStreamingUpload() {
+      if (activeXhrSession) {
+        activeXhrSession.abort();
+        activeXhrSession = null;
+        document.getElementById('status').textContent = 'Upload safely terminated.';
+      } else {
+        document.getElementById('status').textContent = 'Staged file released.';
+      }
+      resetUploadUI();
+    }
+
+    function resetUploadUI() {
+      currentStagedFile = null;
+      document.getElementById('fileInput').value = '';
+      document.getElementById('uploadActions').style.display = 'none';
+      document.getElementById('progressContainer').style.display = 'none';
+      document.getElementById('uploadPrompt').innerHTML = 'Drag & Drop file here or <span style="color:#ff6a00; cursor:pointer;" onclick="document.getElementById(' + "'fileInput'" + ').click()">Browse</span>';
+    }
+
+    // Storage Device List/Mount Operations Control 
+    let selectedFile = null;
+    let fileToDelete = null;
+
+    function fetchList() {
+      document.getElementById('status').textContent = 'Loading ISO files...';
+      document.getElementById('deleteBtn').disabled = true;
+      
+      fetch(`http://${SERVER_CONFIG.rpiIp}:9001/list`)
+        .then(res => res.json())
+        .then(data => {
+          const ul = document.getElementById('isoList');
+          ul.innerHTML = '';
+          selectedFile = null;
+          document.getElementById('mountBtn').disabled = true;
+
+          if (data.available_isos && data.available_isos.length > 0) {
+            data.available_isos.forEach(file => {
+              const li = document.createElement('li');
+              li.className = 'iso-item';
+              
+              const nameSpan = document.createElement('span');
+              nameSpan.className = 'iso-name';
+              nameSpan.textContent = file;
+              
+              const actionsDiv = document.createElement('div');
+              actionsDiv.className = 'iso-actions';
+              
+              const deleteBtn = document.createElement('button');
+              deleteBtn.className = 'delete-iso-btn';
+              deleteBtn.innerHTML = '🗑️ Delete';
+              deleteBtn.title = 'Delete this ISO file';
+              deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                confirmDelete(file);
+              };
+              
+              actionsDiv.appendChild(deleteBtn);
+              li.appendChild(nameSpan);
+              li.appendChild(actionsDiv);
+              
+              li.onclick = () => {
+                const allItems = ul.querySelectorAll('.iso-item');
+                allItems.forEach(item => item.classList.remove('selected'));
+                li.classList.add('selected');
+                selectedFile = file;
+                document.getElementById('mountBtn').disabled = false;
+                document.getElementById('deleteBtn').disabled = false;
+                document.getElementById('status').textContent = 'Selected: ' + file;
+              };
+              
+              ul.appendChild(li);
+            });
+            document.getElementById('status').textContent = 'Found ' + data.available_isos.length + ' ISO files';
+          } else {
+            ul.innerHTML = '<div class="empty-state">No ISO files found</div>';
+            document.getElementById('status').textContent = 'No ISO files available';
+          }
+        })
+        .catch((error) => {
+          console.error('Fetch list error:', error);
+          document.getElementById('status').textContent = 'Failed to fetch list: ' + error.message;
+          document.getElementById('isoList').innerHTML = '<div class="empty-state">Error loading ISO files</div>';
+        });
+    }
+
+    function mountSelected() {
+      if (!selectedFile) return;
+    
+      const statusDiv = document.getElementById('status');
+      statusDiv.textContent = 'Mounting ' + selectedFile + '...';
+    
+      fetch(`http://${SERVER_CONFIG.rpiIp}:9001/mount?filename=` + encodeURIComponent(selectedFile), { method: 'POST' })
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(err => { throw new Error(err.detail || 'Server error'); });
+        }
+        return res.json();
+      })
+      .then(data => {
+        statusDiv.textContent = 'Successfully mounted: ' + (data.iso || selectedFile);
+        document.getElementById('unmountBtn').disabled = false;
+      })
+      .catch((error) => { 
+        statusDiv.textContent = 'Mount operation failed: ' + error.message; 
+        console.error('Mount error:', error);
+      });
+    }
+
+    function unmount() {
+      const statusDiv = document.getElementById('status');
+      statusDiv.textContent = 'Unmounting...';
+    
+      fetch(`http://${SERVER_CONFIG.rpiIp}:9001/stop`, { method: 'POST' })
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(err => { throw new Error(err.detail || 'Server error'); });
+        }
+        return res.json();
+      })
+      .then((data) => {
+        statusDiv.textContent = data.message || 'Successfully unmounted';
+        selectedFile = null;
+        document.getElementById('mountBtn').disabled = true;
+        document.getElementById('unmountBtn').disabled = true;
+        document.getElementById('deleteBtn').disabled = true;
+        const ul = document.getElementById('isoList');
+        ul.querySelectorAll('.iso-item').forEach(item => item.classList.remove('selected'));
+      })
+      .catch((error) => { 
+        statusDiv.textContent = 'Unmount operation failed: ' + error.message;
+        console.error('Unmount error:', error);
+      });
+    }
+
+    // Delete functionality
+    function confirmDelete(fileName) {
+      fileToDelete = fileName;
+      document.getElementById('deleteFileName').textContent = fileName;
+      document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function deleteSelected() {
+      if (!selectedFile) {
+        showToast('Please select a file to delete', true);
+        return;
+      }
+      confirmDelete(selectedFile);
+    }
+
+    // Delete confirmation modal event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('confirmDeleteBtn').addEventListener('click', performDelete);
+      document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
+      document.getElementById('deleteModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('deleteModal')) {
+          closeDeleteModal();
+        }
+      });
+    });
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').style.display = 'none';
+      fileToDelete = null;
+    }
+
+    async function performDelete() {
+      if (!fileToDelete) return;
+      
+      const deleteBtn = document.getElementById('confirmDeleteBtn');
+      const originalText = deleteBtn.textContent;
+      deleteBtn.textContent = 'Deleting...';
+      deleteBtn.disabled = true;
+      
+      const statusDiv = document.getElementById('status');
+      statusDiv.textContent = 'Deleting ' + fileToDelete + '...';
+      
+      try {
+        const response = await fetch(`http://${SERVER_CONFIG.rpiIp}:9001/delete?filename=` + encodeURIComponent(fileToDelete), {
+          method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.detail || 'Server error');
+        }
+        
+        const data = await response.json();
+        statusDiv.textContent = data.message || 'Successfully deleted: ' + fileToDelete;
+        showToast('Deleted: ' + fileToDelete, false);
+        
+        // Clear selection
+        selectedFile = null;
+        document.getElementById('mountBtn').disabled = true;
+        document.getElementById('deleteBtn').disabled = true;
+        fileToDelete = null;
+        
+        // Refresh the list
+        fetchList();
+        closeDeleteModal();
+        
+      } catch (error) {
+        console.error('Delete error:', error);
+        statusDiv.textContent = 'Delete failed: ' + error.message;
+        showToast('Delete failed: ' + error.message, true);
+        deleteBtn.textContent = originalText;
+        deleteBtn.disabled = false;
+      }
+    }
+
+    // Close delete modal with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.getElementById('deleteModal').style.display === 'flex') {
+        closeDeleteModal();
+      }
+    });
+  </script>
+</body>
+</html>

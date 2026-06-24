@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>PythonSV Terminal</title>
+<link rel="icon" type="image/x-icon" href="/static/images/rutomatrix.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #0a0e1a 0%, #0f1219 100%);
+      color: #e9edf5;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    /* Modern Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 28px;
+      background: rgba(18, 22, 28, 0.85);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), 0 1px 0 0 rgba(255, 255, 255, 0.05);
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      z-index: 100;
+      border: 1px solid rgba(255, 106, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+    .device-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff8c42, #ff6a00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.3px;
+    }
+    .device-name i {
+      background: linear-gradient(135deg, #ff8c42, #ff6a00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-size: 1.3rem;
+    }
+    .btn {
+      background: linear-gradient(105deg, #ff6a00 0%, #ff8733 100%);
+      color: #0a0e1a;
+      border: none;
+      padding: 8px 20px;
+      font-weight: 600;
+      border-radius: 40px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(255, 106, 0, 0.3);
+      letter-spacing: -0.2px;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+      box-shadow: 0 6px 20px rgba(255, 106, 0, 0.4);
+    }
+    .btn:active {
+      transform: translateY(0);
+    }
+    .close-btn {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e9edf5;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 6px 16px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .close-btn:hover {
+      background: rgba(255, 106, 0, 0.2);
+      border-color: #ff6a00;
+      color: #ff8c42;
+    }
+    /* Main Container */
+    .container {
+      padding: 20px;
+      box-sizing: border-box;
+      max-width: 2000px;
+      margin: 100px auto 30px;
+    }
+    /* Terminal Wrapper - Glass morphism */
+    .terminal-wrapper {
+      width: 100%;
+      background: #ffffff;
+      border-radius: 28px;
+      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 106, 0, 0.15);
+      box-sizing: border-box;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .terminal-wrapper:hover {
+      box-shadow: 0 25px 45px -12px rgba(255, 106, 0, 0.2), 0 0 0 1px rgba(255, 106, 0, 0.3);
+    }
+    iframe {
+      width: 100%;
+      height: calc(100vh - 240px);
+      min-height: 500px;
+      border: none;
+      background: #ffffff;
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
+    /* Modern Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      display: none;
+      z-index: 1000;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90vw;
+      max-width: 800px;
+      max-height: 85vh;
+      background: linear-gradient(135deg, #171b24 0%, #12141c 100%);
+      border-radius: 28px;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 106, 0, 0.25);
+      padding: 0;
+      z-index: 1001;
+      display: none;
+      animation: modalSlideIn 0.25s cubic-bezier(0.34, 1.2, 0.64, 1);
+      overflow: hidden;
+    }
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.92);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+    .modal-content {
+      max-height: calc(85vh - 80px);
+      overflow-y: auto;
+      padding: 20px 24px 24px;
+    }
+    .modal-content::-webkit-scrollbar {
+      width: 6px;
+    }
+    .modal-content::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.05);
+      border-radius: 3px;
+    }
+    .modal-content::-webkit-scrollbar-thumb {
+      background: #ff6a00;
+      border-radius: 3px;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
+    }
+    .modal-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff8c42, #ff6a00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-title i {
+      color: #ff6a00;
+      background: none;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+    }
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+      color: #ff9f5b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-top: 12px;
+    }
+    .section-title i {
+      font-size: 0.8rem;
+    }
+    .command-group {
+      margin-bottom: 20px;
+    }
+    .command-description {
+      font-size: 0.78rem;
+      color: #aab;
+      margin: 0 0 6px 0;
+      padding-left: 4px;
+      font-style: italic;
+    }
+    .command-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: stretch;
+      margin-bottom: 8px;
+    }
+    .cmd-input {
+      width: 100%;
+      height: 40px;
+      background: #0a0c12;
+      color: #b9e0ff;
+      border: 1px solid #2a2f3a;
+      border-radius: 16px;
+      padding: 0 16px;
+      font-size: 0.78rem;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      box-sizing: border-box;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+      font-weight: 500;
+      letter-spacing: -0.2px;
+      line-height: 1.4;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .cmd-input:hover {
+      border-color: #ff6a00;
+      background: #0f1119;
+    }
+    .cmd-input:focus {
+      outline: none;
+      border-color: #ff6a00;
+      box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.2);
+    }
+    .command-row .btn {
+      height: 40px;
+      padding: 0 14px;
+      white-space: nowrap;
+      background: rgba(255, 106, 0, 0.15);
+      color: #ff9f5b;
+      box-shadow: none;
+      border: 1px solid rgba(255, 106, 0, 0.3);
+      font-size: 0.78rem;
+    }
+    .command-row .btn:hover {
+      background: #ff6a00;
+      color: #0a0e1a;
+      transform: translateY(-1px);
+    }
+    .status {
+      margin-top: 16px;
+      font-size: 0.78rem;
+      color: #4caf50;
+      min-height: 32px;
+      text-align: center;
+      padding: 8px;
+      border-radius: 40px;
+      background: rgba(76, 175, 80, 0.1);
+      transition: all 0.2s ease;
+    }
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      margin: 6px 0 12px 0;
+    }
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header {
+        padding: 10px 18px;
+        top: 12px;
+        left: 12px;
+        right: 12px;
+      }
+      .device-name {
+        font-size: 0.9rem;
+      }
+      .btn {
+        padding: 6px 14px;
+        font-size: 0.75rem;
+      }
+      .container {
+        margin: 88px auto 20px;
+        padding: 12px;
+      }
+      .modal {
+        width: 95vw;
+        max-width: 95vw;
+        max-height: 90vh;
+      }
+      .command-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .command-row .btn {
+        justify-content: center;
+      }
+      .cmd-input {
+        font-size: 0.7rem;
+        height: 36px;
+        padding: 0 12px;
+      }
+      iframe {
+        height: calc(100vh - 200px);
+        min-height: 400px;
+      }
+      .modal-content {
+        padding: 16px;
+      }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .status:not(:empty) {
+      animation: pulse 0.3s ease;
+    }
+    .server-name-tag {
+            font-size: 14px;
+            font-weight: 500;
+            color: #FFFFFF;
+            background: rgba(255, 106, 0, 0.2);
+            padding: 4px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 106, 0, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="device-name">
+    <i class="fa-solid fa-terminal"></i>
+    Command Line Interface
+    <span class="server-name-tag" id="pcServerTag">
+        <span id="pcServerName">SPR</span>
+    </span>
+  </div>
+  <button class="btn" id="openGuideBtn">
+    <i class="fa-solid fa-code-branch"></i>
+    Commands
+  </button>
+</div>
+
+<div class="container">
+  <div class="terminal-wrapper">
+    <iframe id="content-frame" src=""></iframe>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay"></div>
+
+<div class="modal" id="userGuideModal">
+  <div class="modal-header">
+    <div class="modal-title">
+      <i class="fa-solid fa-terminal"></i>
+      Commands
+    </div>
+    <button class="close-btn" id="closeGuideBtn">
+      <i class="fa-solid fa-xmark"></i>
+      Close
+    </button>
+  </div>
+  <div class="modal-content">
+    
+    <!-- Postcode Command -->
+    <div class="section-title">
+      <i class="fa-solid fa-microchip"></i>
+      Postcode
+    </div>
+    <div class="command-group">
+      <p class="command-description">Run postcode to debug system boot sequence</p>
+      <div class="command-row">
+        <input type="text" class="cmd-input" id="commandPostcode"
+               value="sudo minicom -b 115200 -o -D /dev/ttyAMA0" readonly>
+        <button class="btn copy-btn" data-target="commandPostcode">
+          <i class="fa-regular fa-copy"></i>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- BIOS Serial Log -->
+    <div class="section-title">
+      <i class="fa-solid fa-terminal"></i>
+      BIOS Serial Log
+    </div>
+    <div class="command-group">
+      <p class="command-description">View BIOS serial console output</p>
+      <div class="command-row">
+        <input type="text" class="cmd-input" id="commandBios"
+               value="picocom -b 115200 --nolock /dev/ttyUSB0" readonly>
+        <button class="btn copy-btn" data-target="commandBios">
+          <i class="fa-regular fa-copy"></i>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- System State Reading -->
+    <div class="section-title">
+      <i class="fa-solid fa-heartbeat"></i>
+      System State Reading
+    </div>
+    <div class="command-group">
+      <p class="command-description">Read current system state and status</p>
+      <div class="command-row">
+        <input type="text" class="cmd-input" id="commandState"
+               value="bash System_State_Reading1.sh" readonly>
+        <button class="btn copy-btn" data-target="commandState">
+          <i class="fa-regular fa-copy"></i>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- ATX Power Controls -->
+    <div class="section-title">
+      <i class="fa-solid fa-power-off"></i>
+      ATX Power Control
+    </div>
+    <div class="command-group">
+      <p class="command-description">Turn ATX power ON</p>
+      <div class="command-row">
+        <input type="text" class="cmd-input" id="commandAtxOn"
+               value="bash Atx_Power_On.sh" readonly>
+        <button class="btn copy-btn" data-target="commandAtxOn">
+          <i class="fa-regular fa-copy"></i>
+          Copy
+        </button>
+      </div>
+      <p class="command-description" style="margin-top:6px;">Turn ATX power OFF</p>
+      <div class="command-row">
+        <input type="text" class="cmd-input" id="commandAtxOff"
+               value="bash Atx_Power_Off.sh" readonly>
+        <button class="btn copy-btn" data-target="commandAtxOff">
+          <i class="fa-regular fa-copy"></i>
+          Copy
+        </button>
+      </div>
+      <p class="command-description" style="margin-top:6px;">Reset ATX power</p>
+      <div class="command-row">
+        <input type="text" class="cmd-input" id="commandAtxReset"
+               value="bash Atx_Power_Reset.sh" readonly>
+        <button class="btn copy-btn" data-target="commandAtxReset">
+          <i class="fa-regular fa-copy"></i>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Firmware Operations -->
+    <div class="section-title">
+      <i class="fa-solid fa-memory"></i>
+      Firmware Operations
+    </div>
+    
+    <!-- Chip Detection -->
+    <div class="command-group">
+      <p class="command-description">Detect firmware chip and its properties</p>
+      <div class="command-row">
+        <input type="text" class="cmd-input" id="commandDetect"
+               value="flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=15000" readonly>
+        <button class="btn copy-btn" data-target="commandDetect">
+          <i class="fa-regular fa-copy"></i>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- Read Firmware -->
+    <div class="command-group">
+      <p class="command-description">Read firmware from chip (update chip name and path)</p>
+      <div class="command-row">
+        <input type="text" class="cmd-input" id="commandRead"
+               value="sudo flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=15000 -c MT25QL01G -r /home/rpi/Documents/backup47_20260527_125920.bin" readonly>
+        <button class="btn copy-btn" data-target="commandRead">
+          <i class="fa-regular fa-copy"></i>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- Write Firmware -->
+    <div class="command-group">
+      <p class="command-description">Write firmware to chip (update chip name and path)</p>
+      <div class="command-row">
+        <input type="text" class="cmd-input" id="commandWrite"
+               value="sudo flashrom -p linux_spi:dev=/dev/spidev0.0,spispeed=15000 -c MT25QL01G -W /home/rpi/Documents/backup47_20260527_125920.bin" readonly>
+        <button class="btn copy-btn" data-target="commandWrite">
+          <i class="fa-regular fa-copy"></i>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <div class="status" id="statusMsg"></div>
+  </div>
+</div>
+
+<script src="./scripts/config.js"></script>
+<script>
+  // ---------- Modal ----------
+  const openGuideBtn   = document.getElementById('openGuideBtn');
+  const closeGuideBtn  = document.getElementById('closeGuideBtn');
+  const modalOverlay   = document.getElementById('modalOverlay');
+  const userGuideModal = document.getElementById('userGuideModal');
+
+  function openModal() {
+    modalOverlay.style.display   = 'block';
+    userGuideModal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    modalOverlay.style.display   = 'none';
+    userGuideModal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  openGuideBtn.addEventListener('click', openModal);
+  closeGuideBtn.addEventListener('click', closeModal);
+  modalOverlay.addEventListener('click', closeModal);
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && userGuideModal.style.display === 'block') closeModal();
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openModal(); }
+  });
+
+  // ---------- Clipboard ----------
+  async function writeToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (_) { /* fall through */ }
+    }
+    // Legacy fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top      = '0';
+    ta.style.left     = '0';
+    ta.style.width    = '1px';
+    ta.style.height   = '1px';
+    ta.style.padding  = '0';
+    ta.style.border   = 'none';
+    ta.style.opacity  = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length);
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (_) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  const statusMsg = document.getElementById('statusMsg');
+
+  function flashStatus(html, colour, bg) {
+    statusMsg.innerHTML       = html;
+    statusMsg.style.color     = colour;
+    statusMsg.style.background = bg;
+    clearTimeout(flashStatus._t);
+    flashStatus._t = setTimeout(() => {
+      statusMsg.innerHTML = '';
+      statusMsg.style.background = 'rgba(76, 175, 80, 0.1)';
+    }, 2000);
+  }
+
+  async function copyCommand(text, label, sourceEl) {
+    if (!text || !text.trim()) {
+      flashStatus('<i class="fa-solid fa-exclamation-circle"></i> Nothing to copy!',
+                  '#f44336', 'rgba(244, 67, 54, 0.1)');
+      return;
+    }
+    const ok = await writeToClipboard(text.trim());
+    if (ok) {
+      flashStatus(`<i class="fa-solid fa-check-circle"></i> ${label} copied!`,
+                  '#4caf50', 'rgba(76, 175, 80, 0.15)');
+      if (sourceEl) {
+        sourceEl.style.transform  = 'scale(1.01)';
+        sourceEl.style.transition = 'transform 0.2s ease';
+        setTimeout(() => { sourceEl.style.transform = ''; }, 200);
+      }
+    } else {
+      if (sourceEl) { sourceEl.focus(); sourceEl.select(); }
+      flashStatus('<i class="fa-solid fa-triangle-exclamation"></i> Copy blocked — press Ctrl/⌘+C.',
+                  '#f44336', 'rgba(244, 67, 54, 0.1)');
+    }
+  }
+
+  // Setup all copy buttons
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const targetId = this.getAttribute('data-target');
+      const input = document.getElementById(targetId);
+      if (input) {
+        const label = input.closest('.command-group')?.querySelector('.command-description')?.textContent?.trim() || 'Command';
+        copyCommand(input.value, label, input);
+      }
+    });
+  });
+
+  // Click on input to copy
+  document.querySelectorAll('.cmd-input').forEach(el => {
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      this.select();
+      const label = this.closest('.command-group')?.querySelector('.command-description')?.textContent?.trim() || 'Command';
+      copyCommand(this.value, label, this);
+    });
+  });
+
+  // ---------- Iframe ----------
+  const iframe = document.getElementById('content-frame');
+  const url    = `http://${SERVER_CONFIG.rpiIp}:3000/terminal_2`;
+  iframe.style.opacity    = '0';
+  iframe.style.transition = 'opacity 0.4s ease';
+  iframe.onload = () => { iframe.style.opacity = '1'; };
+  iframe.src = url;
+
+  // ============================================================
+  // SERVER NAME LOADING FROM CONFIG.JS
+  // ============================================================
+
+  function parseServerNameFromConfig(content) {
+      try {
+          const match = content.match(/serverName:\s*['"]([^'"]+)['"]/);
+          if (match && match[1]) return match[1];
+          return null;
+      } catch (e) {
+          console.error('Error parsing server name:', e);
+          return null;
+      }
+  }
+
+  function updateServerNameDisplay(serverName) {
+      const serverNameEl = document.getElementById('pcServerName');
+      if (serverNameEl) serverNameEl.textContent = serverName;
+      localStorage.setItem('selectedServer', serverName);
+  }
+
+  function loadConfigFromScript() {
+      return new Promise((resolve) => {
+          try {
+              const script = document.createElement('script');
+              script.src = '../static/scripts/config.js?_=' + Date.now();
+              script.onload = function() {
+                  if (typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG.serverName) {
+                      resolve(SERVER_CONFIG.serverName);
+                  } else {
+                      resolve(null);
+                  }
+              };
+              script.onerror = function() { resolve(null); };
+              document.head.appendChild(script);
+          } catch (e) { resolve(null); }
+      });
+  }
+
+  async function loadConfigDirect() {
+      try {
+          const response = await fetch('../static/scripts/config.js?_=' + Date.now(), { cache: 'no-store' });
+          if (response.ok) {
+              const content = await response.text();
+              return parseServerNameFromConfig(content);
+          }
+          return null;
+      } catch (error) { return null; }
+  }
+
+  async function loadConfigViaAPI() {
+      try {
+          const response = await fetch('/get-config', { cache: 'no-store' });
+          if (response.ok) {
+              const data = await response.json();
+              if (data.success && data.serverName) return data.serverName;
+          }
+          return null;
+      } catch (error) { return null; }
+  }
+
+  async function loadServerName() {
+      const savedServer = localStorage.getItem('selectedServer');
+      if (savedServer && (savedServer === 'SPR' || savedServer === 'GNR')) {
+          updateServerNameDisplay(savedServer);
+          return;
+      }
+      
+      let serverName = await loadConfigViaAPI();
+      if (serverName) { updateServerNameDisplay(serverName); return; }
+      
+      serverName = await loadConfigDirect();
+      if (serverName) { updateServerNameDisplay(serverName); return; }
+      
+      serverName = await loadConfigFromScript();
+      if (serverName) { updateServerNameDisplay(serverName); return; }
+      
+      updateServerNameDisplay('SPR');
+  }
+
+  function startConfigPolling() {
+      setInterval(async () => {
+          try {
+              const response = await fetch('../static/scripts/config.js?_=' + Date.now(), { cache: 'no-store' });
+              if (response.ok) {
+                  const content = await response.text();
+                  const serverName = parseServerNameFromConfig(content);
+                  const currentDisplay = document.getElementById('pcServerName')?.textContent || 'SPR';
+                  if (serverName && serverName !== currentDisplay) {
+                      updateServerNameDisplay(serverName);
+                  }
+              }
+          } catch (error) {}
+      }, 5000);
+  }
+
+  // ============================================================
+  // END SERVER NAME LOADING
+  // ============================================================
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Load server name from config.js
+    loadServerName();
+    startConfigPolling();
+
+  });
+</script>
+</body>
+</html>

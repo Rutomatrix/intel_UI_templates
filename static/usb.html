@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>USB File Sharing</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" type="image/x-icon" href="/static/images/rutomatrix.ico">
+  <style>
+    :root {
+      --bg-dark: #000000;
+      --primary: #ff6a00;
+      --secondary: #0971b3;
+      --text-light: #ffffff;
+      --text-muted: #aaaaaa;
+      --card-bg: #111111;
+      --success: #28a745;
+      --danger: #dc3545;
+      --warning: #ffc107;
+    }
+    
+    body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: var(--text-light);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #121212;
+    height: 100vh;
+  }
+
+    
+    .container {
+      max-width: 800px;
+      width: 90%;
+      padding: 30px;
+      background: #1e1e1e;
+      border-radius: 12px;
+      border: 1px solid #333333;
+      box-shadow: 0 4px 20px rgb(45 45 45 / 36%);
+    }
+    
+    h2 {
+      color: #eee;
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    #detect {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    #read {
+      background-color: var(--secondary);
+      color: white;
+    }
+    
+    #write {
+      background-color: var(--secondary);
+      color: white;
+    }
+    
+    button:hover:enabled {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    button:active:enabled {
+      transform: translateY(0);
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    pre {
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      border-left: 4px solid var(--primary);
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: 'Consolas', monospace;
+    }
+    
+    .file-list {
+      background: #1a1a1a;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .file-item {
+      padding: 10px;
+      margin: 5px 0;
+      background: #252525;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .file-item:hover {
+      background: #333;
+    }
+    
+    .file-item.selected {
+      background: var(--secondary);
+    }
+    
+    .file-icon {
+      color: var(--primary);
+    }
+    
+    .progress-container {
+      width: 100%;
+      background-color: #252525;
+      border-radius: 5px;
+      margin: 20px 0;
+      display: none;
+    }
+    
+    .progress-bar {
+      height: 20px;
+      border-radius: 5px;
+      background-color: var(--primary);
+      width: 0%;
+      transition: width 0.3s;
+      text-align: center;
+      line-height: 20px;
+      font-size: 12px;
+      color: white;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background-color: var(--card-bg);
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 5px 30px rgba(0, 0, 0, 0.4);
+    }
+    
+    .modal h2 {
+      color: var(--primary);
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+      flex-direction: column;
+    }
+
+    #selectedFileName {
+      margin-bottom: 10px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    
+    .modal-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .confirm-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+    }
+    
+    .confirm-btn.active {
+      background-color: #007bff !important;
+      color: #fff !important;
+    }
+    
+    .cancel-btn {
+      background-color: #333;
+      color: white;
+      border: none;
+    }
+    
+    .modal-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      
+      button {
+        min-width: 100%;
+      }
+      
+      .modal-content {
+        padding: 20px;
+      }
+
+      .modal-buttons {
+        flex-direction: column;
+      }
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: #1e1e1e;
+      border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.5);
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      right: 15px;
+      z-index: 100;
+    }
+    
+    .device-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #ff6a00;
+      word-break: break-word;
+    }
+
+    #usb-frame {
+      position: absolute;
+      top: 75px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 75px);
+      border: none;
+      background: #121212;
+    }
+
+    .server-name-tag {
+      font-size: 14px;
+      font-weight: 500;
+      color: #FFFFFF;
+      background: rgba(255, 106, 0, 0.2);
+      padding: 4px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 106, 0, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .device-name-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .settings-btn {
+      background: rgba(255, 106, 0, 0.15);
+      border: 1px solid rgba(255, 106, 0, 0.3);
+      color: #ff6a00;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .settings-btn:hover {
+      background: rgba(255, 106, 0, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .settings-btn i {
+      font-size: 16px;
+    }
+
+    /* IP Settings Modal */
+    .ip-modal-content {
+      background-color: #1e1e1e;
+      padding: 35px;
+      border-radius: 16px;
+      max-width: 450px;
+      width: 90%;
+      text-align: left;
+      border: 1px solid #333;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .ip-modal-content h2 {
+      color: #ff6a00;
+      margin-top: 0;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 22px;
+      justify-content: flex-start;
+    }
+
+    .ip-modal-content .subtitle {
+      color: #aaa;
+      font-size: 14px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 15px;
+    }
+
+    .ip-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .ip-input-group label {
+      color: #ddd;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .ip-input-group input {
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #2a2a2a;
+      color: #fff;
+      font-size: 15px;
+      font-family: 'Consolas', monospace;
+      transition: border-color 0.3s;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .ip-input-group input:focus {
+      outline: none;
+      border-color: #ff6a00;
+      box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.15);
+    }
+
+    .current-ip-display {
+      background: #2a2a2a;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      border-left: 3px solid #ff6a00;
+    }
+
+    .current-ip-display label {
+      color: #888;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .current-ip-display .ip-value {
+      color: #fff;
+      font-family: 'Consolas', monospace;
+      font-size: 16px;
+      margin-top: 2px;
+    }
+
+    .ip-modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .ip-modal-actions button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+      font-size: 14px;
+      min-width: 0;
+    }
+
+    .ip-modal-actions .save-ip-btn {
+      background: #ff6a00;
+      color: white;
+    }
+
+    .ip-modal-actions .save-ip-btn:hover {
+      background: #e65f00;
+      transform: translateY(-2px);
+    }
+
+    .ip-modal-actions .save-ip-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .ip-modal-actions .close-ip-btn {
+      background: #333;
+      color: white;
+    }
+
+    .ip-modal-actions .close-ip-btn:hover {
+      background: #444;
+      transform: translateY(-2px);
+    }
+
+    .toast-message {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #1e1e1e;
+      color: #fff;
+      padding: 16px 24px;
+      border-radius: 10px;
+      border-left: 4px solid #28a745;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.4s ease;
+      z-index: 200;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toast-message.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-message.error {
+      border-left-color: #dc3545;
+    }
+
+    .toast-message i {
+      font-size: 20px;
+    }
+
+    .toast-message .toast-icon-success {
+      color: #28a745;
+    }
+
+    .toast-message .toast-icon-error {
+      color: #dc3545;
+    }
+
+    @media (max-width: 600px) {
+      .ip-modal-actions {
+        flex-direction: column;
+      }
+      
+      .header-right {
+        gap: 8px;
+      }
+      
+      .settings-btn span {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="device-name-row">
+      <div class="device-name">USB File Sharing</div>
+      <span class="server-name-tag" id="pcServerTag">
+        <span id="pcServerName">SPR</span>
+      </span>
+    </div>
+    <div class="header-right">
+      <button class="settings-btn" id="settingsBtn" title="Configure USB IP">
+        <i class="fas fa-network-wired"></i>
+        <span>USB IP</span>
+      </button>
+    </div>
+  </div>
+  
+  <iframe id="usb-frame"></iframe>
+
+  <!-- IP Settings Modal -->
+  <div class="modal" id="ipSettingsModal">
+    <div class="modal-content ip-modal-content">
+      <h2><i class="fas fa-network-wired" style="color: #ff6a00;"></i> USB IP Settings</h2>
+      <div class="subtitle">Configure the IP address for USB file sharing service</div>
+      
+      <div class="current-ip-display">
+        <label>Current USB IP</label>
+        <div class="ip-value" id="currentUsbIpDisplay">Loading...</div>
+      </div>
+      
+      <div class="ip-input-group">
+        <label for="usbIpInput">New USB IP Address</label>
+        <input type="text" id="usbIpInput" placeholder="e.g., 10.208.50.57" />
+      </div>
+      
+      <div class="ip-modal-actions">
+        <button class="save-ip-btn" id="saveUsbIpBtn">
+          <i class="fas fa-save"></i> Save
+        </button>
+        <button class="close-ip-btn" id="closeIpModalBtn">
+          <i class="fas fa-times"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-message" id="toastMessage">
+    <i class="fas fa-check-circle toast-icon-success"></i>
+    <span id="toastText">Success!</span>
+  </div>
+
+  <script src="./scripts/config.js"></script>
+  <script>
+    // ============================================================
+    // USB IP SETTINGS
+    // ============================================================
+
+    let currentUsbIp = '';
+
+    // Get current USB IP from config
+    function getCurrentUsbIp() {
+      if (typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG.usbIp) {
+        return SERVER_CONFIG.usbIp;
+      }
+      return '10.208.50.57'; // Default fallback
+    }
+
+    // Update iframe with new IP
+    function updateIframeSource(ip) {
+      const frame = document.getElementById('usb-frame');
+      if (frame) {
+        frame.src = `http://${ip}:8081`;
+      }
+    }
+
+    // Show toast notification
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toastMessage');
+      const toastText = document.getElementById('toastText');
+      const icon = toast.querySelector('i');
+      
+      toastText.textContent = message;
+      
+      if (isError) {
+        icon.className = 'fas fa-exclamation-circle toast-icon-error';
+        toast.className = 'toast-message error show';
+      } else {
+        icon.className = 'fas fa-check-circle toast-icon-success';
+        toast.className = 'toast-message show';
+      }
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
+    }
+
+    // Save USB IP to config.js via API
+    async function saveUsbIp(newIp) {
+      try {
+        // First, get the current config file content
+        const response = await fetch('/get-config', {
+          cache: 'no-store'
+        });
+        
+        if (!response.ok) {
+          showToast('Failed to read current config', true);
+          return false;
+        }
+        
+        const data = await response.json();
+        if (!data.success || !data.content) {
+          showToast('Failed to read current config', true);
+          return false;
+        }
+        
+        let configContent = data.content;
+        
+        // Update only the usbIp value using regex
+        // This pattern matches usbIp: 'anything' or usbIp: "anything"
+        const usbIpRegex = /(usbIp:\s*['"])([^'"]*)(['"])/;
+        const match = configContent.match(usbIpRegex);
+        
+        if (match) {
+          // Replace only the usbIp value
+          configContent = configContent.replace(usbIpRegex, `$1${newIp}$3`);
+        } else {
+          // If usbIp doesn't exist, add it to the config
+          // Find the closing brace and insert before it
+          const closingBraceIndex = configContent.lastIndexOf('}');
+          if (closingBraceIndex !== -1) {
+            // Check if there's a trailing comma needed
+            const beforeClosing = configContent.substring(0, closingBraceIndex).trim();
+            const needsComma = !beforeClosing.endsWith(',') && !beforeClosing.endsWith('{');
+            const comma = needsComma ? ',' : '';
+            configContent = configContent.substring(0, closingBraceIndex) + 
+                          `${comma}\n    usbIp: '${newIp}'\n` + 
+                          configContent.substring(closingBraceIndex);
+          } else {
+            showToast('Invalid config file format', true);
+            return false;
+          }
+        }
+        
+        // Save the updated content back to the file
+        const saveResponse = await fetch('/save-config', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ content: configContent })
+        });
+        
+        const saveData = await saveResponse.json();
+        
+        if (saveData.success) {
+          // Update local config object
+          if (typeof SERVER_CONFIG !== 'undefined') {
+            SERVER_CONFIG.usbIp = newIp;
+          }
+          
+          // Update display
+          document.getElementById('currentUsbIpDisplay').textContent = newIp;
+          document.getElementById('usbIpInput').value = newIp;
+          
+          // Update iframe
+          updateIframeSource(newIp);
+          
+          // Update local storage
+          localStorage.setItem('usbIp', newIp);
+          
+          showToast(`USB IP updated to ${newIp} successfully!`);
+          return true;
+        } else {
+          showToast(`Error: ${saveData.error || 'Failed to save config'}`, true);
+          return false;
+        }
+      } catch (error) {
+        console.error('Error saving USB IP:', error);
+        showToast(`Error: ${error.message}`, true);
+        return false;
+      }
+    }
+
+    // Load USB IP from config
+    function loadUsbIp() {
+      const ip = getCurrentUsbIp();
+      currentUsbIp = ip;
+      
+      // Update display
+      document.getElementById('currentUsbIpDisplay').textContent = ip;
+      document.getElementById('usbIpInput').value = ip;
+      
+      // Update iframe
+      updateIframeSource(ip);
+    }
+
+    // ============================================================
+    // SERVER NAME LOADING FROM CONFIG.JS
+    // ============================================================
+
+    function parseServerNameFromConfig(content) {
+      try {
+        const match = content.match(/serverName:\s*['"]([^'"]+)['"]/);
+        if (match && match[1]) {
+          return match[1];
+        }
+        return null;
+      } catch (e) {
+        console.error('Error parsing server name:', e);
+        return null;
+      }
+    }
+
+    function updateServerNameDisplay(serverName) {
+      const serverNameEl = document.getElementById('pcServerName');
+      if (serverNameEl) {
+        serverNameEl.textContent = serverName;
+      }
+      localStorage.setItem('selectedServer', serverName);
+    }
+
+    function loadConfigFromScript() {
+      return new Promise((resolve) => {
+        try {
+          const script = document.createElement('script');
+          script.src = '../static/scripts/config.js?_=' + Date.now();
+          script.onload = function() {
+            if (typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG.serverName) {
+              resolve(SERVER_CONFIG.serverName);
+            } else {
+              resolve(null);
+            }
+          };
+          script.onerror = function() {
+            resolve(null);
+          };
+          document.head.appendChild(script);
+        } catch (e) {
+          resolve(null);
+        }
+      });
+    }
+
+    async function loadConfigDirect() {
+      try {
+        const response = await fetch('../static/scripts/config.js?_=' + Date.now(), {
+          cache: 'no-store'
+        });
+        if (response.ok) {
+          const content = await response.text();
+          return parseServerNameFromConfig(content);
+        }
+        return null;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    async function loadConfigViaAPI() {
+      try {
+        const response = await fetch('/get-config', {
+          cache: 'no-store'
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.serverName) {
+            return data.serverName;
+          }
+        }
+        return null;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    async function loadServerName() {
+      const savedServer = localStorage.getItem('selectedServer');
+      if (savedServer && (savedServer === 'SPR' || savedServer === 'GNR')) {
+        updateServerNameDisplay(savedServer);
+        console.log('Server loaded from localStorage:', savedServer);
+        return;
+      }
+      
+      let serverName = await loadConfigViaAPI();
+      if (serverName) {
+        updateServerNameDisplay(serverName);
+        console.log('Server loaded via API:', serverName);
+        return;
+      }
+      
+      serverName = await loadConfigDirect();
+      if (serverName) {
+        updateServerNameDisplay(serverName);
+        console.log('Server loaded via direct fetch:', serverName);
+        return;
+      }
+      
+      serverName = await loadConfigFromScript();
+      if (serverName) {
+        updateServerNameDisplay(serverName);
+        console.log('Server loaded via script tag:', serverName);
+        return;
+      }
+      
+      console.warn('All config loading methods failed, using default SPR');
+      updateServerNameDisplay('SPR');
+    }
+
+    function startConfigPolling() {
+      setInterval(async () => {
+        try {
+          const response = await fetch('../static/scripts/config.js?_=' + Date.now(), {
+            cache: 'no-store'
+          });
+          if (response.ok) {
+            const content = await response.text();
+            const serverName = parseServerNameFromConfig(content);
+            const currentDisplay = document.getElementById('pcServerName')?.textContent || 'SPR';
+            if (serverName && serverName !== currentDisplay) {
+              console.log('Config file changed! New server:', serverName);
+              updateServerNameDisplay(serverName);
+            }
+          }
+        } catch (error) {
+          // Silent fail
+        }
+      }, 5000);
+    }
+
+    // ============================================================
+    // EVENT LISTENERS
+    // ============================================================
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load USB IP
+      loadUsbIp();
+      
+      // Load server name
+      loadServerName();
+      startConfigPolling();
+      
+      // Settings button - show modal
+      document.getElementById('settingsBtn').addEventListener('click', () => {
+        document.getElementById('ipSettingsModal').style.display = 'flex';
+        // Refresh current IP display
+        const currentIp = getCurrentUsbIp();
+        document.getElementById('currentUsbIpDisplay').textContent = currentIp;
+        document.getElementById('usbIpInput').value = currentIp;
+      });
+      
+      // Close modal button
+      document.getElementById('closeIpModalBtn').addEventListener('click', () => {
+        document.getElementById('ipSettingsModal').style.display = 'none';
+      });
+      
+      // Close modal on outside click
+      document.getElementById('ipSettingsModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('ipSettingsModal')) {
+          document.getElementById('ipSettingsModal').style.display = 'none';
+        }
+      });
+      
+      // Save USB IP
+      document.getElementById('saveUsbIpBtn').addEventListener('click', async () => {
+        const input = document.getElementById('usbIpInput');
+        const newIp = input.value.trim();
+        
+        // Basic IP validation (simple)
+        if (!newIp) {
+          showToast('Please enter a valid IP address', true);
+          return;
+        }
+        
+        // Simple IP format validation
+        const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+        if (!ipRegex.test(newIp)) {
+          showToast('Please enter a valid IP address format (e.g., 10.208.50.57)', true);
+          return;
+        }
+        
+        // Check if IP changed
+        const currentIp = getCurrentUsbIp();
+        if (newIp === currentIp) {
+          showToast('IP address is already set to this value');
+          document.getElementById('ipSettingsModal').style.display = 'none';
+          return;
+        }
+        
+        // Save the new IP
+        const saveBtn = document.getElementById('saveUsbIpBtn');
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        
+        const success = await saveUsbIp(newIp);
+        
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save';
+        
+        if (success) {
+          document.getElementById('ipSettingsModal').style.display = 'none';
+        }
+      });
+      
+      // Enter key on input field
+      document.getElementById('usbIpInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          document.getElementById('saveUsbIpBtn').click();
+        }
+      });
+    });
+
+    // ============================================================
+    // END SERVER NAME LOADING
+    // ============================================================
+  </script>
+</body>
+</html>

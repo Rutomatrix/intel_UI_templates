@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Firmware Flash Utility</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" type="image/x-icon" href="/static/images/rutomatrix.ico">
+  <style>
+    :root {
+      --bg-dark: #000000;
+      --primary: #ff6a00;
+      --secondary: #0971b3;
+      --text-light: #ffffff;
+      --text-muted: #aaaaaa;
+      --card-bg: #111111;
+      --success: #28a745;
+      --danger: #dc3545;
+      --warning: #ffc107;
+    }
+    
+    body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: var(--text-light);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #121212;
+    height: 100vh;
+  }
+
+    
+    .container {
+      max-width: 800px;
+      width: 90%;
+      padding: 30px;
+      background: #1e1e1e;
+      border-radius: 12px;
+      border: 1px solid #333333;
+      box-shadow: 0 4px 20px rgb(45 45 45 / 36%);
+    }
+    
+    h2 {
+      color: #eee;
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    #detect {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    #read {
+      background-color: var(--secondary);
+      color: white;
+    }
+    
+    #write {
+      background-color: var(--secondary);
+      color: white;
+    }
+    
+    button:hover:enabled {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    button:active:enabled {
+      transform: translateY(0);
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    pre {
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      border-left: 4px solid var(--primary);
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: 'Consolas', monospace;
+    }
+    
+    .file-list {
+      background: #1a1a1a;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .file-item {
+      padding: 10px;
+      margin: 5px 0;
+      background: #252525;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .file-item:hover {
+      background: #333;
+    }
+    
+    .file-item.selected {
+      background: var(--secondary);
+    }
+    
+    .file-icon {
+      color: var(--primary);
+    }
+    
+    .progress-container {
+      width: 100%;
+      background-color: #252525;
+      border-radius: 5px;
+      margin: 20px 0;
+      display: none;
+    }
+    
+    .progress-bar {
+      height: 20px;
+      border-radius: 5px;
+      background-color: var(--primary);
+      width: 0%;
+      transition: width 0.3s;
+      text-align: center;
+      line-height: 20px;
+      font-size: 12px;
+      color: white;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background-color: var(--card-bg);
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 5px 30px rgba(0, 0, 0, 0.4);
+    }
+    
+    .modal h2 {
+      color: var(--primary);
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+      flex-direction: column;
+    }
+
+    #selectedFileName {
+      margin-bottom: 10px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    
+    .modal-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .confirm-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+    }
+    
+    .confirm-btn.active {
+      background-color: #007bff !important;
+      color: #fff !important;
+    }
+    
+    .cancel-btn {
+      background-color: #333;
+      color: white;
+      border: none;
+    }
+    
+    .modal-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      
+      button {
+        min-width: 100%;
+      }
+      
+      .modal-content {
+        padding: 20px;
+      }
+
+      .modal-buttons {
+        flex-direction: column;
+      }
+    }
+
+    /* Header */
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px 16px;
+          background: #1e1e1e;
+          border-radius: 8px;
+          box-shadow: 0 10px 24px rgba(0,0,0,0.5);
+          position: fixed;
+          top: 15px;
+          left: 15px;
+          right: 15px;
+          z-index: 100;
+        }
+        .device-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: #ff6a00;
+        word-break: break-word;
+        }
+
+        #firmware-frame {
+          position: absolute;
+          top: 75px;      /* below header */
+          left: 0;
+          width: 100%;
+          height: calc(100vh - 75px);
+          border: none;
+          background: #121212;
+        }
+
+
+        .server-name-tag {
+            font-size: 14px;
+            font-weight: 500;
+            color: #FFFFFF;
+            background: rgba(255, 106, 0, 0.2);
+            padding: 4px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 106, 0, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .device-name-row {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+    <div class="header">
+        <div class="device-name-row">
+            <div class="device-name">Rutomatrix - Firmware Flashing</div>
+              <span class="server-name-tag" id="pcServerTag">
+                  <span id="pcServerName">SPR</span>
+              </span>
+        </div>
+    </div>
+    
+  <iframe id="firmware-frame"></iframe>
+
+  <script src="./scripts/config.js"></script>
+  <script>
+     document.getElementById("firmware-frame").src =
+     `http://${SERVER_CONFIG.rpiIp}:5003`;
+
+
+  // ============================================================
+  // SERVER NAME LOADING FROM CONFIG.JS
+  // ============================================================
+
+  // Function to parse server name from config.js content
+  function parseServerNameFromConfig(content) {
+      try {
+          const match = content.match(/serverName:\s*['"]([^'"]+)['"]/);
+          if (match && match[1]) {
+              return match[1];
+          }
+          return null;
+      } catch (e) {
+          console.error('Error parsing server name:', e);
+          return null;
+      }
+  }
+
+  // Function to update server name display
+  function updateServerNameDisplay(serverName) {
+      const serverNameEl = document.getElementById('pcServerName');
+      if (serverNameEl) {
+          serverNameEl.textContent = serverName;
+      }
+      localStorage.setItem('selectedServer', serverName);
+  }
+
+  // Method 1: Load via script tag
+  function loadConfigFromScript() {
+      return new Promise((resolve) => {
+          try {
+              const script = document.createElement('script');
+              script.src = '../static/scripts/config.js?_=' + Date.now();
+              script.onload = function() {
+                  if (typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG.serverName) {
+                      resolve(SERVER_CONFIG.serverName);
+                  } else {
+                      resolve(null);
+                  }
+              };
+              script.onerror = function() {
+                  resolve(null);
+              };
+              document.head.appendChild(script);
+          } catch (e) {
+              resolve(null);
+          }
+      });
+  }
+
+  // Method 2: Load via direct fetch
+  async function loadConfigDirect() {
+      try {
+          const response = await fetch('../static/scripts/config.js?_=' + Date.now(), {
+              cache: 'no-store'
+          });
+          if (response.ok) {
+              const content = await response.text();
+              return parseServerNameFromConfig(content);
+          }
+          return null;
+      } catch (error) {
+          return null;
+      }
+  }
+
+  // Method 3: Load via API
+  async function loadConfigViaAPI() {
+      try {
+          const response = await fetch('/get-config', {
+              cache: 'no-store'
+          });
+          if (response.ok) {
+              const data = await response.json();
+              if (data.success && data.serverName) {
+                  return data.serverName;
+              }
+          }
+          return null;
+      } catch (error) {
+          return null;
+      }
+  }
+
+  // Main function to load server name
+  async function loadServerName() {
+      // Try localStorage first
+      const savedServer = localStorage.getItem('selectedServer');
+      if (savedServer && (savedServer === 'SPR' || savedServer === 'GNR')) {
+          updateServerNameDisplay(savedServer);
+          console.log('Server loaded from localStorage:', savedServer);
+          return;
+      }
+      
+      // Try API
+      let serverName = await loadConfigViaAPI();
+      if (serverName) {
+          updateServerNameDisplay(serverName);
+          console.log('Server loaded via API:', serverName);
+          return;
+      }
+      
+      // Try direct fetch
+      serverName = await loadConfigDirect();
+      if (serverName) {
+          updateServerNameDisplay(serverName);
+          console.log('Server loaded via direct fetch:', serverName);
+          return;
+      }
+      
+      // Try script tag
+      serverName = await loadConfigFromScript();
+      if (serverName) {
+          updateServerNameDisplay(serverName);
+          console.log('Server loaded via script tag:', serverName);
+          return;
+      }
+      
+      // Default
+      console.warn('All config loading methods failed, using default SPR');
+      updateServerNameDisplay('SPR');
+  }
+
+  // Poll for config changes every 5 seconds
+  function startConfigPolling() {
+      setInterval(async () => {
+          try {
+              const response = await fetch('../static/scripts/config.js?_=' + Date.now(), {
+                  cache: 'no-store'
+              });
+              if (response.ok) {
+                  const content = await response.text();
+                  const serverName = parseServerNameFromConfig(content);
+                  const currentDisplay = document.getElementById('pcServerName')?.textContent || 'SPR';
+                  if (serverName && serverName !== currentDisplay) {
+                      console.log('Config file changed! New server:', serverName);
+                      updateServerNameDisplay(serverName);
+                  }
+              }
+          } catch (error) {
+              // Silent fail
+          }
+      }, 5000);
+  }
+
+  // Load server name when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        loadServerName();
+        startConfigPolling();
+    });
+
+  // ============================================================
+  // END SERVER NAME LOADING
+  // ============================================================
+  </script>
+</body>
+</html>

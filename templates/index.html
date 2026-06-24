@@ -6,7 +6,7 @@
     <title>RUTOMATRIX - Device Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="images/rutomatrix.ico">
+    <link rel="icon" type="image/x-icon" href="../static/images/rutomatrix.ico">
     <style>
         * {
             margin: 0;
@@ -15,7 +15,7 @@
         }
         
         body {
-            font-family: 'Poppins', serif;
+            font-family: 'Poppins', sans-serif;
             background-color: #121212;
             color: #e0e0e0;
             min-height: 100vh;
@@ -45,7 +45,20 @@
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
+            flex: 1;
+        }
+        
+        .logo-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-right {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
         }
         
         .logo-text {
@@ -59,12 +72,27 @@
             color: #ff6a00;
         }
         
+        .server-name-display {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ff6a00;
+            background: rgba(255, 106, 0, 0.15);
+            padding: 4px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 106, 0, 0.3);
+            display: inline-block;
+            white-space: nowrap;
+        }
+        
+        .server-name-display i {
+            margin-right: 6px;
+        }
+        
         /* Dashboard header with menu */
         .dashboard-header {
-            position: absolute;
-            top: 65px;
-            right: 30px;
+            position: relative;
             z-index: 100;
+            margin-left: 15px;
         }
         
         .menu-toggle-btn {
@@ -95,7 +123,7 @@
             background-color: #1e1e1e;
             border-radius: 10px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-            width: 280px;
+            width: 320px;
             z-index: 101;
             display: none;
             border: 1px solid #333;
@@ -113,7 +141,7 @@
         }
         
         .menu-header {
-            padding: 15px;
+            padding: 15px 20px;
             background-color: #252525;
             border-bottom: 1px solid #333;
         }
@@ -130,44 +158,95 @@
             color: #aaa;
         }
         
-        .device-details {
-            padding: 15px;
-            max-height: 300px;
-            overflow-y: auto;
+        /* Server Selection */
+        .server-selection {
+            padding: 20px;
         }
         
-        .device-info-item {
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #333;
-        }
-        
-        .device-info-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        
-        .info-label {
+        .server-selection label {
+            display: block;
             font-size: 0.85rem;
             color: #aaa;
-            margin-bottom: 3px;
-            display: block;
-        }
-        
-        .info-value {
-            font-size: 0.95rem;
+            margin-bottom: 10px;
             font-weight: 500;
-            color: #fff;
         }
         
-        .ip-address {
-            font-family: monospace;
+        .server-selection label i {
+            color: #ff6a00;
+            margin-right: 6px;
+        }
+        
+        .server-select {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: #0a0c12;
+            color: #e0e0e0;
+            border: 1px solid #333;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff6a00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+        
+        .server-select:hover {
+            border-color: #ff6a00;
+        }
+        
+        .server-select:focus {
+            outline: none;
+            border-color: #ff6a00;
+            box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.2);
+        }
+        
+        .server-select option {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            padding: 10px;
+        }
+        
+        .selected-server-info {
+            margin-top: 14px;
+            padding: 12px 16px;
+            background: rgba(255, 106, 0, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #ff6a00;
             font-size: 0.9rem;
-            background-color: #252525;
-            padding: 6px 10px;
-            border-radius: 5px;
-            border-left: 2px solid #ff6a00;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .selected-server-info .server-label {
+            color: #aaa;
+        }
+        
+        .selected-server-info .server-value {
+            color: #ff6a00;
+            font-weight: 600;
+        }
+        
+        .selected-server-info .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: #00cc66;
+            background: rgba(0, 204, 102, 0.1);
+            padding: 3px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 204, 102, 0.2);
+        }
+        
+        .selected-server-info .status-badge i {
+            font-size: 0.7rem;
         }
         
         /* Dashboard content */
@@ -208,6 +287,15 @@
             text-align: left;
         }
         
+        .dashboard-para .server-badge {
+            color: #ff6a00;
+            font-weight: 600;
+            background: rgba(255, 106, 0, 0.15);
+            padding: 2px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 106, 0, 0.3);
+        }
+        
         /* Devices grid */
         .devices-grid {
             display: grid;
@@ -220,7 +308,7 @@
             padding: 10px 0;
         }
         
-        /* Device card styling - SMALLER */
+        /* Device card styling */
         .device-card {
             width: 200px;
             height: 200px;
@@ -266,6 +354,17 @@
             line-height: 1.3;
         }
         
+        .device-server-tag {
+            font-size: 0.7rem;
+            color: #ff6a00;
+            background: rgba(255, 106, 0, 0.15);
+            padding: 2px 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 106, 0, 0.2);
+            margin-top: 4px;
+            display: inline-block;
+        }
+        
         .device-status {
             display: flex;
             align-items: center;
@@ -279,6 +378,7 @@
             border-radius: 50%;
             background-color: #00cc66;
             box-shadow: 0 0 8px rgba(0, 204, 102, 0.5);
+            animation: pulse 2s infinite;
         }
         
         .status-text {
@@ -330,6 +430,16 @@
             font-size: 1.2rem;
             font-weight: 600;
             color: #ff6a00;
+        }
+        
+        .modal-title .server-tag {
+            font-size: 0.85rem;
+            color: #ffaa66;
+            background: rgba(255, 106, 0, 0.15);
+            padding: 2px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 106, 0, 0.2);
+            margin-left: 8px;
         }
         
         .modal-controls {
@@ -387,15 +497,52 @@
             object-fit: contain;
         }
 
-        /* Animation for status indicator */
+        /* Pulse animation */
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.6; }
             100% { opacity: 1; }
         }
         
-        .status-indicator {
-            animation: pulse 2s infinite;
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+        }
+        
+        .notification.success {
+            background-color: #1e3a2a;
+            border: 1px solid #00cc66;
+            color: #00cc66;
+        }
+        
+        .notification.error {
+            background-color: #3a1e1e;
+            border: 1px solid #ff4444;
+            color: #ff4444;
+        }
+        
+        .notification.info {
+            background-color: #1a2a3a;
+            border: 1px solid #4a8cff;
+            color: #4a8cff;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
         }
         
         /* Responsive adjustments */
@@ -404,7 +551,6 @@
                 grid-template-columns: repeat(3, 1fr);
                 max-width: 800px;
             }
-            
             .device-card {
                 width: 190px;
                 height: 190px;
@@ -416,7 +562,6 @@
                 grid-template-columns: repeat(2, 1fr);
                 max-width: 500px;
             }
-            
             .device-card {
                 width: 200px;
                 height: 200px;
@@ -428,36 +573,41 @@
                 grid-template-columns: repeat(2, 1fr);
                 max-width: 450px;
             }
-            
             .device-card {
                 width: 180px;
                 height: 180px;
                 padding: 15px;
             }
-            
             .dashboard-title {
                 font-size: 1.5rem;
             }
-            
             .dashboard-para {
                 font-size: 0.9rem;
             }
-            
             .header {
                 padding: 12px 20px;
             }
-            
             .logo-text {
                 font-size: 1.5rem;
             }
-            
             .modal-content {
                 width: 95%;
                 height: 500px;
             }
-
             .logo-image {
                 height: 27px;
+            }
+            .server-name-display {
+                font-size: 1rem;
+                padding: 2px 12px;
+            }
+            .menu-dropdown {
+                width: 280px;
+                right: -15px;
+            }
+            .logo-container {
+                flex-wrap: wrap;
+                gap: 10px;
             }
         }
         
@@ -466,14 +616,16 @@
                 grid-template-columns: 1fr;
                 max-width: 300px;
             }
-            
             .device-card {
                 width: 220px;
                 height: 220px;
             }
-            
             .logo-image {
                 height: 23px;
+            }
+            .server-name-display {
+                font-size: 0.9rem;
+                padding: 2px 10px;
             }
         }
         
@@ -484,42 +636,27 @@
                 height: 200px;
                 padding: 15px;
             }
-            
             .dashboard-content-wrapper {
                 padding: 20px 15px;
             }
-            
             .menu-dropdown {
                 width: 250px;
                 right: -15px;
             }
-            
             .modal-content {
                 height: 450px;
             }
-            
             .logo-image {
                 height: 20px;
             }
-        }
-        
-        /* Custom scrollbar */
-        .device-details::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .device-details::-webkit-scrollbar-track {
-            background: #252525;
-            border-radius: 3px;
-        }
-        
-        .device-details::-webkit-scrollbar-thumb {
-            background: #ff6a00;
-            border-radius: 3px;
-        }
-        
-        .device-details::-webkit-scrollbar-thumb:hover {
-            background: #e85a00;
+            .server-name-display {
+                font-size: 0.85rem;
+                padding: 2px 10px;
+            }
+            .logo-container {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
         }
     </style>
 </head>
@@ -527,14 +664,22 @@
     <div class="dashboard-container">
         <!-- Header with logo -->
         <div class="header">
-            <div class="logo-left">
-                <!-- RUTOMATRIX Logo -->
-                <img src="images/RutoMatrix.png" alt="RUTOMATRIX Logo" class="logo-image logo-image-left">
-            </div>
+            <div class="logo-container">
+                <div class="logo-left">
+                    <!-- RUTOMATRIX Logo -->
+                    <img src="../static/images/RutoMatrix.png" alt="RUTOMATRIX Logo" class="logo-image logo-image-left">
+                    
+                    <!-- Server Name Display -->
+                    <span class="server-name-display" id="serverNameDisplay">
+                        <i class="fas fa-server"></i>
+                        <span id="serverNameText">SPR</span>
+                    </span>
+                </div>
 
-            <div class="logo-right">
-                <!-- RUTOMATRIX Logo -->
-                <img src="images/tessolve.png" alt="Tessolve Logo" class="logo-image logo-image-right">
+                <div class="logo-right">
+                    <!-- Tessolve Logo -->
+                    <img src="../static/images/tessolve.png" alt="Tessolve Logo" class="logo-image logo-image-right">
+                </div>
             </div>
             
             <div class="dashboard-header">
@@ -542,18 +687,30 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 
-                <!-- Menu dropdown for device details -->
+                <!-- Menu dropdown for server selection -->
                 <div class="menu-dropdown" id="menuDropdown">
                     <div class="menu-header">
-                        <div class="menu-title">Device Details</div>
-                        <div class="menu-subtitle">IP Information & Device Specifications</div>
+                        <div class="menu-title">Server Selection</div>
+                        <div class="menu-subtitle">Choose the active server</div>
                     </div>
                     
-                    <div class="device-details" id="deviceDetails">
-                        <!-- Device details will be populated here when a device is clicked -->
-                        <div class="no-selection" style="text-align: center; padding: 30px 15px; color: #888;">
-                            <i class="fas fa-mouse-pointer" style="font-size: 2rem; color: #555; margin-bottom: 10px;"></i>
-                            <p style="font-size: 0.9rem;">Click on a device card to view its details here</p>
+                    <div class="server-selection">
+                        <label for="serverSelect">
+                            <i class="fas fa-server"></i> Select Server
+                        </label>
+                        <select class="server-select" id="serverSelect">
+                            <option value="SPR">SPR (Sapphire Rapids)</option>
+                            <option value="GNR">GNR (Granite Rapids)</option>
+                        </select>
+                        <div class="selected-server-info">
+                            <div>
+                                <span class="server-label">Current Server:</span>
+                                <span class="server-value" id="currentServerDisplay">SPR</span>
+                            </div>
+                            <span class="status-badge">
+                                <i class="fas fa-check-circle"></i>
+                                Active
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -564,99 +721,112 @@
         <div class="dashboard-center-wrapper">
             <div class="dashboard-content-wrapper">
                 <h1 class="dashboard-title">Device Dashboard</h1>
-                <h2 class="dashboard-para">Control and monitor your selected devices</h2>
+                <h2 class="dashboard-para">
+                    Control and monitor your selected devices 
+                    <span class="server-badge" id="dashboardServerBadge">
+                        <i class="fas fa-server"></i> SPR
+                    </span>
+                </h2>
                 
                 <div class="devices-grid">
-                    <!-- Device 001 - Virtual Desk -->
-                    <div class="device-card" data-device-id="001" data-feature="virtual-desk">
+                    <!-- Virtual Desk -->
+                    <div class="device-card" data-feature="virtual-os">
                         <div class="device-icon">
                             <i class="fas fa-desktop"></i>
                         </div>
-                        <div class="device-name">Device 001 - Virtual Desk</div>
+                        <div class="device-name">Virtual Desk & OS Flashing</div>
+                        <div class="device-server-tag">SPR</div>
                         <div class="device-status">
                             <div class="status-indicator"></div>
                             <div class="status-text">Ready</div>
                         </div>
                     </div>
                     
-                    <!-- Device 001 - OS Flashing -->
-                    <div class="device-card" data-device-id="001" data-feature="os-flashing">
+                    <!-- USB File Sharing -->
+                    <div class="device-card" data-feature="usb-file-sharing">
                         <div class="device-icon">
-                            <i class="fas fa-download"></i>
+                            <i class="fa-brands fa-usb"></i>
                         </div>
-                        <div class="device-name">Device 001 - OS Flashing</div>
+                        <div class="device-name">USB File Sharing</div>
+                        <div class="device-server-tag">SPR</div>
                         <div class="device-status">
                             <div class="status-indicator"></div>
                             <div class="status-text">Ready</div>
                         </div>
                     </div>
                     
-                    <!-- Device 001 - USB File Sharing -->
-                    <div class="device-card" data-device-id="001" data-feature="usb-file-sharing">
-                        <div class="device-icon">
-                            <i class="fas fa-usb"></i>
-                        </div>
-                        <div class="device-name">Device 001 - USB File Sharing</div>
-                        <div class="device-status">
-                            <div class="status-indicator"></div>
-                            <div class="status-text">Ready</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Device 001 - Post Code Reading -->
-                    <div class="device-card" data-device-id="001" data-feature="post-code-reading">
-                        <div class="device-icon">
-                            <i class="fas fa-code"></i>
-                        </div>
-                        <div class="device-name">Device 001 - Post Code Reading</div>
-                        <div class="device-status">
-                            <div class="status-indicator"></div>
-                            <div class="status-text">Ready</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Device 001 - System State Control & ATX -->
-                    <div class="device-card" data-device-id="001" data-feature="system-state-control">
-                        <div class="device-icon">
-                            <i class="fas fa-power-off"></i>
-                        </div>
-                        <div class="device-name">Device 001 - System State Control & ATX</div>
-                        <div class="device-status">
-                            <div class="status-indicator"></div>
-                            <div class="status-text">Ready</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Device 001 - BIOS Log Monitor -->
-                    <div class="device-card" data-device-id="001" data-feature="bios-log-monitor">
+                    <!-- System Control & Monitoring -->
+                    <div class="device-card" data-feature="system-monitoring">
                         <div class="device-icon">
                             <i class="fas fa-microchip"></i>
                         </div>
-                        <div class="device-name">Device 001 - BIOS Log Monitor</div>
+                        <div class="device-name">Postcode / BIOS / System State & ATX</div>
+                        <div class="device-server-tag">SPR</div>
                         <div class="device-status">
                             <div class="status-indicator"></div>
                             <div class="status-text">Ready</div>
                         </div>
                     </div>
                     
-                    <!-- Device 001 - Firmware Flashing -->
-                    <div class="device-card" data-device-id="001" data-feature="firmware-flashing">
+                    <!-- Firmware Flashing -->
+                    <div class="device-card" data-feature="firmware-flashing">
                         <div class="device-icon">
                             <i class="fas fa-cogs"></i>
                         </div>
-                        <div class="device-name">Device 001 - Firmware Flashing</div>
+                        <div class="device-name">Firmware Flashing</div>
+                        <div class="device-server-tag">SPR</div>
                         <div class="device-status">
                             <div class="status-indicator"></div>
                             <div class="status-text">Ready</div>
                         </div>
                     </div>
                     
-                    <!-- Device 001 - PDU -->
-                    <div class="device-card" data-device-id="001" data-feature="pdu">
+                    <!-- PDU -->
+                    <div class="device-card" data-feature="pdu">
                         <div class="device-icon">
                             <i class="fas fa-plug"></i>
                         </div>
-                        <div class="device-name">Device 001 - PDU</div>
+                        <div class="device-name">PDU</div>
+                        <div class="device-server-tag">SPR</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+
+                    <!-- PythonSV -->
+                    <div class="device-card" data-feature="python-service">
+                        <div class="device-icon">
+                            <i class="fa-brands fa-python"></i>
+                        </div>
+                        <div class="device-name">PythonSV</div>
+                        <div class="device-server-tag">SPR</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+
+                    <!-- BMC -->
+                    <div class="device-card" data-feature="bmc-server-info">
+                        <div class="device-icon">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div class="device-name">BMC Server Info</div>
+                        <div class="device-server-tag">SPR</div>
+                        <div class="device-status">
+                            <div class="status-indicator"></div>
+                            <div class="status-text">Ready</div>
+                        </div>
+                    </div>
+
+                    <!-- CLI -->
+                    <div class="device-card" data-feature="cli">
+                        <div class="device-icon">
+                            <i class="fas fa-terminal"></i>
+                        </div>
+                        <div class="device-name">Command Line Interface</div>
+                        <div class="device-server-tag">SPR</div>
                         <div class="device-status">
                             <div class="status-indicator"></div>
                             <div class="status-text">Ready</div>
@@ -670,7 +840,12 @@
         <div class="feature-modal" id="featureModal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <div class="modal-title" id="modalTitle">Feature Window</div>
+                    <div class="modal-title" id="modalTitle">
+                        Feature Window
+                        <span class="server-tag" id="modalServerTag">
+                            <i class="fas fa-server"></i> SPR
+                        </span>
+                    </div>
                     <div class="modal-controls">
                         <button class="modal-btn" id="minimizeBtn">
                             <i class="fas fa-window-minimize"></i>
@@ -694,27 +869,16 @@
     <script>
         // Device data for each device type
         const deviceData = {
-            "virtual-desk": {
-                name: "Virtual Desk",
+            "virtual-os": {
+                name: "Virtual Desk & OS Flashing",
                 ip: "192.168.1.101",
                 subnet: "255.255.255.0",
                 gateway: "192.168.1.1",
                 mac: "00:1A:2B:3C:4D:5E",
                 status: "Ready",
                 lastActive: "2025-11-28 15:42:00",
-                specs: "Dual Monitor Support, Remote Access, Virtualization Enabled",
-                htmlFile: "virtual_os.html"
-            },
-            "os-flashing": {
-                name: "OS Flashing",
-                ip: "192.168.1.102",
-                subnet: "255.255.255.0",
-                gateway: "192.168.1.1",
-                mac: "00:1A:2B:3C:4D:5F",
-                status: "Ready",
-                lastActive: "2025-11-28 14:30:00",
-                specs: "Multiple OS Support, Fast Flash Technology, Error Recovery",
-                htmlFile: "virtual_os.html"
+                specs: "Virtual Desk (Remote Access, Dual Monitor), OS Flashing (Multi-OS, Fast Flash, Recovery)",
+                htmlFile: "../static/virtual_os.html"
             },
             "usb-file-sharing": {
                 name: "USB File Sharing",
@@ -725,40 +889,18 @@
                 status: "Ready",
                 lastActive: "2025-11-28 15:15:00",
                 specs: "USB 3.2 Gen 2, Multiple Port Support, Secure Transfer",
-                htmlFile: "usb.html"
+                htmlFile: "../static/usb.html"
             },
-            "post-code-reading": {
-                name: "Post Code Reading",
+            "system-monitoring": {
+                name: "POST Code / BIOS / System State Control",
                 ip: "192.168.1.104",
                 subnet: "255.255.255.0",
                 gateway: "192.168.1.1",
                 mac: "00:1A:2B:3C:4D:61",
                 status: "Ready",
-                lastActive: "2025-11-28 13:45:00",
-                specs: "Real-time POST Monitoring, Error Code Database, Log Export",
-                htmlFile: "psb.html"
-            },
-            "system-state-control": {
-                name: "System State Control & ATX",
-                ip: "192.168.1.105",
-                subnet: "255.255.255.0",
-                gateway: "192.168.1.1",
-                mac: "00:1A:2B:3C:4D:62",
-                status: "Ready",
                 lastActive: "2025-11-28 15:40:00",
-                specs: "ATX Power Control, System State Monitoring, Remote Reboot",
-                htmlFile: "psb.html"
-            },
-            "bios-log-monitor": {
-                name: "BIOS Log Monitor",
-                ip: "192.168.1.106",
-                subnet: "255.255.255.0",
-                gateway: "192.168.1.1",
-                mac: "00:1A:2B:3C:4D:63",
-                status: "Ready",
-                lastActive: "2025-11-28 12:20:00",
-                specs: "BIOS Event Logging, Real-time Monitoring, Alert System",
-                htmlFile: "psb.html"
+                specs: "POST Code Monitoring, BIOS Log Tracking, ATX Power & System State Control",
+                htmlFile: "../static/psb.html"
             },
             "firmware-flashing": {
                 name: "Firmware Flashing",
@@ -769,7 +911,7 @@
                 status: "Ready",
                 lastActive: "2025-11-28 11:10:00",
                 specs: "Firmware Update Tools, Rollback Support, Validation Checks",
-                htmlFile: "firmware.html"
+                htmlFile: "../static/firmware.html"
             },
             "pdu": {
                 name: "PDU",
@@ -780,20 +922,170 @@
                 status: "Ready",
                 lastActive: "2025-11-28 15:35:00",
                 specs: "Power Distribution Control, Remote Outlet Management, Power Monitoring",
-                htmlFile: "pdu.html"
+                htmlFile: "../static/pdu.html"
+            },
+            "python-service": {
+                name: "PythonSV",
+                ip: "192.168.1.109",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:66",
+                status: "Ready",
+                lastActive: "2025-11-28 16:10:00",
+                specs: "Python Flask Service, REST API, Background Worker",
+                htmlFile: "../static/pythonsv.html"
+            },
+            "bmc-server-info": {
+                name: "BMC Server Info",
+                ip: "192.168.1.110",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:67",
+                status: "Ready",
+                lastActive: "2025-11-28 16:10:00",
+                specs: "Python Flask Service, REST API, Background Worker",
+                htmlFile: "../static/bmc.html"
+            },
+            "cli": {
+                name: "Command Line Interface",
+                ip: "192.168.1.104",
+                subnet: "255.255.255.0",
+                gateway: "192.168.1.1",
+                mac: "00:1A:2B:3C:4D:61",
+                status: "Ready",
+                lastActive: "2025-11-28 16:10:00",
+                specs: "Python Flask Service, REST API, Background Worker",
+                htmlFile: "../static/cli.html"
             }
         };
         
         // DOM elements
         const menuToggle = document.getElementById('menuToggle');
         const menuDropdown = document.getElementById('menuDropdown');
-        const deviceDetails = document.getElementById('deviceDetails');
         const deviceCards = document.querySelectorAll('.device-card');
         const featureModal = document.getElementById('featureModal');
         const featureIframe = document.getElementById('featureIframe');
         const modalTitle = document.getElementById('modalTitle');
+        const modalServerTag = document.getElementById('modalServerTag');
         const minimizeBtn = document.getElementById('minimizeBtn');
         const closeBtn = document.getElementById('closeBtn');
+        const serverSelect = document.getElementById('serverSelect');
+        const serverNameText = document.getElementById('serverNameText');
+        const currentServerDisplay = document.getElementById('currentServerDisplay');
+        const dashboardServerBadge = document.getElementById('dashboardServerBadge');
+        
+        // Store current server
+        let currentServer = 'SPR';
+        
+        // Function to show notification
+        function showNotification(message, type = 'info') {
+            // Remove existing notification
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Trigger show animation
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+        
+        // Helper function to get current USB IP from config
+        function getCurrentUsbIp() {
+            if (typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG.usbIp) {
+                return SERVER_CONFIG.usbIp;
+            }
+            // Try to get from localStorage
+            return localStorage.getItem('usbIp') || '10.208.50.57';
+        }
+        
+        // Update all server name displays
+        function updateServerDisplay(server) {
+            currentServer = server;
+            
+            // Update header
+            serverNameText.textContent = server;
+            
+            // Update dashboard badge
+            dashboardServerBadge.innerHTML = `<i class="fas fa-server"></i> ${server}`;
+            
+            // Update dropdown info
+            currentServerDisplay.textContent = server;
+            
+            // Update all card server tags
+            document.querySelectorAll('.device-server-tag').forEach(tag => {
+                tag.textContent = server;
+            });
+            
+            // Update modal server tag if modal is open
+            modalServerTag.innerHTML = `<i class="fas fa-server"></i> ${server}`;
+            
+            // Store in localStorage for persistence
+            localStorage.setItem('selectedServer', server);
+        }
+        
+        // Handle server selection change
+        serverSelect.addEventListener('change', function() {
+            const selectedServer = this.value;
+            updateServerDisplay(selectedServer);
+            
+            // Close menu after selection
+            setTimeout(() => {
+                menuDropdown.classList.remove('active');
+            }, 500);
+        });
+        
+        // Load saved server preference
+        function loadServerPreference() {
+            // First try to get from localStorage
+            const savedServer = localStorage.getItem('selectedServer');
+            if (savedServer && (savedServer === 'SPR' || savedServer === 'GNR')) {
+                serverSelect.value = savedServer;
+                currentServer = savedServer;
+                updateServerDisplay(savedServer);
+                return;
+            }
+            
+            // If not in localStorage, try to get from config.js via API
+            fetch('/get-config')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.serverName) {
+                        const server = data.serverName;
+                        if (server === 'SPR' || server === 'GNR') {
+                            serverSelect.value = server;
+                            currentServer = server;
+                            updateServerDisplay(server);
+                            return;
+                        }
+                    }
+                    // Default to SPR
+                    serverSelect.value = 'SPR';
+                    currentServer = 'SPR';
+                    updateServerDisplay('SPR');
+                })
+                .catch(() => {
+                    // Default to SPR if API fails
+                    serverSelect.value = 'SPR';
+                    currentServer = 'SPR';
+                    updateServerDisplay('SPR');
+                });
+        }
         
         // Toggle menu visibility
         menuToggle.addEventListener('click', function(e) {
@@ -813,67 +1105,22 @@
             card.addEventListener('click', function() {
                 const feature = this.getAttribute('data-feature');
                 const deviceInfo = deviceData[feature];
+                const deviceName = this.querySelector('.device-name').textContent;
                 
                 if (deviceInfo) {
-                    // Update menu dropdown with device details
-                    deviceDetails.innerHTML = `
-                        <div class="device-info-item">
-                            <span class="info-label">Device Name</span>
-                            <span class="info-value">${this.querySelector('.device-name').textContent}</span>
-                        </div>
-                        
-                        <div class="device-info-item">
-                            <span class="info-label">IP Address</span>
-                            <div class="info-value ip-address">${deviceInfo.ip}</div>
-                        </div>
-                        
-                        <div class="device-info-item">
-                            <span class="info-label">Subnet Mask</span>
-                            <div class="info-value ip-address">${deviceInfo.subnet}</div>
-                        </div>
-                        
-                        <div class="device-info-item">
-                            <span class="info-label">Gateway</span>
-                            <div class="info-value ip-address">${deviceInfo.gateway}</div>
-                        </div>
-                        
-                        <div class="device-info-item">
-                            <span class="info-label">MAC Address</span>
-                            <div class="info-value ip-address">${deviceInfo.mac}</div>
-                        </div>
-                        
-                        <div class="device-info-item">
-                            <span class="info-label">Status</span>
-                            <span class="info-value" style="color: #00cc66;">${deviceInfo.status}</span>
-                        </div>
-                        
-                        <div class="device-info-item">
-                            <span class="info-label">Last Active</span>
-                            <span class="info-value">${deviceInfo.lastActive}</span>
-                        </div>
-                        
-                        <div class="device-info-item">
-                            <span class="info-label">Specifications</span>
-                            <span class="info-value">${deviceInfo.specs}</span>
-                        </div>
-                    `;
-                    
-                    // Open the menu if it's closed
-                    if (!menuDropdown.classList.contains('active')) {
-                        menuDropdown.classList.add('active');
-                    }
+                    // Update modal title with server name
+                    modalTitle.innerHTML = `${deviceName} <span class="server-tag"><i class="fas fa-server"></i> ${currentServer}</span>`;
                     
                     // Open the feature HTML file in modal window
                     setTimeout(() => {
-                        const width = 800;
-                        const height = 600;
-
+                        const width = 900;
+                        const height = 700;
                         const left = (screen.width - width) / 2;
                         const top = (screen.height - height) / 2;
 
                         window.open(
                             deviceInfo.htmlFile,
-                            'intelMiniWindow',
+                            `intelMiniWindow_${feature}`,
                             `width=${width},height=${height},left=${left},top=${top},resizable=yes`
                         );
                     }, 300);
@@ -910,26 +1157,13 @@
             });
         });
         
-        // Function to open feature in modal window
-        function openFeatureModal(feature, deviceInfo) {
-            // Set modal title
-            modalTitle.textContent = `${deviceInfo.name} - Device 001`;
-            
-            // Load the HTML file in iframe
-            const htmlFile = deviceInfo.htmlFile;
-            featureIframe.src = htmlFile;
-            
-            // Show the modal
-            featureModal.classList.add('active');
-        }
-        
         // Close modal window
         closeBtn.addEventListener('click', function() {
             featureModal.classList.remove('active');
             featureIframe.src = '';
         });
         
-        // Minimize modal window (simulate minimize - just hide it)
+        // Minimize modal window
         minimizeBtn.addEventListener('click', function() {
             featureModal.classList.remove('active');
         });
@@ -951,96 +1185,10 @@
             }
         });
         
-        // Create placeholder HTML files for features if they don't exist
-        // This is just a helper function - in production, you would have actual HTML files
-        function createPlaceholderFeatureFile(featureName) {
-            return `
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>${featureName}</title>
-                    <style>
-                        body {
-                            font-family: 'Poppins', sans-serif;
-                            background-color: #1a1a1a;
-                            color: #f5f5f5;
-                            margin: 0;
-                            padding: 20px;
-                            height: 100vh;
-                            overflow: auto;
-                        }
-                        .feature-content {
-                            max-width: 800px;
-                            margin: 0 auto;
-                            padding: 30px;
-                            background-color: #252525;
-                            border-radius: 10px;
-                            border-left: 4px solid #ff6a00;
-                        }
-                        h1 {
-                            color: #ff6a00;
-                            margin-bottom: 20px;
-                        }
-                        .status {
-                            display: inline-block;
-                            padding: 5px 15px;
-                            background-color: #00cc66;
-                            color: white;
-                            border-radius: 20px;
-                            font-weight: bold;
-                            margin-bottom: 20px;
-                        }
-                        .info-grid {
-                            display: grid;
-                            grid-template-columns: 1fr 1fr;
-                            gap: 15px;
-                            margin-top: 20px;
-                        }
-                        .info-item {
-                            padding: 10px;
-                            background-color: #1e1e1e;
-                            border-radius: 5px;
-                        }
-                        .label {
-                            color: #aaa;
-                            font-size: 0.9rem;
-                            margin-bottom: 5px;
-                        }
-                        .value {
-                            font-weight: bold;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="feature-content">
-                        <h1>${featureName} - Device 001</h1>
-                        <div class="status">Active & Running</div>
-                        <p>This is the ${featureName} interface for Device 001. All controls and monitoring functions are available here.</p>
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <div class="label">Device Status</div>
-                                <div class="value">Operational</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="label">IP Address</div>
-                                <div class="value">192.168.1.101</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="label">Last Updated</div>
-                                <div class="value">${new Date().toLocaleString()}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="label">Connection</div>
-                                <div class="value">Secure (SSL)</div>
-                            </div>
-                        </div>
-                    </div>
-                </body>
-                </html>
-            `;
-        }
+        // Initialize server preference on load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadServerPreference();
+        });
     </script>
 </body>
 </html>
