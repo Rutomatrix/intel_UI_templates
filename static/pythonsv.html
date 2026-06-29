@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+​<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8" />
@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <!-- Font Awesome Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<!-- Google Fonts (fixed: trailing %22 in the original href broke the link element) -->
+<!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
     * {
@@ -24,6 +24,7 @@
       padding: 0;
       min-height: 100vh;
     }
+
     /* Modern Header */
     .header {
       display: flex;
@@ -42,6 +43,7 @@
       border: 1px solid rgba(255, 106, 0, 0.2);
       transition: all 0.3s ease;
     }
+
     .device-name {
       font-size: 1.2rem;
       font-weight: 700;
@@ -54,6 +56,7 @@
       gap: 10px;
       letter-spacing: -0.3px;
     }
+
     .device-name i {
       background: linear-gradient(135deg, #ff8c42, #ff6a00);
       -webkit-background-clip: text;
@@ -61,6 +64,7 @@
       color: transparent;
       font-size: 1.3rem;
     }
+
     .btn {
       background: linear-gradient(105deg, #ff6a00 0%, #ff8733 100%);
       color: #0a0e1a;
@@ -77,14 +81,17 @@
       box-shadow: 0 2px 8px rgba(255, 106, 0, 0.3);
       letter-spacing: -0.2px;
     }
+
     .btn:hover {
       transform: translateY(-2px);
       filter: brightness(1.08);
       box-shadow: 0 6px 20px rgba(255, 106, 0, 0.4);
     }
+
     .btn:active {
       transform: translateY(0);
     }
+
     .close-btn {
       background: rgba(255, 255, 255, 0.08);
       color: #e9edf5;
@@ -99,11 +106,13 @@
       gap: 6px;
       transition: all 0.2s ease;
     }
+
     .close-btn:hover {
       background: rgba(255, 106, 0, 0.2);
       border-color: #ff6a00;
       color: #ff8c42;
     }
+
     /* Main Container */
     .container {
       padding: 20px;
@@ -111,6 +120,7 @@
       max-width: 2000px;
       margin: 100px auto 30px;
     }
+
     /* Terminal Wrapper - Glass morphism */
     .terminal-wrapper {
       width: 100%;
@@ -123,9 +133,11 @@
       overflow: hidden;
       transition: all 0.3s ease;
     }
+
     .terminal-wrapper:hover {
       box-shadow: 0 25px 45px -12px rgba(255, 106, 0, 0.2), 0 0 0 1px rgba(255, 106, 0, 0.3);
     }
+
     iframe {
       width: 100%;
       height: calc(100vh - 240px);
@@ -136,6 +148,7 @@
       position: relative;
       z-index: 1;
     }
+
     /* Modern Modal Styles */
     .modal-overlay {
       position: fixed;
@@ -146,17 +159,16 @@
       z-index: 1000;
       animation: fadeIn 0.2s ease;
     }
+
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
+
     .modal {
       position: fixed;
       top: 50%;
       left: 50%;
-      /* Baseline = post-animation state. The original had scale(0.95)
-         here, which made the modal snap back to a slightly smaller size
-         when the CSS animation ended. */
       transform: translate(-50%, -50%);
       width: 90vw;
       max-width: 560px;
@@ -168,7 +180,10 @@
       display: none;
       animation: modalSlideIn 0.25s cubic-bezier(0.34, 1.2, 0.64, 1);
       overflow: hidden;
+      max-height: 90vh;
+      overflow-y: auto;
     }
+
     @keyframes modalSlideIn {
       from {
         opacity: 0;
@@ -179,6 +194,7 @@
         transform: translate(-50%, -50%) scale(1);
       }
     }
+
     .modal-header {
       display: flex;
       justify-content: space-between;
@@ -186,7 +202,13 @@
       padding: 20px 24px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       background: rgba(0, 0, 0, 0.2);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(18, 20, 28, 0.98);
+      backdrop-filter: blur(10px);
     }
+
     .modal-title {
       font-size: 1.3rem;
       font-weight: 700;
@@ -198,12 +220,57 @@
       align-items: center;
       gap: 10px;
     }
+
     .modal-title i {
       color: #ff6a00;
       background: none;
       -webkit-background-clip: unset;
       background-clip: unset;
     }
+
+    .modal-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 0 24px;
+      background: rgba(0, 0, 0, 0.15);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .modal-tab {
+      padding: 12px 20px 12px 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #8892a8;
+      border-bottom: 2px solid transparent;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+    }
+
+    .modal-tab:hover {
+      color: #e9edf5;
+    }
+
+    .modal-tab.active {
+      color: #ff8c42;
+      border-bottom-color: #ff6a00;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 20px 24px 24px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
     .section-title {
       font-size: 0.85rem;
       font-weight: 600;
@@ -215,19 +282,29 @@
       align-items: center;
       gap: 8px;
     }
+
     .section-title i {
       font-size: 0.8rem;
     }
+
+    .section-title.sub {
+      font-size: 0.75rem;
+      color: #8892a8;
+      margin-top: 20px;
+    }
+
     .command-row {
       display: grid;
       grid-template-columns: 1fr auto;
       gap: 12px;
-      align-items: stretch;          /* stretch so input + button match */
-      margin-bottom: 28px;
+      align-items: stretch;
+      margin-bottom: 16px;
     }
-    /* Single-line command field (was <textarea> — switched to <input>
-       so the field is exactly one line tall instead of the textarea's
-       2-row default, which left a vertical gap next to the Copy button). */
+
+    .command-row.multi {
+      margin-bottom: 8px;
+    }
+
     .cmd-input {
       width: 100%;
       height: 44px;
@@ -245,17 +322,20 @@
       letter-spacing: -0.2px;
       line-height: 1.4;
     }
+
     .cmd-input:hover {
       border-color: #ff6a00;
       background: #0f1119;
     }
+
     .cmd-input:focus {
       outline: none;
       border-color: #ff6a00;
       box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.2);
     }
+
     .command-row .btn {
-      height: 44px;                  /* matches .cmd-input */
+      height: 44px;
       padding: 0 18px;
       white-space: nowrap;
       background: rgba(255, 106, 0, 0.15);
@@ -263,13 +343,26 @@
       box-shadow: none;
       border: 1px solid rgba(255, 106, 0, 0.3);
     }
+
     .command-row .btn:hover {
       background: #ff6a00;
       color: #0a0e1a;
       transform: translateY(-1px);
     }
+
+    .command-row .btn-success {
+      background: rgba(76, 175, 80, 0.15);
+      color: #4caf50;
+      border-color: rgba(76, 175, 80, 0.3);
+    }
+
+    .command-row .btn-success:hover {
+      background: #4caf50;
+      color: #0a0e1a;
+    }
+
     .status {
-      margin-top: 20px;
+      margin-top: 12px;
       font-size: 0.78rem;
       color: #4caf50;
       min-height: 32px;
@@ -279,6 +372,38 @@
       background: rgba(76, 175, 80, 0.1);
       transition: all 0.2s ease;
     }
+
+    .command-group {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .command-group .cmd-input {
+      height: 38px;
+      font-size: 0.78rem;
+    }
+
+    .command-group .btn {
+      height: 38px;
+      font-size: 0.75rem;
+      padding: 0 14px;
+    }
+
+    .command-group .command-row {
+      margin-bottom: 8px;
+    }
+
+    .copy-all-btn {
+      width: 100%;
+      margin-top: 8px;
+      justify-content: center;
+      background: rgba(255, 106, 0, 0.1);
+      border: 1px dashed rgba(255, 106, 0, 0.3);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .header {
@@ -301,6 +426,7 @@
       .modal {
         width: 95vw;
         max-width: 95vw;
+        max-height: 95vh;
       }
       .command-row {
         grid-template-columns: 1fr;
@@ -311,32 +437,70 @@
       }
       .cmd-input {
         font-size: 0.78rem;
+        height: 40px;
       }
       iframe {
         height: calc(100vh - 200px);
         min-height: 400px;
       }
+      .modal-tab {
+        font-size: 0.75rem;
+        padding: 10px 14px;
+      }
+      .modal-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+      }
     }
+
     @keyframes pulse {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.6; }
     }
+
     .status:not(:empty) {
       animation: pulse 0.3s ease;
     }
 
     .server-name-tag {
-            font-size: 14px;
-            font-weight: 500;
-            color: #FFFFFF;
-            background: rgba(255, 106, 0, 0.2);
-            padding: 4px 14px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 106, 0, 0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
+      font-size: 14px;
+      font-weight: 500;
+      color: #FFFFFF;
+      background: rgba(255, 106, 0, 0.2);
+      padding: 4px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 106, 0, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .info-box {
+      background: rgba(255, 106, 0, 0.08);
+      border-left: 3px solid #ff6a00;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      font-size: 0.8rem;
+      color: #aab4c8;
+    }
+
+    .info-box strong {
+      color: #ff9f5b;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(255, 106, 0, 0.15);
+      color: #ff9f5b;
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 20px;
+      margin-left: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
 </style>
 </head>
 <body>
@@ -346,8 +510,8 @@
     <i class="fa-solid fa-terminal"></i>
     PythonSV Terminal
     <span class="server-name-tag" id="pcServerTag">
-                  <span id="pcServerName">SPR</span>
-              </span>
+      <span id="pcServerName">SPR</span>
+    </span>
   </div>
   <button class="btn" id="openGuideBtn">
     <i class="fa-solid fa-code-branch"></i>
@@ -374,34 +538,164 @@
       Close
     </button>
   </div>
-  <div style="padding: 20px 24px 24px;">
-    <div class="section-title">
-      <i class="fa-solid fa-cloud-upload-alt"></i>
-      Activate Environment
+
+  <!-- Tabs -->
+  <div class="modal-tabs">
+    <button class="modal-tab active" data-tab="tab-commands">
+      <i class="fa-solid fa-play"></i> Run
+    </button>
+    <button class="modal-tab" data-tab="tab-update">
+      <i class="fa-solid fa-rotate"></i> Update
+    </button>
+  </div>
+
+  <!-- Tab 1: Commands -->
+  <div class="tab-content active" id="tab-commands">
+    <div style="padding: 20px 24px 24px;">
+      <div class="section-title">
+        <i class="fa-solid fa-cloud-upload-alt"></i>
+        Activate Environment
+      </div>
+      <div class="command-row">
+        <input type="text" class="cmd-input" id="commandPush"
+               value="source pythonsv_env_ICL.bash" readonly
+               title="Click to copy command">
+        <button class="btn" id="copyPushBtn">
+          <i class="fa-regular fa-copy"></i>
+          Copy
+        </button>
+      </div>
+
+      <div class="section-title">
+        <i class="fa-solid fa-cloud-download-alt"></i>
+        Start Application
+      </div>
+      <div class="command-row">
+        <input type="text" class="cmd-input" id="commandPull"
+               value="python startgnr.py" readonly
+               title="Click to copy command">
+        <button class="btn" id="copyPullBtn">
+          <i class="fa-regular fa-copy"></i>
+          Copy
+        </button>
+      </div>
+      <div class="status" id="statusMsg"></div>
     </div>
-    <div class="command-row">
-      <input type="text" class="cmd-input" id="commandPush"
-             value="source pythonsv_env_ICL.bash" readonly
-             title="Click to copy command">
-      <button class="btn" id="copyPushBtn">
+  </div>
+
+  <!-- Tab 2: Update/Package Commands -->
+  <div class="tab-content" id="tab-update">
+    <div style="padding: 20px 24px 24px;">
+      <div class="info-box">
+        <i class="fa-solid fa-info-circle" style="color: #ff6a00; margin-right: 8px;"></i>
+        Run these commands in order to update the packages. You will be prompted for credentials.
+      </div>
+
+      <div class="section-title">
+        <i class="fa-solid fa-folder-tree"></i>
+        Navigate to Workspace
+      </div>
+      <div class="command-row">
+        <input type="text" class="cmd-input" id="commandCd"
+               value="cd pythonsv_workspace/pythonsv/" readonly
+               title="Click to copy command">
+        <button class="btn" id="copyCdBtn">
+          <i class="fa-regular fa-copy"></i>
+          Copy
+        </button>
+      </div>
+
+      <div class="section-title">
+        <i class="fa-solid fa-code-branch"></i>
+        Git Pull Updates
+      </div>
+
+      <div class="command-group">
+        <div class="command-row multi">
+          <input type="text" class="cmd-input" id="commandPull1"
+                 value="cd graniterapids && git pull" readonly
+                 title="Click to copy command">
+          <button class="btn" id="copyPull1Btn">
+            <i class="fa-regular fa-copy"></i>
+            Copy
+          </button>
+        </div>
+        <div class="command-row multi">
+          <input type="text" class="cmd-input" id="commandPull2"
+                 value="cd components && git pull" readonly
+                 title="Click to copy command">
+          <button class="btn" id="copyPull2Btn">
+            <i class="fa-regular fa-copy"></i>
+            Copy
+          </button>
+        </div>
+        <div class="command-row multi">
+          <input type="text" class="cmd-input" id="commandPull3"
+                 value="cd common && git pull" readonly
+                 title="Click to copy command">
+          <button class="btn" id="copyPull3Btn">
+            <i class="fa-regular fa-copy"></i>
+            Copy
+          </button>
+        </div>
+        <button class="btn copy-all-btn" id="copyAllPullsBtn">
+          <i class="fa-regular fa-copy"></i>
+          Copy All Pull Commands
+        </button>
+      </div>
+
+      <div class="section-title">
+        <i class="fa-solid fa-arrow-right"></i>
+        Navigate to graniterapids
+      </div>
+      <div class="command-row">
+        <input type="text" class="cmd-input" id="commandCdGranite"
+               value="cd $PYSV_PATH/graniterapids" readonly
+               title="Click to copy command">
+        <button class="btn" id="copyCdGraniteBtn">
+          <i class="fa-regular fa-copy"></i>
+          Copy
+        </button>
+      </div>
+
+      <div class="section-title">
+        <i class="fa-solid fa-gear"></i>
+        Run Update Tool
+      </div>
+      <div class="command-row">
+        <input type="text" class="cmd-input" id="commandUpdate"
+               value="python update_tools.py" readonly
+               title="Click to copy command">
+        <button class="btn btn-success" id="copyUpdateBtn">
+          <i class="fa-regular fa-copy"></i>
+          Copy
+        </button>
+      </div>
+
+      <div class="section-title sub">
+        <i class="fa-solid fa-key"></i>
+        Credentials
+      </div>
+      <div class="info-box" style="border-left-color: #4caf50; background: rgba(76, 175, 80, 0.05);">
+        <div style="display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">
+          <span style="color: #8892a8;">Username:</span>
+          <span style="color: #b9e0ff;">sys_crse</span>
+          <span style="color: #8892a8;">Password:</span>
+          <span style="color: #b9e0ff;">Intel@1234Intel@1234</span>
+        </div>
+        <div style="margin-top: 8px; font-size: 0.75rem; color: #8892a8;">
+          <i class="fa-regular fa-circle-check" style="color: #4caf50;"></i>
+          Enter credentials when prompted and type <strong style="color: #ff9f5b;">yes</strong> to proceed.
+        </div>
+      </div>
+
+      <button class="btn" id="copyAllUpdateBtn" style="width: 100%; justify-content: center; margin-top: 8px; background: rgba(76, 175, 80, 0.1); border: 1px dashed rgba(76, 175, 80, 0.3);">
         <i class="fa-regular fa-copy"></i>
-        Copy
+        Copy All Update Commands
       </button>
+
+      <div class="status" id="updateStatusMsg"></div>
     </div>
-    <div class="section-title">
-      <i class="fa-solid fa-cloud-download-alt"></i>
-      Start Application
-    </div>
-    <div class="command-row">
-      <input type="text" class="cmd-input" id="commandPull"
-             value="python startgnr.py" readonly
-             title="Click to copy command">
-      <button class="btn" id="copyPullBtn">
-        <i class="fa-regular fa-copy"></i>
-        Copy
-      </button>
-    </div>
-    <div class="status" id="statusMsg"></div>
   </div>
 </div>
 
@@ -409,280 +703,362 @@
 <script>
 
   // ============================================================
-        // SERVER NAME LOADING FROM CONFIG.JS
-        // ============================================================
+  // SERVER NAME LOADING FROM CONFIG.JS
+  // ============================================================
 
-        // Function to parse server name from config.js content
-        function parseServerNameFromConfig(content) {
-            try {
-                const match = content.match(/serverName:\s*['"]([^'"]+)['"]/);
-                if (match && match[1]) {
-                    return match[1];
-                }
-                return null;
-            } catch (e) {
-                console.error('Error parsing server name:', e);
-                return null;
-            }
-        }
-
-        // Function to update server name display
-        function updateServerNameDisplay(serverName) {
-            const serverNameEl = document.getElementById('pcServerName');
-            if (serverNameEl) {
-                serverNameEl.textContent = serverName;
-            }
-            localStorage.setItem('selectedServer', serverName);
-        }
-
-        // Method 1: Load via script tag
-        function loadConfigFromScript() {
-            return new Promise((resolve) => {
-                try {
-                    const script = document.createElement('script');
-                    script.src = '../static/scripts/config.js?_=' + Date.now();
-                    script.onload = function() {
-                        if (typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG.serverName) {
-                            resolve(SERVER_CONFIG.serverName);
-                        } else {
-                            resolve(null);
-                        }
-                    };
-                    script.onerror = function() {
-                        resolve(null);
-                    };
-                    document.head.appendChild(script);
-                } catch (e) {
-                    resolve(null);
-                }
-            });
-        }
-
-        // Method 2: Load via direct fetch
-        async function loadConfigDirect() {
-            try {
-                const response = await fetch('../static/scripts/config.js?_=' + Date.now(), {
-                    cache: 'no-store'
-                });
-                if (response.ok) {
-                    const content = await response.text();
-                    return parseServerNameFromConfig(content);
-                }
-                return null;
-            } catch (error) {
-                return null;
-            }
-        }
-
-        // Method 3: Load via API
-        async function loadConfigViaAPI() {
-            try {
-                const response = await fetch('/get-config', {
-                    cache: 'no-store'
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success && data.serverName) {
-                        return data.serverName;
-                    }
-                }
-                return null;
-            } catch (error) {
-                return null;
-            }
-        }
-
-        // Main function to load server name
-        async function loadServerName() {
-            // Try localStorage first
-            const savedServer = localStorage.getItem('selectedServer');
-            if (savedServer && (savedServer === 'SPR' || savedServer === 'GNR')) {
-                updateServerNameDisplay(savedServer);
-                console.log('Server loaded from localStorage:', savedServer);
-                return;
-            }
-            
-            // Try API
-            let serverName = await loadConfigViaAPI();
-            if (serverName) {
-                updateServerNameDisplay(serverName);
-                console.log('Server loaded via API:', serverName);
-                return;
-            }
-            
-            // Try direct fetch
-            serverName = await loadConfigDirect();
-            if (serverName) {
-                updateServerNameDisplay(serverName);
-                console.log('Server loaded via direct fetch:', serverName);
-                return;
-            }
-            
-            // Try script tag
-            serverName = await loadConfigFromScript();
-            if (serverName) {
-                updateServerNameDisplay(serverName);
-                console.log('Server loaded via script tag:', serverName);
-                return;
-            }
-            
-            // Default
-            console.warn('All config loading methods failed, using default SPR');
-            updateServerNameDisplay('SPR');
-        }
-
-        // Poll for config changes every 5 seconds
-        function startConfigPolling() {
-            setInterval(async () => {
-                try {
-                    const response = await fetch('../static/scripts/config.js?_=' + Date.now(), {
-                        cache: 'no-store'
-                    });
-                    if (response.ok) {
-                        const content = await response.text();
-                        const serverName = parseServerNameFromConfig(content);
-                        const currentDisplay = document.getElementById('pcServerName')?.textContent || 'SPR';
-                        if (serverName && serverName !== currentDisplay) {
-                            console.log('Config file changed! New server:', serverName);
-                            updateServerNameDisplay(serverName);
-                        }
-                    }
-                } catch (error) {
-                    // Silent fail
-                }
-            }, 5000);
-        }
-
-        // ============================================================
-        // END SERVER NAME LOADING
-        // ============================================================
-
-// ---------- Modal ----------
-const openGuideBtn   = document.getElementById('openGuideBtn');
-const closeGuideBtn  = document.getElementById('closeGuideBtn');
-const modalOverlay   = document.getElementById('modalOverlay');
-const userGuideModal = document.getElementById('userGuideModal');
-
-function openModal() {
-  modalOverlay.style.display   = 'block';
-  userGuideModal.style.display = 'block';
-  document.body.style.overflow = 'hidden';
-}
-function closeModal() {
-  modalOverlay.style.display   = 'none';
-  userGuideModal.style.display = 'none';
-  document.body.style.overflow = '';
-}
-openGuideBtn.addEventListener('click', openModal);
-closeGuideBtn.addEventListener('click', closeModal);
-modalOverlay.addEventListener('click', closeModal);
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && userGuideModal.style.display === 'block') closeModal();
-  if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openModal(); }
-});
-
-// ---------- Clipboard (with HTTP fallback) ----------
-// navigator.clipboard only exists on HTTPS or localhost. When the page
-// is served over plain HTTP via the Pi's LAN IP, we fall back to the
-// older execCommand path, which works everywhere.
-async function writeToClipboard(text) {
-  if (navigator.clipboard && window.isSecureContext) {
+  function parseServerNameFromConfig(content) {
     try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch (_) { /* fall through to legacy */ }
-  }
-  // Legacy fallback: temporary textarea + execCommand('copy').
-  // Hidden off-screen so the user never sees it.
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.setAttribute('readonly', '');
-  ta.style.position = 'fixed';
-  ta.style.top      = '0';
-  ta.style.left     = '0';
-  ta.style.width    = '1px';
-  ta.style.height   = '1px';
-  ta.style.padding  = '0';
-  ta.style.border   = 'none';
-  ta.style.opacity  = '0';
-  document.body.appendChild(ta);
-  ta.focus();
-  ta.select();
-  ta.setSelectionRange(0, ta.value.length);
-  let ok = false;
-  try { ok = document.execCommand('copy'); } catch (_) { ok = false; }
-  document.body.removeChild(ta);
-  return ok;
-}
-
-const statusMsg     = document.getElementById('statusMsg');
-const copyPushBtn   = document.getElementById('copyPushBtn');
-const commandPush   = document.getElementById('commandPush');
-const copyPullBtn   = document.getElementById('copyPullBtn');
-const commandPull   = document.getElementById('commandPull');
-
-function flashStatus(html, colour, bg) {
-  statusMsg.innerHTML       = html;
-  statusMsg.style.color     = colour;
-  statusMsg.style.background = bg;
-  clearTimeout(flashStatus._t);
-  flashStatus._t = setTimeout(() => {
-    statusMsg.innerHTML = '';
-    statusMsg.style.background = 'rgba(76, 175, 80, 0.1)';
-  }, 2000);
-}
-
-async function copyCommand(text, label, sourceEl) {
-  if (!text || !text.trim()) {
-    flashStatus('<i class="fa-solid fa-exclamation-circle"></i> Nothing to copy!',
-                '#f44336', 'rgba(244, 67, 54, 0.1)');
-    return;
-  }
-  const ok = await writeToClipboard(text.trim());
-  if (ok) {
-    flashStatus(`<i class="fa-solid fa-check-circle"></i> ${label} copied!`,
-                '#4caf50', 'rgba(76, 175, 80, 0.15)');
-    if (sourceEl) {
-      sourceEl.style.transform  = 'scale(1.01)';
-      sourceEl.style.transition = 'transform 0.2s ease';
-      setTimeout(() => { sourceEl.style.transform = ''; }, 200);
+      const match = content.match(/serverName:\s*['"]([^'"]+)['"]/);
+      if (match && match[1]) {
+        return match[1];
+      }
+      return null;
+    } catch (e) {
+      console.error('Error parsing server name:', e);
+      return null;
     }
-  } else {
-    // Last resort: select the field so the user can ⌘/Ctrl-C manually.
-    if (sourceEl) { sourceEl.focus(); sourceEl.select(); }
-    flashStatus('<i class="fa-solid fa-triangle-exclamation"></i> Copy blocked — press Ctrl/⌘+C.',
-                '#f44336', 'rgba(244, 67, 54, 0.1)');
   }
-}
 
-copyPushBtn.addEventListener('click',
-  () => copyCommand(commandPush.value, 'Environment command', commandPush));
-copyPullBtn.addEventListener('click',
-  () => copyCommand(commandPull.value, 'Start command', commandPull));
+  function updateServerNameDisplay(serverName) {
+    const serverNameEl = document.getElementById('pcServerName');
+    if (serverNameEl) {
+      serverNameEl.textContent = serverName;
+    }
+    localStorage.setItem('selectedServer', serverName);
+  }
 
-// Click the input itself to copy (mirrors the Copy button)
-[commandPush, commandPull].forEach((el) => {
-  el.addEventListener('click', (e) => {
-    e.stopPropagation();
-    el.select();
-    const label = el.id === 'commandPush' ? 'Environment command' : 'Start command';
-    copyCommand(el.value, label, el);
+  function loadConfigFromScript() {
+    return new Promise((resolve) => {
+      try {
+        const script = document.createElement('script');
+        script.src = '../static/scripts/config.js?_=' + Date.now();
+        script.onload = function() {
+          if (typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG.serverName) {
+            resolve(SERVER_CONFIG.serverName);
+          } else {
+            resolve(null);
+          }
+        };
+        script.onerror = function() {
+          resolve(null);
+        };
+        document.head.appendChild(script);
+      } catch (e) {
+        resolve(null);
+      }
+    });
+  }
+
+  async function loadConfigDirect() {
+    try {
+      const response = await fetch('../static/scripts/config.js?_=' + Date.now(), {
+        cache: 'no-store'
+      });
+      if (response.ok) {
+        const content = await response.text();
+        return parseServerNameFromConfig(content);
+      }
+      return null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async function loadConfigViaAPI() {
+    try {
+      const response = await fetch('/get-config', {
+        cache: 'no-store'
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.serverName) {
+          return data.serverName;
+        }
+      }
+      return null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async function loadServerName() {
+    const savedServer = localStorage.getItem('selectedServer');
+    if (savedServer && (savedServer === 'SPR' || savedServer === 'GNR')) {
+      updateServerNameDisplay(savedServer);
+      console.log('Server loaded from localStorage:', savedServer);
+      return;
+    }
+    
+    let serverName = await loadConfigViaAPI();
+    if (serverName) {
+      updateServerNameDisplay(serverName);
+      console.log('Server loaded via API:', serverName);
+      return;
+    }
+    
+    serverName = await loadConfigDirect();
+    if (serverName) {
+      updateServerNameDisplay(serverName);
+      console.log('Server loaded via direct fetch:', serverName);
+      return;
+    }
+    
+    serverName = await loadConfigFromScript();
+    if (serverName) {
+      updateServerNameDisplay(serverName);
+      console.log('Server loaded via script tag:', serverName);
+      return;
+    }
+    
+    console.warn('All config loading methods failed, using default SPR');
+    updateServerNameDisplay('SPR');
+  }
+
+  function startConfigPolling() {
+    setInterval(async () => {
+      try {
+        const response = await fetch('../static/scripts/config.js?_=' + Date.now(), {
+          cache: 'no-store'
+        });
+        if (response.ok) {
+          const content = await response.text();
+          const serverName = parseServerNameFromConfig(content);
+          const currentDisplay = document.getElementById('pcServerName')?.textContent || 'SPR';
+          if (serverName && serverName !== currentDisplay) {
+            console.log('Config file changed! New server:', serverName);
+            updateServerNameDisplay(serverName);
+          }
+        }
+      } catch (error) {
+        // Silent fail
+      }
+    }, 5000);
+  }
+
+  // ============================================================
+  // END SERVER NAME LOADING
+  // ============================================================
+
+  // ---------- Tabs ----------
+  const tabs = document.querySelectorAll('.modal-tab');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.tab;
+      
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      
+      tabContents.forEach(content => {
+        content.classList.remove('active');
+        if (content.id === target) {
+          content.classList.add('active');
+        }
+      });
+    });
   });
-});
 
-// ---------- Iframe ----------
-const iframe = document.getElementById('content-frame');
-const url    = `http://${SERVER_CONFIG.rpiIp}:3000/terminal_1`;
-iframe.style.opacity    = '0';
-iframe.style.transition = 'opacity 0.4s ease';
-iframe.onload = () => { iframe.style.opacity = '1'; };
-iframe.src = url;
+  // ---------- Modal ----------
+  const openGuideBtn   = document.getElementById('openGuideBtn');
+  const closeGuideBtn  = document.getElementById('closeGuideBtn');
+  const modalOverlay   = document.getElementById('modalOverlay');
+  const userGuideModal = document.getElementById('userGuideModal');
 
-document.addEventListener("DOMContentLoaded", function () {
-    // Load server name from config.js
+  function openModal() {
+    modalOverlay.style.display   = 'block';
+    userGuideModal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modalOverlay.style.display   = 'none';
+    userGuideModal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  openGuideBtn.addEventListener('click', openModal);
+  closeGuideBtn.addEventListener('click', closeModal);
+  modalOverlay.addEventListener('click', closeModal);
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && userGuideModal.style.display === 'block') closeModal();
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openModal(); }
+  });
+
+  // ---------- Clipboard ----------
+  async function writeToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (_) { /* fall through */ }
+    }
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top      = '0';
+    ta.style.left     = '0';
+    ta.style.width    = '1px';
+    ta.style.height   = '1px';
+    ta.style.padding  = '0';
+    ta.style.border   = 'none';
+    ta.style.opacity  = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length);
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (_) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  // ---------- Status Messages ----------
+  const statusMsg = document.getElementById('statusMsg');
+  const updateStatusMsg = document.getElementById('updateStatusMsg');
+
+  function flashStatus(msg, colour, bg, target = statusMsg) {
+    target.innerHTML = msg;
+    target.style.color = colour;
+    target.style.background = bg;
+    clearTimeout(flashStatus._t);
+    flashStatus._t = setTimeout(() => {
+      target.innerHTML = '';
+      target.style.background = 'rgba(76, 175, 80, 0.1)';
+    }, 2000);
+  }
+
+  async function copyCommand(text, label, sourceEl, statusTarget = statusMsg) {
+    if (!text || !text.trim()) {
+      flashStatus('<i class="fa-solid fa-exclamation-circle"></i> Nothing to copy!',
+                  '#f44336', 'rgba(244, 67, 54, 0.1)', statusTarget);
+      return;
+    }
+    const ok = await writeToClipboard(text.trim());
+    if (ok) {
+      flashStatus(`<i class="fa-solid fa-check-circle"></i> ${label} copied!`,
+                  '#4caf50', 'rgba(76, 175, 80, 0.15)', statusTarget);
+      if (sourceEl) {
+        sourceEl.style.transform  = 'scale(1.01)';
+        sourceEl.style.transition = 'transform 0.2s ease';
+        setTimeout(() => { sourceEl.style.transform = ''; }, 200);
+      }
+    } else {
+      if (sourceEl) { sourceEl.focus(); sourceEl.select(); }
+      flashStatus('<i class="fa-solid fa-triangle-exclamation"></i> Copy blocked — press Ctrl/⌘+C.',
+                  '#f44336', 'rgba(244, 67, 54, 0.1)', statusTarget);
+    }
+  }
+
+  // ---------- Run Tab Copy Buttons ----------
+  const copyPushBtn = document.getElementById('copyPushBtn');
+  const commandPush = document.getElementById('commandPush');
+  const copyPullBtn = document.getElementById('copyPullBtn');
+  const commandPull = document.getElementById('commandPull');
+
+  copyPushBtn.addEventListener('click', () => copyCommand(commandPush.value, 'Environment command', commandPush));
+  copyPullBtn.addEventListener('click', () => copyCommand(commandPull.value, 'Start command', commandPull));
+
+  [commandPush, commandPull].forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      el.select();
+      const label = el.id === 'commandPush' ? 'Environment command' : 'Start command';
+      copyCommand(el.value, label, el);
+    });
+  });
+
+  // ---------- Update Tab Copy Buttons ----------
+  const copyCdBtn = document.getElementById('copyCdBtn');
+  const commandCd = document.getElementById('commandCd');
+  const copyPull1Btn = document.getElementById('copyPull1Btn');
+  const commandPull1 = document.getElementById('commandPull1');
+  const copyPull2Btn = document.getElementById('copyPull2Btn');
+  const commandPull2 = document.getElementById('commandPull2');
+  const copyPull3Btn = document.getElementById('copyPull3Btn');
+  const commandPull3 = document.getElementById('commandPull3');
+  const copyCdGraniteBtn = document.getElementById('copyCdGraniteBtn');
+  const commandCdGranite = document.getElementById('commandCdGranite');
+  const copyUpdateBtn = document.getElementById('copyUpdateBtn');
+  const commandUpdate = document.getElementById('commandUpdate');
+  const copyAllPullsBtn = document.getElementById('copyAllPullsBtn');
+  const copyAllUpdateBtn = document.getElementById('copyAllUpdateBtn');
+
+  copyCdBtn.addEventListener('click', () => copyCommand(commandCd.value, 'CD command', commandCd, updateStatusMsg));
+  copyPull1Btn.addEventListener('click', () => copyCommand(commandPull1.value, 'Pull graniterapids', commandPull1, updateStatusMsg));
+  copyPull2Btn.addEventListener('click', () => copyCommand(commandPull2.value, 'Pull components', commandPull2, updateStatusMsg));
+  copyPull3Btn.addEventListener('click', () => copyCommand(commandPull3.value, 'Pull common', commandPull3, updateStatusMsg));
+  copyCdGraniteBtn.addEventListener('click', () => copyCommand(commandCdGranite.value, 'CD granite', commandCdGranite, updateStatusMsg));
+  copyUpdateBtn.addEventListener('click', () => copyCommand(commandUpdate.value, 'Update command', commandUpdate, updateStatusMsg));
+
+  // Click to copy on inputs
+  [commandCd, commandPull1, commandPull2, commandPull3, commandCdGranite, commandUpdate].forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      el.select();
+      const labels = {
+        'commandCd': 'CD command',
+        'commandPull1': 'Pull graniterapids',
+        'commandPull2': 'Pull components',
+        'commandPull3': 'Pull common',
+        'commandCdGranite': 'CD granite',
+        'commandUpdate': 'Update command'
+      };
+      copyCommand(el.value, labels[el.id] || 'Command', el, updateStatusMsg);
+    });
+  });
+
+  // Copy all pull commands
+  copyAllPullsBtn.addEventListener('click', async () => {
+    const pulls = [
+      commandPull1.value,
+      commandPull2.value,
+      commandPull3.value
+    ].join('\n');
+    const ok = await writeToClipboard(pulls);
+    if (ok) {
+      flashStatus('<i class="fa-solid fa-check-circle"></i> All pull commands copied!',
+                  '#4caf50', 'rgba(76, 175, 80, 0.15)', updateStatusMsg);
+    } else {
+      flashStatus('<i class="fa-solid fa-triangle-exclamation"></i> Copy failed!',
+                  '#f44336', 'rgba(244, 67, 54, 0.1)', updateStatusMsg);
+    }
+  });
+
+  // Copy all update commands (full sequence)
+  copyAllUpdateBtn.addEventListener('click', async () => {
+    const sequence = [
+      commandCd.value,
+      commandPull1.value,
+      commandPull2.value,
+      commandPull3.value,
+      commandCdGranite.value,
+      commandUpdate.value
+    ].join('\n');
+    const ok = await writeToClipboard(sequence);
+    if (ok) {
+      flashStatus('<i class="fa-solid fa-check-circle"></i> All update commands copied!',
+                  '#4caf50', 'rgba(76, 175, 80, 0.15)', updateStatusMsg);
+    } else {
+      flashStatus('<i class="fa-solid fa-triangle-exclamation"></i> Copy failed!',
+                  '#f44336', 'rgba(244, 67, 54, 0.1)', updateStatusMsg);
+    }
+  });
+
+  // ---------- Iframe ----------
+  const iframe = document.getElementById('content-frame');
+  const url = `http://${SERVER_CONFIG.rpiIp}:3000/terminal_1`;
+  iframe.style.opacity = '0';
+  iframe.style.transition = 'opacity 0.4s ease';
+  iframe.onload = () => { iframe.style.opacity = '1'; };
+  iframe.src = url;
+
+  document.addEventListener("DOMContentLoaded", function () {
     loadServerName();
     startConfigPolling();
-});
+  });
 
 </script>
 </body>

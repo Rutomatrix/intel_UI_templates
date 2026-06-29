@@ -583,7 +583,7 @@
   <script src="./scripts/config.js"></script>
   <script>
     // ============================================================
-    // USB IP SETTINGS
+    // USB IP SETTINGS - USING DEDICATED ENDPOINT
     // ============================================================
 
     let currentUsbIp = '';
@@ -625,65 +625,21 @@
       }, 4000);
     }
 
-    // Save USB IP to config.js via API
-    async function saveUsbIp(newIp) {
+    // Update USB IP using the dedicated endpoint
+    async function updateUsbIp(newIp) {
       try {
-        // First, get the current config file content
-        const response = await fetch('/get-config', {
-          cache: 'no-store'
-        });
-        
-        if (!response.ok) {
-          showToast('Failed to read current config', true);
-          return false;
-        }
-        
-        const data = await response.json();
-        if (!data.success || !data.content) {
-          showToast('Failed to read current config', true);
-          return false;
-        }
-        
-        let configContent = data.content;
-        
-        // Update only the usbIp value using regex
-        // This pattern matches usbIp: 'anything' or usbIp: "anything"
-        const usbIpRegex = /(usbIp:\s*['"])([^'"]*)(['"])/;
-        const match = configContent.match(usbIpRegex);
-        
-        if (match) {
-          // Replace only the usbIp value
-          configContent = configContent.replace(usbIpRegex, `$1${newIp}$3`);
-        } else {
-          // If usbIp doesn't exist, add it to the config
-          // Find the closing brace and insert before it
-          const closingBraceIndex = configContent.lastIndexOf('}');
-          if (closingBraceIndex !== -1) {
-            // Check if there's a trailing comma needed
-            const beforeClosing = configContent.substring(0, closingBraceIndex).trim();
-            const needsComma = !beforeClosing.endsWith(',') && !beforeClosing.endsWith('{');
-            const comma = needsComma ? ',' : '';
-            configContent = configContent.substring(0, closingBraceIndex) + 
-                          `${comma}\n    usbIp: '${newIp}'\n` + 
-                          configContent.substring(closingBraceIndex);
-          } else {
-            showToast('Invalid config file format', true);
-            return false;
-          }
-        }
-        
-        // Save the updated content back to the file
-        const saveResponse = await fetch('/save-config', {
+        const response = await fetch('/update-usb-ip', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ content: configContent })
+          body: JSON.stringify({ usbIp: newIp })
         });
         
-        const saveData = await saveResponse.json();
+        const data = await response.json();
+        console.log('Update USB IP response:', data);
         
-        if (saveData.success) {
+        if (data.success) {
           // Update local config object
           if (typeof SERVER_CONFIG !== 'undefined') {
             SERVER_CONFIG.usbIp = newIp;
@@ -699,14 +655,13 @@
           // Update local storage
           localStorage.setItem('usbIp', newIp);
           
-          showToast(`USB IP updated to ${newIp} successfully!`);
           return true;
         } else {
-          showToast(`Error: ${saveData.error || 'Failed to save config'}`, true);
+          showToast(`Failed to save: ${data.error || 'Unknown error'}`, true);
           return false;
         }
       } catch (error) {
-        console.error('Error saving USB IP:', error);
+        console.error('Error updating USB IP:', error);
         showToast(`Error: ${error.message}`, true);
         return false;
       }
@@ -750,28 +705,6 @@
       localStorage.setItem('selectedServer', serverName);
     }
 
-    function loadConfigFromScript() {
-      return new Promise((resolve) => {
-        try {
-          const script = document.createElement('script');
-          script.src = '../static/scripts/config.js?_=' + Date.now();
-          script.onload = function() {
-            if (typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG.serverName) {
-              resolve(SERVER_CONFIG.serverName);
-            } else {
-              resolve(null);
-            }
-          };
-          script.onerror = function() {
-            resolve(null);
-          };
-          document.head.appendChild(script);
-        } catch (e) {
-          resolve(null);
-        }
-      });
-    }
-
     async function loadConfigDirect() {
       try {
         const response = await fetch('../static/scripts/config.js?_=' + Date.now(), {
@@ -787,23 +720,6 @@
       }
     }
 
-    async function loadConfigViaAPI() {
-      try {
-        const response = await fetch('/get-config', {
-          cache: 'no-store'
-        });
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success && data.serverName) {
-            return data.serverName;
-          }
-        }
-        return null;
-      } catch (error) {
-        return null;
-      }
-    }
-
     async function loadServerName() {
       const savedServer = localStorage.getItem('selectedServer');
       if (savedServer && (savedServer === 'SPR' || savedServer === 'GNR')) {
@@ -812,24 +728,16 @@
         return;
       }
       
-      let serverName = await loadConfigViaAPI();
-      if (serverName) {
-        updateServerNameDisplay(serverName);
-        console.log('Server loaded via API:', serverName);
-        return;
-      }
-      
-      serverName = await loadConfigDirect();
+      let serverName = await loadConfigDirect();
       if (serverName) {
         updateServerNameDisplay(serverName);
         console.log('Server loaded via direct fetch:', serverName);
         return;
       }
       
-      serverName = await loadConfigFromScript();
-      if (serverName) {
-        updateServerNameDisplay(serverName);
-        console.log('Server loaded via script tag:', serverName);
+      if (typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG.serverName) {
+        updateServerNameDisplay(SERVER_CONFIG.serverName);
+        console.log('Server loaded from script tag:', SERVER_CONFIG.serverName);
         return;
       }
       
@@ -850,6 +758,28 @@
             if (serverName && serverName !== currentDisplay) {
               console.log('Config file changed! New server:', serverName);
               updateServerNameDisplay(serverName);
+            }
+            
+            // Also check for USB IP changes
+            const usbMatch = content.match(/usbIp:\s*['"]([^'"]+)['"]/);
+            if (usbMatch && usbMatch[1]) {
+              const newUsbIp = usbMatch[1];
+              const currentIp = document.getElementById('currentUsbIpDisplay')?.textContent || '';
+              if (newUsbIp && newUsbIp !== currentIp) {
+                console.log('Config file changed! New USB IP:', newUsbIp);
+                // Update iframe if IP changed
+                updateIframeSource(newUsbIp);
+                if (document.getElementById('currentUsbIpDisplay')) {
+                  document.getElementById('currentUsbIpDisplay').textContent = newUsbIp;
+                }
+                if (document.getElementById('usbIpInput')) {
+                  document.getElementById('usbIpInput').value = newUsbIp;
+                }
+                // Update local config object
+                if (typeof SERVER_CONFIG !== 'undefined') {
+                  SERVER_CONFIG.usbIp = newUsbIp;
+                }
+              }
             }
           }
         } catch (error) {
@@ -922,13 +852,14 @@
         saveBtn.disabled = true;
         saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
         
-        const success = await saveUsbIp(newIp);
+        const success = await updateUsbIp(newIp);
         
         saveBtn.disabled = false;
         saveBtn.innerHTML = '<i class="fas fa-save"></i> Save';
         
         if (success) {
           document.getElementById('ipSettingsModal').style.display = 'none';
+          showToast(`USB IP updated to ${newIp} successfully!`);
         }
       });
       
