@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -123,7 +122,7 @@
             background-color: #1e1e1e;
             border-radius: 10px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-            width: 320px;
+            width: 340px;
             z-index: 101;
             display: none;
             border: 1px solid #333;
@@ -156,6 +155,40 @@
         .menu-subtitle {
             font-size: 0.8rem;
             color: #aaa;
+        }
+        
+        /* RPI IP Display */
+        .rpi-ip-display {
+            padding: 12px 20px;
+            background: rgba(255, 106, 0, 0.08);
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .rpi-ip-display .ip-label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .rpi-ip-display .ip-value {
+            font-family: 'Consolas', monospace;
+            font-size: 0.95rem;
+            color: #ff8c42;
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 12px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 106, 0, 0.2);
+        }
+        
+        .rpi-ip-display .ip-value i {
+            margin-right: 6px;
+            font-size: 0.8rem;
+            color: #ff6a00;
         }
         
         /* Server Selection */
@@ -545,6 +578,23 @@
             opacity: 1;
         }
         
+        /* Loading spinner for save operation */
+        .saving-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 106, 0, 0.3);
+            border-top: 2px solid #ff6a00;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 1200px) {
             .devices-grid {
@@ -602,7 +652,7 @@
                 padding: 2px 12px;
             }
             .menu-dropdown {
-                width: 280px;
+                width: 300px;
                 right: -15px;
             }
             .logo-container {
@@ -626,6 +676,10 @@
             .server-name-display {
                 font-size: 0.9rem;
                 padding: 2px 10px;
+            }
+            .menu-dropdown {
+                width: 270px;
+                right: -15px;
             }
         }
         
@@ -694,6 +748,15 @@
                         <div class="menu-subtitle">Choose the active server</div>
                     </div>
                     
+                    <!-- RPI IP Display -->
+                    <div class="rpi-ip-display">
+                        <span class="ip-label"><i class="fas fa-network-wired"></i> RPI IP Address</span>
+                        <span class="ip-value" id="rpiIpDisplay">
+                            <i class="fas fa-circle" style="color: #00cc66; font-size: 0.5rem;"></i>
+                            <span id="rpiIpText">10.208.50.57</span>
+                        </span>
+                    </div>
+                    
                     <div class="server-selection">
                         <label for="serverSelect">
                             <i class="fas fa-server"></i> Select Server
@@ -707,7 +770,7 @@
                                 <span class="server-label">Current Server:</span>
                                 <span class="server-value" id="currentServerDisplay">SPR</span>
                             </div>
-                            <span class="status-badge">
+                            <span class="status-badge" id="serverStatusBadge">
                                 <i class="fas fa-check-circle"></i>
                                 Active
                             </span>
@@ -973,9 +1036,12 @@
         const serverNameText = document.getElementById('serverNameText');
         const currentServerDisplay = document.getElementById('currentServerDisplay');
         const dashboardServerBadge = document.getElementById('dashboardServerBadge');
+        const serverStatusBadge = document.getElementById('serverStatusBadge');
+        const rpiIpText = document.getElementById('rpiIpText');
         
         // Store current server
         let currentServer = 'SPR';
+        let isSaving = false;
         
         // Function to show notification
         function showNotification(message, type = 'info') {
@@ -996,22 +1062,79 @@
                 notification.classList.add('show');
             }, 10);
             
-            // Auto-hide after 3 seconds
+            // Auto-hide after 4 seconds
             setTimeout(() => {
                 notification.classList.remove('show');
                 setTimeout(() => {
                     notification.remove();
                 }, 300);
-            }, 3000);
+            }, 4000);
         }
         
-        // Helper function to get current USB IP from config
-        function getCurrentUsbIp() {
-            if (typeof SERVER_CONFIG !== 'undefined' && SERVER_CONFIG.usbIp) {
-                return SERVER_CONFIG.usbIp;
+        // Function to save server name to config.js
+        async function saveServerToConfig(serverName) {
+            if (isSaving) return;
+            
+            isSaving = true;
+            
+            // Update status badge to show saving
+            serverStatusBadge.innerHTML = `
+                <span class="saving-spinner"></span>
+                Saving...
+            `;
+            
+            try {
+                // Send only the serverName to update
+                const response = await fetch('/save-config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        serverName: serverName
+                        // Note: usbIp is not sent here, it will be preserved from the existing file
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showNotification(`✅ Server switched to ${serverName} successfully!`, 'success');
+                    
+                    // Update status badge
+                    serverStatusBadge.innerHTML = `
+                        <i class="fas fa-check-circle"></i>
+                        Active
+                    `;
+                    
+                    // Update all displays
+                    updateServerDisplay(serverName);
+                    
+                    // Update localStorage
+                    localStorage.setItem('selectedServer', serverName);
+                    
+                    // Reload the page to apply changes to all components
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                    
+                } else {
+                    showNotification(`❌ Failed to save config: ${data.error}`, 'error');
+                    serverStatusBadge.innerHTML = `
+                        <i class="fas fa-exclamation-circle"></i>
+                        Error
+                    `;
+                }
+            } catch (error) {
+                console.error('Error saving config:', error);
+                showNotification('❌ Network error while saving configuration', 'error');
+                serverStatusBadge.innerHTML = `
+                    <i class="fas fa-exclamation-circle"></i>
+                    Error
+                `;
+            } finally {
+                isSaving = false;
             }
-            // Try to get from localStorage
-            return localStorage.getItem('usbIp') || '10.208.50.57';
         }
         
         // Update all server name displays
@@ -1035,56 +1158,82 @@
             // Update modal server tag if modal is open
             modalServerTag.innerHTML = `<i class="fas fa-server"></i> ${server}`;
             
-            // Store in localStorage for persistence
-            localStorage.setItem('selectedServer', server);
+            // Update select dropdown
+            serverSelect.value = server;
+        }
+        
+        // Update RPI IP display
+        function updateRpiIpDisplay(ip) {
+            if (rpiIpText) {
+                rpiIpText.textContent = ip;
+            }
+            localStorage.setItem('rpiIp', ip);
+        }
+        
+        // Load RPI IP from config
+        async function loadRpiIp() {
+            try {
+                const response = await fetch('/get-config');
+                const data = await response.json();
+                
+                if (data.success && data.content) {
+                    // Parse RPI IP from content
+                    const match = data.content.match(/rpiIp:\s*['"]([^'"]+)['"]/);
+                    if (match && match[1]) {
+                        updateRpiIpDisplay(match[1]);
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.log('Failed to load RPI IP from API');
+            }
+            
+            // Fallback to default
+            updateRpiIpDisplay('10.208.50.57');
         }
         
         // Handle server selection change
         serverSelect.addEventListener('change', function() {
             const selectedServer = this.value;
+            
+            // Update display immediately for responsiveness
             updateServerDisplay(selectedServer);
             
-            // Close menu after selection
-            setTimeout(() => {
-                menuDropdown.classList.remove('active');
-            }, 500);
+            // Close menu
+            menuDropdown.classList.remove('active');
+            
+            // Save only the server name to config.js
+            saveServerToConfig(selectedServer);
         });
         
         // Load saved server preference
-        function loadServerPreference() {
-            // First try to get from localStorage
+        async function loadServerPreference() {
+            try {
+                // First try to get from config.js via API
+                const response = await fetch('/get-config');
+                const data = await response.json();
+                
+                if (data.success && data.serverName) {
+                    const server = data.serverName;
+                    if (server === 'SPR' || server === 'GNR') {
+                        updateServerDisplay(server);
+                        localStorage.setItem('selectedServer', server);
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.log('API fetch failed, falling back to localStorage');
+            }
+            
+            // Fallback to localStorage
             const savedServer = localStorage.getItem('selectedServer');
             if (savedServer && (savedServer === 'SPR' || savedServer === 'GNR')) {
-                serverSelect.value = savedServer;
-                currentServer = savedServer;
                 updateServerDisplay(savedServer);
                 return;
             }
             
-            // If not in localStorage, try to get from config.js via API
-            fetch('/get-config')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.serverName) {
-                        const server = data.serverName;
-                        if (server === 'SPR' || server === 'GNR') {
-                            serverSelect.value = server;
-                            currentServer = server;
-                            updateServerDisplay(server);
-                            return;
-                        }
-                    }
-                    // Default to SPR
-                    serverSelect.value = 'SPR';
-                    currentServer = 'SPR';
-                    updateServerDisplay('SPR');
-                })
-                .catch(() => {
-                    // Default to SPR if API fails
-                    serverSelect.value = 'SPR';
-                    currentServer = 'SPR';
-                    updateServerDisplay('SPR');
-                });
+            // Default to SPR
+            updateServerDisplay('SPR');
         }
         
         // Toggle menu visibility
@@ -1188,6 +1337,7 @@
         // Initialize server preference on load
         document.addEventListener('DOMContentLoaded', function() {
             loadServerPreference();
+            loadRpiIp();
         });
     </script>
 </body>
